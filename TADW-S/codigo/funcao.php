@@ -165,6 +165,18 @@ function listar_feedbacks($conexao) {
     $resultado = mysqli_query($conexao, $sql);
     return mysqli_fetch_all($resultado, MYSQLI_ASSOC);}
 
+
+
+
+
+
+
+
+
+
+
+    
+
 // Funções para manipulação da tabela 'pizza'
 function criar_pizza($conexao, $variedade, $tamanho, $preco, $quantidade, $foto) {
     $sql = "INSERT INTO pizza (variedade, tamanho, preco, quantidade, foto) VALUES (?, ?, ?, ?, ?)";
@@ -192,17 +204,27 @@ function atualizar_pizza($conexao, $id, $variedade, $tamanho, $preco, $quantidad
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;}
-function deletar_pizza($conexao, $idpizza) {    
-    $sql = "DELETE FROM pizza WHERE idpizza = ?";
+function deletar_pizza($conexao, $idpizza) {    $sql = "DELETE FROM pizza WHERE idpizza = ?";
     $comando = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($comando, 'i', $idpizza);
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;}
-function listar_pizzas($conexao) {    
+function listar_pizzas($conexao) {
     $sql = "SELECT * FROM pizza";
-    $resultado = mysqli_query($conexao, $sql);
-    return mysqli_fetch_all($resultado, MYSQLI_ASSOC);}
+    $comando = mysqli_prepare($conexao, $sql);
+
+    mysqli_stmt_execute($comando);
+    $resultado = mysqli_stmt_get_result($comando);
+
+    $lista_pizzas = [];
+    while ($pizza = mysqli_fetch_assoc($resultado)) {
+        $lista_pizzas[] = $pizza;
+    }
+
+    mysqli_stmt_close($comando);
+    return $lista_pizzas;
+}
 
 
 

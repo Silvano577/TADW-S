@@ -38,5 +38,8 @@
         <li>
       <h3>  <a href="formpedido.php">  Registrar pedido   <br> salvar Funcionando </a> </h3>
         </li>
+                <li>
+      <h3>  <a href="listarpizza.php">  lista pizza   <br> listar Funcionando/ foto/ apaga/  </a> </h3>
+        </li>
 </body>
 </html>
