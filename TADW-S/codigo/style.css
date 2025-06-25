@@ -1,70 +1,62 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #fdfdfd;
-    margin: 20px;
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #fdfbfb, #ebedee);
+    color: #333;
+    padding: 40px;
+}
+
+/* Título principal */
 h1 {
     text-align: center;
-    color: #c0392b;
+    margin-bottom: 30px;
+    color: #2c3e50;
 }
 
-table {
-    width: 90%;
-    margin: 0 auto;
-    border-collapse: collapse;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+/* Estilo da lista */
+ul {
+    list-style-type: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 0;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
+/* Cada item da lista */
+li {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
-th {
-    background-color: #e74c3c;
-    color: white;
+li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #f1f1f1;
-}
-
-img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 0 3px rgba(0,0,0,0.3);
-}
-
+/* Links */
 a {
     text-decoration: none;
     color: #2980b9;
-    font-weight: bold;
+    font-size: 18px;
+    line-height: 1.5;
 }
 
 a:hover {
-    text-decoration: underline;
+    color: #1abc9c;
 }
 
-button {
-    display: block;
-    margin: 20px auto;
-    background-color: #27ae60;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #219150;
+/* Texto dentro do h3 */
+h3 {
+    text-align: center;
+    font-size: 20px;
+    font-weight: normal;
 }

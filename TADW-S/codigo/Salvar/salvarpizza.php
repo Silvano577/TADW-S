@@ -1,14 +1,13 @@
 <?php
 
-require_once "conexao.php";
-require_once "funcao.php";
+require_once "../conexao.php";
+require_once "../funcao.php";
 
 // Recebe os dados do formulário
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $variedade = $_POST['variedade'];
 $tamanho = $_POST['tamanho'];
 $preco = $_POST['preco'];
-$quantidade = $_POST['quantidade'];
 
 // Caminho físico onde a foto será salva
 $pasta_fotos = "/var/www/html/fotos/";
@@ -57,13 +56,14 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
 
 // Agora, decide se vai criar ou atualizar
 if ($id > 0) {
-    atualizar_pizza($conexao, $id, $variedade, $tamanho, $preco, $quantidade, $caminho_foto_final);
+    atualizar_pizza($conexao, $id, $variedade, $tamanho, $preco, $caminho_foto_final);
 } else {
-    criar_pizza($conexao, $variedade, $tamanho, $preco, $quantidade, $caminho_foto_final);
+    criar_pizza($conexao, $variedade, $tamanho, $preco, $caminho_foto_final);
 }
 
 // Redireciona de volta
-header("Location: formpizza.php");
+header("Location: ../home.php
+");
 exit;
 
 ?>

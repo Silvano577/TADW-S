@@ -1,8 +1,8 @@
 <?php
     if (isset($_GET['id'])) {
         // Editar pizza existente
-        require_once "conexao.php";
-        require_once "funcao.php";
+        require_once "../conexao.php";
+        require_once "../funcao.php";
 
         $id = $_GET['id'];
 
@@ -12,7 +12,6 @@
             $variedade = $pizza['variedade'];
             $tamanho = $pizza['tamanho'];
             $preco = $pizza['preco'];
-            $quantidade = $pizza['quantidade'];
             $foto = $pizza['foto']; // caminho da imagem no banco
         }
 
@@ -23,7 +22,6 @@
         $variedade = "";
         $tamanho = "";
         $preco = "";
-        $quantidade = "";
         $foto = ""; // nenhuma imagem ainda
 
         $botao = "Cadastrar";
@@ -38,7 +36,7 @@
 <body>
     <h1><?php echo $botao; ?> Pizza</h1>
 
-    <form action="salvarpizza.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data">
+    <form action="../Salvar/salvarpizza.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data">
         <?php if ($id != 0 && !empty($foto)): ?>
             <p>Foto atual:</p>
             <img src="<?php echo $foto; ?>" width="100" alt="Foto da pizza"><br><br>
@@ -56,13 +54,10 @@
         Preço:<br>
         <input type="text" name="preco" value="<?php echo $preco; ?>" required><br><br>
 
-        Quantidade:<br>
-        <input type="number" name="quantidade" value="<?php echo $quantidade; ?>" required><br><br>
-
         <input type="submit" value="<?php echo $botao; ?>">
     </form>
 
-    <form action="home.php" method="get">
+    <form action="../home.php" method="get">
         <button type="submit">Voltar</button>
     </form>
 </body>

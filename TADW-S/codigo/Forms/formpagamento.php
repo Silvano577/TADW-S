@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="salvarpagamento.php" method="post">
+    <form action="../Salvar/salvarpagamento.php" method="post">
         Qual a Forma de Pagamento: <br>
         <input type="text" name="metodo_pagamento"> <br><br>
         Valor: <br>
@@ -20,7 +20,7 @@
 
     </form>
     </form>
-    <form action="home.php" method="get">
+    <form action="../home.php" method="get">
     <button type="submit">Voltar</button>
     </form>
 

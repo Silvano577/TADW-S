@@ -1,7 +1,7 @@
 <?php
 
-require_once "conexao.php";
-require_once "funcao.php";
+require_once "../conexao.php";
+require_once "../funcao.php";
 
 $metodo_pagamento = $_POST['metodo_pagamento'];
 $valor = $_POST['valor'];
@@ -13,5 +13,6 @@ $data_pagamento = $_POST['data_pagamento'];
 $id=0;
     cadastrar_pagamento($conexao, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento);
 
-header("Location: formpagamento.php");
+header("Location: ../home.php
+");
 ?>
