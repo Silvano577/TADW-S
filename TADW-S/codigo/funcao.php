@@ -1,11 +1,13 @@
 <?php
 
 
+
 function criar_usuario($conexao, $usuario, $email, $senha) {
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-    $sql = "INSERT INTO usuario (usuario, email, senha) VALUES (?, ?, ?)";
+    $tipo = 'cliente';
+    $sql = "INSERT INTO usuario (usuario, email, senha, tipo) VALUES (?, ?, ?, ?)";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sss', $usuario, $email, $senha_hash);
+    mysqli_stmt_bind_param($comando, 'ssss', $usuario, $email, $senha_hash, $tipo);
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;
@@ -22,7 +24,8 @@ function buscar_usuario($conexao, $idusuario, $usuario) {
     return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
 }
 
-function atualizar_usuario($conexao, $idusuario , $usuario, $email , $senha) {
+
+function atualizar_usuario($conexao, $idusuario, $usuario, $email, $senha) {
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
     $sql = "UPDATE usuario SET usuario=?, email=?, senha=? WHERE idusuario=?";
     $comando = mysqli_prepare($conexao, $sql);
@@ -31,6 +34,9 @@ function atualizar_usuario($conexao, $idusuario , $usuario, $email , $senha) {
     mysqli_stmt_close($comando);
     return $resultado;
 }
+
+
+
 
 function deletar_usuario($conexao, $idusuario) {
     $sql = "DELETE FROM usuario WHERE idusuario = ?";
@@ -41,6 +47,7 @@ function deletar_usuario($conexao, $idusuario) {
     return $resultado;
 }
 
+
 function listar_usuarios($conexao) {
     $sql = "SELECT * FROM usuario";
     $comando = mysqli_prepare($conexao, $sql);
@@ -50,6 +57,7 @@ function listar_usuarios($conexao) {
     mysqli_stmt_close($comando);
     return $usuarios;
 }
+
 
 
 function criar_cliente($conexao, $nome, $data_ani, $endereco, $telefone, $foto) {
@@ -193,168 +201,66 @@ function listar_feedbacks($conexao) {
     mysqli_stmt_close($comando);
     return $feedbacks;
 } 
-
-function criar_pizza($conexao, $variedade, $tamanho, $preco, $foto) {
-    $sql = "INSERT INTO pizza (variedade, tamanho, preco, foto) VALUES (?, ?, ?, ?)";
+// Criar Produto
+function criar_produto($conexao, $nome, $tipo, $tamanho, $preco, $foto) {
+    $sql = "INSERT INTO produto (nome, tipo, tamanho, preco, foto) VALUES (?, ?, ?, ?, ?)";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ssds', $variedade, $tamanho, $preco, $foto);
+    mysqli_stmt_bind_param($comando, 'sssds', $nome, $tipo, $tamanho, $preco, $foto);
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;
 }
 
-function buscar_pizza($conexao, $idpizza, $variedade) {
-    $sql = "SELECT * FROM pizza WHERE idpizza = ? OR variedade LIKE ?";
+// Buscar Produto por ID ou Nome
+function buscar_produto($conexao, $idproduto, $nome) {
+    $sql = "SELECT * FROM produto WHERE idproduto = ? OR nome LIKE ?";
     $comando = mysqli_prepare($conexao, $sql);
-    $variedade = "%$variedade%";
-    mysqli_stmt_bind_param($comando, 'is', $idpizza, $variedade);
+    $nome = "%$nome%";
+    mysqli_stmt_bind_param($comando, 'is', $idproduto, $nome);
     mysqli_stmt_execute($comando);
     $resultado = mysqli_stmt_get_result($comando);
     mysqli_stmt_close($comando);
     return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
 }
-function atualizar_pizza($conexao, $id, $variedade, $tamanho, $preco, $foto) {    
-    $sql = "UPDATE pizza SET variedade=?, tamanho=?, preco=?, foto=? WHERE idpizza=?";
+
+// Atualizar Produto
+function atualizar_produto($conexao, $id, $nome, $tipo, $tamanho, $preco, $foto) {
+    $sql = "UPDATE produto SET nome=?, tipo=?, tamanho=?, preco=?, foto=? WHERE idproduto=?";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ssdsi', $variedade, $tamanho, $preco, $foto, $id);
+    mysqli_stmt_bind_param($comando, 'sssdsi', $nome, $tipo, $tamanho, $preco, $foto, $id);
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;
 }
 
-function deletar_pizza($conexao, $idpizza) {    $sql = "DELETE FROM pizza WHERE idpizza = ?";
+// Deletar Produto
+function deletar_produto($conexao, $idproduto) {
+    $sql = "DELETE FROM produto WHERE idproduto = ?";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idpizza);
+    mysqli_stmt_bind_param($comando, 'i', $idproduto);
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;
 }
-function listar_pizzas($conexao) {
-    $sql = "SELECT * FROM pizza";
-    $comando = mysqli_prepare($conexao, $sql);
 
+// Listar Produtos
+function listar_produtos($conexao) {
+    $sql = "SELECT * FROM produto";
+    $comando = mysqli_prepare($conexao, $sql);
     mysqli_stmt_execute($comando);
     $resultado = mysqli_stmt_get_result($comando);
 
-    $lista_pizzas = [];
-    while ($pizza = mysqli_fetch_assoc($resultado)) {
-        $lista_pizzas[] = $pizza;
+    $lista_produtos = [];
+    while ($produto = mysqli_fetch_assoc($resultado)) {
+        $lista_produtos[] = $produto;
     }
 
     mysqli_stmt_close($comando);
-    return $lista_pizzas;
+    return $lista_produtos;
 }
 
 
 
-
-
-
-
-
-
-
-function criar_promocao($conexao, $descricao, $preco, $foto) {
-    $sql = "INSERT INTO promocao (descricao, preco, foto) VALUES (?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sds', $descricao, $preco, $foto);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-function buscar_promocao($conexao, $idpromocao, $descricao, $foto) {
-    $sql = "SELECT * FROM promocao WHERE idpromocao = ? OR descricao LIKE ? OR foto LIKE ?";
-    $comando = mysqli_prepare($conexao, $sql);
-
-    $descricao = "%$descricao%";
-    $foto = "%$foto%";
-
-    mysqli_stmt_bind_param($comando, 'iss', $idpromocao, $descricao, $foto);
-
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    mysqli_stmt_close($comando);
-
-    return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-}
-
-function atualizar_promocao($conexao, $id, $descricao, $desconto, $vantagem, $foto) {    
-    $sql = "UPDATE promocao SET descricao=?, preco=?, descricao=?, foto=? WHERE idpromocao=?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sdssi', $descricao, $desconto, $vantagem, $foto, $id);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-function deletar_promocao($conexao, $idpromocao) {    
-    $sql = "DELETE FROM promocao WHERE idpromocao = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idpromocao);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-function listar_promocoes($conexao) {    
-    $sql = "SELECT * FROM promocao";
-    $resultado = mysqli_query($conexao, $sql);
-    return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function cadastrar_bebida($conexao, $marca, $preco, $foto) {
-    $sql = "INSERT INTO bebidas (marca, preco, foto) VALUES (?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sds', $marca, $preco, $foto);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-function buscar_bebida($conexao, $idbebidas, $marca) {
-    $sql = "SELECT * FROM bebidas WHERE idbebidas = ? OR marca LIKE ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    $marca = "%$marca%";
-    mysqli_stmt_bind_param($comando, 'is', $idbebidas, $marca);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    mysqli_stmt_close($comando);
-    return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-}
-function atualizar_bebida($conexao, $id, $marca, $preco, $foto) {    
-    $sql = "UPDATE bebidas SET marca=?, preco=?, foto=? WHERE idbebidas=?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sdsi', $marca, $preco, $foto, $id);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-function deletar_bebida($conexao, $idbebida) {    
-    $sql = "DELETE FROM bebidas WHERE idbebidas = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idbebida);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-function listar_bebidas($conexao) {    
-    $sql = "SELECT * FROM bebidas";
-    $resultado = mysqli_query($conexao, $sql);
-    return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-}
-
-// Funções para manipulação da tabela 'delivery'
 function criar_delivery($conexao, $endereco_entrega, $tempo_entrega) {
     $sql = "INSERT INTO delivery (endereco_entrega, tempo_entrega) VALUES (?, ?)";
     $comando = mysqli_prepare($conexao, $sql);
