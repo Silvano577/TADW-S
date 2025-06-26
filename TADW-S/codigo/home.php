@@ -37,6 +37,10 @@
       <h3>  <a href="./Listar/listarproduto.php">  lista Produto   <br>   </a> </h3>
         </li>
                 </li>
+                <li>
+      <h3>  <a href="./Forms/formcomprarproduto.php">  Compra  <br>   </a> </h3>
+        </li>
+                </li>
 
 
 </body>

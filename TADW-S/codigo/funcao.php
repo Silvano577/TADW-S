@@ -108,14 +108,15 @@ function listar_clientes($conexao) {
     return $clientes;
 }
 
-function criar_pedido($conexao, $delivery, $cliente, $idfeedback, $idpagamento1) {
-    $sql = "INSERT INTO pedido (delivery, cliente, idfeedback, idpagamento1) VALUES (?, ?, ?, ?)";
+function criar_pedido($conexao, $delivery, $cliente, $idfeedback, $idpagamento1, $valortotal) {
+    $sql = "INSERT INTO pedido (delivery, cliente, idfeedback, idpagamento1, valortotal) VALUES (?, ?, ?, ?, ?)";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'iiii', $delivery, $cliente, $idfeedback, $idpagamento1);
+    mysqli_stmt_bind_param($comando, 'iiiid', $delivery, $cliente, $idfeedback, $idpagamento1, $valortotal);
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;
 }
+
 
 function buscar_pedido($conexao, $idpedido) {
     $sql = "SELECT * FROM pedido WHERE idpedido = ?";
@@ -127,14 +128,16 @@ function buscar_pedido($conexao, $idpedido) {
     return mysqli_fetch_assoc($resultado);
 }
 
-function atualizar_pedido($conexao, $id_pedido, $delivery, $cliente, $promocao ) {
-    $sql = "UPDATE pedido SET delivery=?, cliente=?, promocao=? WHERE idpedido=?";
+
+function atualizar_pedido($conexao, $idpedido, $delivery, $cliente, $idfeedback, $idpagamento1, $valortotal) {
+    $sql = "UPDATE pedido SET delivery = ?, cliente = ?, idfeedback = ?, idpagamento1 = ?, valortotal = ? WHERE idpedido = ?";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'iiii', $delivery, $cliente, $promocao, $id_pedido);
+    mysqli_stmt_bind_param($comando, 'iiiidi', $delivery, $cliente, $idfeedback, $idpagamento1, $valortotal, $idpedido);
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;
 }
+
 
 function deletar_pedido($conexao, $idpedido) {
     $sql = "DELETE FROM pedido WHERE idpedido = ?";
@@ -154,6 +157,7 @@ function listar_pedidos($conexao) {
     mysqli_stmt_close($comando);
     return $pedidos;
 }
+
 
 function registrar_feedback($conexao, $assunto, $comentario) {
     $sql = "INSERT INTO feedback (assunto, comentario) VALUES (?, ?)";
@@ -303,6 +307,21 @@ function listar_pagamentos($conexao) {
     $sql = "SELECT * FROM pagamento";
     $resultado = mysqli_query($conexao, $sql);
     return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+}
+
+
+
+function salvarAtualizarItemPedido($conexao, $idpedido, $idproduto, $quantidade) {
+    $sql = "INSERT INTO pedido_produto (idpedido, idproduto, quantidade) VALUES (?, ?, ?) 
+    ON DUPLICATE KEY UPDATE quantidade = quantidade + VALUES(quantidade)";
+
+    $comando = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($comando, 'iii', $idpedido, $idproduto, $quantidade);
+
+    $sucesso = mysqli_stmt_execute($comando);
+    mysqli_stmt_close($comando);
+
+    return $sucesso;
 }
 
 ?>

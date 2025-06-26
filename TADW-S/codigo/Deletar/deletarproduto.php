@@ -4,23 +4,23 @@ require_once "../funcao.php";
 
 $id = intval($_GET['id']);
 
-// 1) Busca a bebida para pegar o caminho da foto
-$bebida = buscar_bebida($conexao, $id, "");
-if (!empty($bebida)) {
-    $foto = $bebida[0]['foto'];  // Exemplo: "fotos/abc123.png"
+// 1) Buscar o produto no banco para obter o caminho da foto
+$produto = buscar_produto($conexao, $id, "");
+if (!empty($produto)) {
+    $foto = $produto[0]['foto']; // Ex: "fotos/abc123.jpg"
 
-    // Caminho absoluto da foto
+    // Caminho absoluto no servidor
     $arquivo = "/var/www/html/" . $foto;
 
-    // Se o arquivo existir, apaga
+    // Apagar a imagem se ela existir fisicamente
     if (file_exists($arquivo)) {
         unlink($arquivo);
     }
 }
 
-// 2) Apaga o registro no banco
-if (deletar_bebida($conexao, $id)) {
-    header("Location: ../Listar/listarbebida.php");
+// 2) Apagar o registro do banco
+if (deletar_produto($conexao, $id)) {
+    header("Location: ../Listar/listarproduto.php");
 } else {
     header("Location: ../home.php");
 }

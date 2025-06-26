@@ -1,18 +1,18 @@
 <?php
+    require_once "../conexao.php";
+    require_once "../funcao.php";
+
     if (isset($_GET['id'])) {
         // Editar pedido existente
-        require_once "../conexao.php";
-        require_once "../funcao.php";
-
         $id = $_GET['id'];
+        $pedido = buscar_pedido($conexao, $id);
 
-        $pedido = buscar_pedido($conexao, $id, "");
         if (!empty($pedido)) {
-            $pedido = $pedido[0];
             $delivery = $pedido['delivery'];
             $cliente = $pedido['cliente'];
             $idfeedback = $pedido['idfeedback'];
             $idpagamento1 = $pedido['idpagamento1'];
+            $valortotal = $pedido['valortotal'];
         }
 
         $botao = "Atualizar";
@@ -23,6 +23,7 @@
         $cliente = "";
         $idfeedback = "";
         $idpagamento1 = "";
+        $valortotal = "";
 
         $botao = "Cadastrar";
     }
@@ -38,16 +39,19 @@
 
     <form action="../Salvar/salvarpedido.php?id=<?php echo $id; ?>" method="post">
         Delivery:<br>
-        <input type="text" name="delivery" value="<?php echo $delivery; ?>" required><br><br>
+        <input type="number" name="delivery" value="<?php echo $delivery; ?>" required><br><br>
 
         Cliente:<br>
-        <input type="text" name="cliente" value="<?php echo $cliente; ?>" required><br><br>
+        <input type="number" name="cliente" value="<?php echo $cliente; ?>" required><br><br>
 
         ID Feedback:<br>
-        <input type="text" name="idfeedback" value="<?php echo $idfeedback; ?>"><br><br>
+        <input type="number" name="idfeedback" value="<?php echo $idfeedback; ?>"><br><br>
 
         ID Pagamento:<br>
-        <input type="text" name="idpagamento1" value="<?php echo $idpagamento1; ?>"><br><br>
+        <input type="number" name="idpagamento1" value="<?php echo $idpagamento1; ?>" required><br><br>
+
+        Valor Total (R$):<br>
+        <input type="number" step="0.01" name="valortotal" value="<?php echo $valortotal; ?>" required><br><br>
 
         <input type="submit" value="<?php echo $botao; ?>">
     </form>
