@@ -108,13 +108,27 @@ function listar_clientes($conexao) {
     return $clientes;
 }
 
-function criar_pedido($conexao, $delivery, $cliente, $idfeedback, $idpagamento1, $valortotal) {
-    $sql = "INSERT INTO pedido (delivery, cliente, idfeedback, idpagamento1, valortotal) VALUES (?, ?, ?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'iiiid', $delivery, $cliente, $idfeedback, $idpagamento1, $valortotal);
-    $resultado = mysqli_stmt_execute($comando);
+function salvarPedido($conexao, $delivery, $cliente, $idpagamento1, $valortotal, $idfeedback = null) {
+    // Verifica se idfeedback é nulo e ajusta a SQL
+    if ($idfeedback === null) {
+        $sql = "INSERT INTO pedido (delivery, cliente, idpagamento1, valortotal) VALUES (?, ?, ?, ?)";
+        $comando = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($comando, 'iiid', $delivery, $cliente, $idpagamento1, $valortotal);
+    } else {
+        $sql = "INSERT INTO pedido (delivery, cliente, idfeedback, idpagamento1, valortotal) VALUES (?, ?, ?, ?, ?)";
+        $comando = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($comando, 'iiiid', $delivery, $cliente, $idfeedback, $idpagamento1, $valortotal);
+    }
+
+    $funcionou = mysqli_stmt_execute($comando);
+
+    // Pega o ID do pedido gerado automaticamente
+    $idpedido = mysqli_insert_id($conexao);
+
     mysqli_stmt_close($comando);
-    return $resultado;
+
+    // Retorna o ID do pedido inserido ou 0 em caso de erro
+    return $funcionou ? $idpedido : 0;
 }
 
 
@@ -130,13 +144,22 @@ function buscar_pedido($conexao, $idpedido) {
 
 
 function atualizar_pedido($conexao, $idpedido, $delivery, $cliente, $idfeedback, $idpagamento1, $valortotal) {
-    $sql = "UPDATE pedido SET delivery = ?, cliente = ?, idfeedback = ?, idpagamento1 = ?, valortotal = ? WHERE idpedido = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'iiiidi', $delivery, $cliente, $idfeedback, $idpagamento1, $valortotal, $idpedido);
+    if ($idfeedback === null) {
+        $sql = "UPDATE pedido SET delivery = ?, cliente = ?, idpagamento1 = ?, valortotal = ? WHERE idpedido = ?";
+        $comando = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($comando, 'iiidi', $delivery, $cliente, $idpagamento1, $valortotal, $idpedido);
+    } else {
+        $sql = "UPDATE pedido SET delivery = ?, cliente = ?, idfeedback = ?, idpagamento1 = ?, valortotal = ? WHERE idpedido = ?";
+        $comando = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($comando, 'iiiidi', $delivery, $cliente, $idfeedback, $idpagamento1, $valortotal, $idpedido);
+    }
+
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
+
     return $resultado;
 }
+
 
 
 function deletar_pedido($conexao, $idpedido) {
@@ -308,7 +331,6 @@ function listar_pagamentos($conexao) {
     $resultado = mysqli_query($conexao, $sql);
     return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
 }
-
 
 
 function salvarAtualizarItemPedido($conexao, $idpedido, $idproduto, $quantidade) {

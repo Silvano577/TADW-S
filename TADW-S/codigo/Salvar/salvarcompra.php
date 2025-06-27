@@ -2,26 +2,20 @@
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-// Verificar se os dados foram enviados
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $idpedido = intval($_POST['idpedido']);
-    $idproduto = intval($_POST['idproduto']);
-    $quantidade = intval($_POST['quantidade']);
+// Coleta os dados do formulário
+$idpedido = isset($_POST['idpedido']) ? intval($_POST['idpedido']) : 0;
+$idproduto = isset($_POST['idproduto']) ? intval($_POST['idproduto']) : 0;
+$quantidade = isset($_POST['quantidade']) ? intval($_POST['quantidade']) : 1;
 
-    if ($idpedido > 0 && $idproduto > 0 && $quantidade > 0) {
-        $sucesso = salvarAtualizarItemPedido($conexao, $idpedido, $idproduto, $quantidade);
+if ($idpedido > 0 && $idproduto > 0 && $quantidade > 0) {
+    $sucesso = salvarAtualizarItemPedido($conexao, $idpedido, $idproduto, $quantidade);
 
-        if ($sucesso) {
-            echo "<p>Produto adicionado com sucesso ao pedido!</p>";
-        } else {
-            echo "<p>Erro ao adicionar produto ao pedido.</p>";
-        }
+    if ($sucesso) {
+        header("Location: ../Formularios/form_comprar_produto.php?idpedido=" . $idpedido);
+        exit;
     } else {
-        echo "<p>Dados inválidos enviados.</p>";
+        echo "Erro ao adicionar produto ao pedido.";
     }
 } else {
-    echo "<p>Requisição inválida.</p>";
+    echo "Dados inválidos.";
 }
-?>
-
-<a href="formcomprarproduto.php?idpedido=<?php echo $idpedido; ?>">Voltar ao formulário</a>
