@@ -1,4 +1,9 @@
 <?php
+
+require_once "protege.php";
+protegeTipo('ADM'); // só ADM pode acessar
+
+
 require_once "../conexao.php";
 require_once "../funcao.php";
 

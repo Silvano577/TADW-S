@@ -1,4 +1,6 @@
 <?php
+    require_once "../protege.php"; // ajuste o caminho relativo
+    
     if (isset($_GET['id'])) {
         // Editar delivery existente
         require_once "../conexao.php";

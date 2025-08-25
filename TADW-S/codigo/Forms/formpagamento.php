@@ -1,3 +1,7 @@
+<?php
+require_once "protege.php"; // ajuste o caminho relativo
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

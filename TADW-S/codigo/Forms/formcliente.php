@@ -1,4 +1,11 @@
 <?php
+
+    require_once "../protege.php"; // ajuste o caminho relativo
+
+
+
+
+
     if (isset($_GET['id'])) {
         // Editar cliente existente
         require_once "../conexao.php";

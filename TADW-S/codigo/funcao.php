@@ -6,10 +6,10 @@ function criar_usuario($conexao, $usuario, $email, $senha) {
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
     $tipo = 'cliente';
     $sql = "INSERT INTO usuario (usuario, email, senha, tipo) VALUES (?, ?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ssss', $usuario, $email, $senha_hash, $tipo);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ssss', $usuario, $email, $senha_hash, $tipo);
+    $resultado = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
     return $resultado;
 }
 
@@ -25,15 +25,24 @@ function buscar_usuario($conexao, $idusuario, $usuario) {
 }
 
 
-function atualizar_usuario($conexao, $idusuario, $usuario, $email, $senha) {
-    $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-    $sql = "UPDATE usuario SET usuario=?, email=?, senha=? WHERE idusuario=?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sssi', $usuario, $email, $senha_hash, $idusuario);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
+function atualizar_usuario($conexao, $idusuario, $usuario, $email, $senha = null) {
+    if ($senha !== null && $senha !== '') {
+        // Atualiza senha
+        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+        $sql = "UPDATE usuario SET usuario=?, email=?, senha=? WHERE idusuario=?";
+        $stmt = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($stmt, 'sssi', $usuario, $email, $senha_hash, $idusuario);
+    } else {
+        // Mantém a senha antiga
+        $sql = "UPDATE usuario SET usuario=?, email=? WHERE idusuario=?";
+        $stmt = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($stmt, 'ssi', $usuario, $email, $idusuario);
+    }
+    $resultado = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
     return $resultado;
 }
+
 
 
 

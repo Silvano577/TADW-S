@@ -1,4 +1,8 @@
 <?php
+
+
+require_once "protege.php"; // ajuste o caminho relativo
+
     require_once "../conexao.php";
     require_once "../funcao.php";
 
