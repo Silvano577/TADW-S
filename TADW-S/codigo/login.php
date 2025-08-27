@@ -4,16 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso ao Sistema</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px; }
-        form { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        input[type="text"], input[type="password"] { width: 100%; padding: 8px; margin: 5px 0 15px; border-radius: 4px; border: 1px solid #ccc; }
-        input[type="submit"] { padding: 10px 20px; border: none; border-radius: 4px; background-color: #28a745; color: white; cursor: pointer; }
-        input[type="submit"]:hover { background-color: #218838; }
-        .erro { color: red; margin-bottom: 15px; }
-        a { text-decoration: none; color: #007bff; }
-        a:hover { text-decoration: underline; }
-    </style>
+
 </head>
 <body>
     <h2 style="text-align:center;">Acesso ao Sistema</h2>

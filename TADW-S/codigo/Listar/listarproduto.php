@@ -5,30 +5,31 @@ require_once "../funcao.php";
 // Filtro opcional por tipo
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : "";
 
-// Se tipo estiver definido, busca com filtro
+// Buscar produtos usando a função listar_produtos()
 $lista_produtos = [];
+$todos = listar_produtos($conexao);
 if ($tipo) {
-    $todos = listar_produtos($conexao);
     foreach ($todos as $produto) {
         if ($produto['tipo'] === $tipo) {
             $lista_produtos[] = $produto;
         }
     }
 } else {
-    $lista_produtos = listar_produtos($conexao);
+    $lista_produtos = $todos;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Lista de Produtos</title>
+    <title>Produtos - Pizzaria Delícia</title>
+    <link rel="stylesheet" href="../css/lista_produto.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Lista de Produtos</h1>
+    <h1>Produtos</h1>
 
-    <form method="get" action="">
+    <form method="get" action="" class="filtro-form">
         <label>Filtrar por tipo:</label>
         <select name="tipo" onchange="this.form.submit()">
             <option value="">Todos</option>
@@ -38,42 +39,33 @@ if ($tipo) {
         </select>
     </form>
 
-    <?php if (count($lista_produtos) == 0): ?>
+    <?php if (count($lista_produtos) === 0): ?>
         <p style="text-align:center;">Nenhum produto encontrado.</p>
     <?php else: ?>
-        <table border="1">
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Tipo</th>
-                <th>Tamanho</th>
-                <th>Preço</th>
-                <th>Foto</th>
-                <th colspan="2">Ações</th>
-            </tr>
+        <div class="grid">
             <?php foreach ($lista_produtos as $produto): ?>
-                <tr>
-                    <td><?= $produto['idproduto'] ?></td>
-                    <td><?= htmlspecialchars($produto['nome']) ?></td>
-                    <td><?= $produto['tipo'] ?></td>
-                    <td><?= $produto['tamanho'] ?? '-' ?></td>
-                    <td>R$ <?= number_format($produto['preco'], 2, ',', '.') ?></td>
-                    <td>
-                        <?php if (!empty($produto['foto'])): ?>
-                            <img src="<?= $produto['foto'] ?>" width="80" alt="Foto do produto">
-                        <?php else: ?>
-                            Sem imagem
-                        <?php endif; ?>
-                    </td>
-                    <td><a href="../Forms/formproduto.php?id=<?= $produto['idproduto'] ?>">Editar</a></td>
-                    <td><a href="../Deletar/deletarproduto.php?id=<?= $produto['idproduto'] ?>" onclick="return confirm('Deseja realmente excluir este produto?');">Excluir</a></td>
-                </tr>
+                <div class="card">
+                    <?php if (!empty($produto['foto'])): ?>
+                        <!-- Usa basename para pegar apenas o nome do arquivo -->
+                        <img src="../fotos/<?= basename($produto['foto']) ?>" alt="<?= htmlspecialchars($produto['nome']) ?>">
+                    <?php else: ?>
+                        <div class="no-image">Sem imagem</div>
+                    <?php endif; ?>
+                    <h3><?= htmlspecialchars($produto['nome']) ?></h3>
+                    <p>Tipo: <?= $produto['tipo'] ?></p>
+                    <?php if (!empty($produto['tamanho'])): ?>
+                        <p>Tamanho: <?= htmlspecialchars($produto['tamanho']) ?></p>
+                    <?php endif; ?>
+                    <p>R$ <?= number_format($produto['preco'], 2, ',', '.') ?></p>
+                    <a href="../Forms/formproduto.php?id=<?= $produto['idproduto'] ?>" class="btn">Editar</a>
+                    <a href="../Deletar/deletarproduto.php?id=<?= $produto['idproduto'] ?>" onclick="return confirm('Deseja realmente excluir este produto?');" class="btn btn-delete">Excluir</a>
+                </div>
             <?php endforeach; ?>
-        </table>
+        </div>
     <?php endif; ?>
 
-    <form action="../home.php" method="get">
-        <button type="submit">Voltar</button>
-    </form>
+    <div style="text-align:center; margin-top:20px;">
+        <a href="../homeAdm.php" class="btn-voltar">Voltar</a>
+    </div>
 </body>
 </html>

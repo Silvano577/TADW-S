@@ -9,7 +9,7 @@ protegeTipo('adm'); // garante que só ADM acesse
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Sistema Pizzaria</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/adm.css">
     <!-- Google Fonts e FontAwesome para ícones -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">

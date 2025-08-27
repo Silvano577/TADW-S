@@ -1,0 +1,134 @@
+/* Reset básico e fonte */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #8B0000;
+    padding: 15px 30px;
+    color: #fff;
+    flex-wrap: wrap;
+}
+
+header .logo {
+    font-size: 28px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+header .logo img {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+}
+
+header .user-info {
+    font-weight: 500;
+}
+
+header .logout a {
+    color: #fff;
+    text-decoration: none;
+    background-color: #c00000;
+    padding: 6px 12px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+header .logout a:hover {
+    background-color: #a00000;
+}
+
+/* Main */
+main.dashboard {
+    padding: 30px;
+    text-align: center;
+}
+
+main.dashboard h1 {
+    margin-bottom: 30px;
+    font-size: 32px;
+    color: #8B0000;
+}
+
+/* Menu grid */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.menu-grid li {
+    list-style: none;
+}
+
+.menu-grid li a {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background-color: #fff;
+    color: #8B0000;
+    text-decoration: none;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-weight: 600;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.menu-grid li a i {
+    font-size: 32px;
+}
+
+/* Hover efeito */
+.menu-grid li a:hover {
+    transform: translateY(-5px);
+    background-color: #f2f2f2;
+}
+
+/* Footer */
+footer {
+    margin-top: 40px;
+    background-color: #8B0000;
+    color: #fff;
+    padding: 15px 20px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    main.dashboard h1 {
+        font-size: 28px;
+    }
+
+    .menu-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+    }
+}

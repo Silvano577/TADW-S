@@ -57,6 +57,6 @@ if ($id > 0) {
 }
 
 // Redireciona
-header("Location: ../home.php");
+header("Location: ../homeAdm.php");
 exit;
 ?>
