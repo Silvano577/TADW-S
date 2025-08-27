@@ -29,6 +29,6 @@ if ($id > 0) {
 }
 
 // Redireciona para a página de login
-header("Location: ../index.php");
+header("Location: ../login.php");
 exit;
 ?>

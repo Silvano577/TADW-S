@@ -146,13 +146,8 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
 INSERT INTO usuario (usuario, email, senha, tipo) 
-VALUES ('Administrador', 'admin@pizzaria.com', '123456', 'ADM');
+VALUES ('Administrador', 'admin@pizzaria.com', '$2y$10$iEmilq/3TWnh.vKZHJ9jG.NdwVSI9CE5mi0EaeFuSnfiPBcd0JPbS', 'adm');
 
 
 
-INSERT INTO pizza (variedade, tamanho, preco, quantidade, foto)
-VALUES
-('Calabresa', 'Grande', 39.90, 10, 'assets/img/pizza1.jpg'),
-('Frango com Catupiry', 'Grande', 42.90, 10, 'assets/img/pizza2.jpg'),
-('Marguerita', 'Grande', 44.90, 10, 'assets/img/pizza3.jpg');
 

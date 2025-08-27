@@ -1,5 +1,7 @@
 <?php
-require_once "protege.php"; // ajuste o caminho relativo
+require_once "protege.php";
+protegeTipo('adm'); // garante que só ADM acesse
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">

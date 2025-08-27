@@ -45,7 +45,7 @@ if (isset($_GET['id'])) {
         <input type="submit" value="<?php echo $botao; ?>">
     </form>
 
-    <form action="../index.php" method="get">
+    <form action="../login.php" method="get">
         <button type="submit">Voltar</button>
     </form>
 </body>

@@ -20,7 +20,7 @@ function protegeTipo($tipoNecessario) {
     global $tipo;
     if ($tipo !== $tipoNecessario) {
         // Redireciona para a home do tipo correspondente
-        if ($tipo === 'ADM') {
+        if ($tipo === 'adm') {
             header("Location: ../homeAdm.php");
         } else {
             header("Location: ../home_cliente.php");

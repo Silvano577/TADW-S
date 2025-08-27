@@ -1,7 +1,7 @@
 <?php
 
-require_once "protege.php";
-protegeTipo('ADM'); // só ADM pode acessar
+require_once "../protege.php";
+protegeTipo('adm'); // só ADM pode acessar
 
 
 require_once "../conexao.php";
@@ -93,7 +93,7 @@ if (isset($_GET['id'])) {
         <input type="submit" value="<?php echo $botao; ?>">
     </form>
 
-    <form action="../home.php" method="get">
+    <form action="../homeAdm.php" method="get">
         <button type="submit">Voltar</button>
     </form>
 </body>
