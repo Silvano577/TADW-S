@@ -1,6 +1,8 @@
 <?php
 // protege.php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Se não estiver logado, redireciona para login
 if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
@@ -10,11 +12,11 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
 
 // Disponibiliza os dados do usuário
 $usuario = $_SESSION['usuario'] ?? 'Usuário';
-$tipo = $_SESSION['tipo'] ?? ''; // ADM ou usuario
+$tipo = $_SESSION['tipo'] ?? ''; // adm ou usuario
 
 /**
  * Função para proteger páginas específicas por tipo
- * Uso: protegeTipo('ADM'); ou protegeTipo('usuario');
+ * Uso: protegeTipo('adm'); ou protegeTipo('usuario');
  */
 function protegeTipo($tipoNecessario) {
     global $tipo;

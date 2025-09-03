@@ -8,6 +8,12 @@
 </head>
 <body>
     <header>
+        <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
         <div class="logo">
             <img src="../fotosc/images.png" alt="Logo Pizzaria">
         </div>

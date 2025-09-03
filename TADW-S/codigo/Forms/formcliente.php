@@ -69,7 +69,7 @@
         <input type="submit" value="<?php echo $botao; ?>">
     </form>
 
-    <form action="../home.php" method="get">
+    <form action="../homeAdm.php" method="get">
         <button type="submit">Voltar</button>
     </form>
 </body>

@@ -1,4 +1,9 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+
 require_once "conexao.php"; 
 
 // Buscar todos os produtos (pizzas e bebidas)
@@ -20,19 +25,32 @@ if ($result && $result->num_rows > 0) {
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <img src="../fotosc/images.png" alt="Logo Pizzaria">
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.php" class="ativo">Início</a></li>
-                <li><a href="sobre.php">Sobre</a></li>
-                <li><a href="contato.php">Contato</a></li>
+<header>
+    <div class="logo">
+        <img src="../fotosc/images.png" alt="Logo Pizzaria">
+    </div>
+    <nav>
+        <ul>
+            <li><a href="index.php" class="ativo">Início</a></li>
+            <li><a href="sobre.php">Sobre</a></li>
+
+            <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim' && ($_SESSION['tipo'] ?? '') === 'adm'): ?>
+
+                <li><a href="homeAdm.php">Admin</a></li>
+            <?php endif; ?>
+
+            <li><a href="contato.php">Contato</a></li>
+
+            <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim'): ?>
+                <li class="saudacao">Olá, <?= htmlspecialchars($_SESSION['usuario'] ?? ''); ?></li>
+                <li><a href="deslogar.php">Sair</a></li>
+            <?php else: ?>
                 <li><a href="login.php">Login</a></li>
-            </ul>
-        </nav>
-    </header>
+            <?php endif; ?>
+        </ul>
+    </nav>
+</header>
+
 
     <main>
         <h1>Bem-vindo à nossa Pizzaria!</h1>

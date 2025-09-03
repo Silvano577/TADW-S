@@ -14,7 +14,7 @@ if ($idpedido > 0 && !empty($idprodutos)) {
         $qtd = isset($quantidades[$idproduto]) ? intval($quantidades[$idproduto]) : 1;
 
         if ($idproduto > 0 && $qtd > 0) {
-            $sucesso = salvarAtualizarItemPedido($conexao, $idpedido, $idproduto, $qtd);
+            $sucesso = salvar_venda($conexao, $idpedido, $idproduto, $qtd);
             if (!$sucesso) {
                 $sucesso_total = false;
             }

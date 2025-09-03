@@ -1,55 +1,49 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once "conexao.php";
 
-// Recebe dados do formulário
-$email = $_POST['email'] ?? '';
+// 1) Receber e validar
+$email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $senha = $_POST['senha'] ?? '';
 
-// Verifica se os campos foram preenchidos
-if (empty($email) || empty($senha)) {
-    header("Location: index.php?erro=campos");
+if ($email === '' || $senha === '') {
+    header("Location: login.php?erro=campos");
     exit;
 }
 
-// Prepara a query para evitar SQL Injection
-$sql = "SELECT * FROM usuario WHERE email = ?";
+// 2) Buscar usuário com prepared statement
+$sql = "SELECT idusuario, usuario, email, senha, tipo FROM usuario WHERE email = ?";
 $stmt = mysqli_prepare($conexao, $sql);
+if (!$stmt) {
+    // Em produção, logar erro; aqui só volta com mensagem genérica
+    header("Location: login.php?erro=email");
+    exit;
+}
 mysqli_stmt_bind_param($stmt, "s", $email);
 mysqli_stmt_execute($stmt);
-$resultado = mysqli_stmt_get_result($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$linha = $result ? mysqli_fetch_assoc($result) : null;
 
-// Verifica se encontrou o usuário
-$linha = mysqli_fetch_assoc($resultado);
 if (!$linha) {
-    // Email não encontrado
-    header("Location: index.php?erro=email");
+    header("Location: login.php?erro=email");
     exit;
 }
 
-$senha_banco = $linha['senha'];
-$tipo = $linha['tipo'];
-$usuario_nome = $linha['usuario']; // <-- coluna correta da tabela
-
-// Verifica a senha
-// Verifica a senha
-if (password_verify($senha, $senha_banco)) {
-    session_start();
-    session_regenerate_id(true); // protege a sessão
-    $_SESSION['logado'] = 'sim';
-    $_SESSION['tipo'] = $tipo;
-    $_SESSION['usuario'] = $usuario_nome;
-
-    // Redireciona conforme o tipo
-    if ($tipo === 'adm') {
-        header("Location: homeAdm.php");
-    } else {
-        header("Location: index.php");
-    }
-    exit;
-} else {
-    // Senha incorreta
+// 3) Conferir senha (assumindo senha hash com password_hash)
+if (!password_verify($senha, $linha['senha'])) {
     header("Location: login.php?erro=senha");
     exit;
 }
 
-?>
+// 4) Logar e redirecionar SEMPRE ao index
+session_regenerate_id(true);
+$_SESSION['logado']   = 'sim';
+$_SESSION['idusuario']= $linha['idusuario'] ?? null;
+$_SESSION['usuario']  = $linha['usuario'];   // nome do usuário
+$_SESSION['tipo']     = $linha['tipo'];      // 'adm' ou 'cliente'
+
+// Opcional: parâmetro só para dar um "bem-vindo" no index
+header("Location: index.php?bemvindo=1");
+exit;

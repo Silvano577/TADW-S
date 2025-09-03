@@ -23,7 +23,7 @@ if ($tipo) {
 <head>
     <meta charset="UTF-8">
     <title>Produtos - Pizzaria Delícia</title>
-    <link rel="stylesheet" href="../css/lista_produto.css">
+    <link rel="stylesheet" href="../css/lista_padrao.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
