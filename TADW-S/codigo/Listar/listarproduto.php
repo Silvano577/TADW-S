@@ -4,18 +4,20 @@ require_once "../funcao.php";
 
 // Filtro opcional por tipo
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : "";
+// Busca opcional por nome
+$busca = isset($_GET['busca']) ? trim($_GET['busca']) : "";
 
-// Buscar produtos usando a função listar_produtos()
-$lista_produtos = [];
+// Buscar todos os produtos
 $todos = listar_produtos($conexao);
-if ($tipo) {
-    foreach ($todos as $produto) {
-        if ($produto['tipo'] === $tipo) {
-            $lista_produtos[] = $produto;
-        }
+
+// Aplicar filtro de tipo e busca por nome
+$lista_produtos = [];
+foreach ($todos as $produto) {
+    $matchTipo = $tipo === "" || $produto['tipo'] === $tipo;
+    $matchNome = $busca === "" || stripos($produto['nome'], $busca) !== false;
+    if ($matchTipo && $matchNome) {
+        $lista_produtos[] = $produto;
     }
-} else {
-    $lista_produtos = $todos;
 }
 ?>
 <!DOCTYPE html>
@@ -29,36 +31,42 @@ if ($tipo) {
 <body>
     <h1>Produtos</h1>
 
-    <form method="get" action="" class="filtro-form">
-        <label>Filtrar por tipo:</label>
-        <select name="tipo" onchange="this.form.submit()">
+    <!-- Barra de pesquisa e filtro usando as mesmas classes do listar usuário -->
+    <form method="get" class="form-pesquisa">
+        <input type="text" name="busca" placeholder="Pesquisar produto..."
+               value="<?= htmlspecialchars($busca) ?>" class="input-pesquisa">
+        <select name="tipo" onchange="this.form.submit()" class="input-pesquisa">
             <option value="">Todos</option>
             <option value="pizza" <?= $tipo === 'pizza' ? 'selected' : '' ?>>Pizza</option>
             <option value="bebida" <?= $tipo === 'bebida' ? 'selected' : '' ?>>Bebida</option>
             <option value="promocao" <?= $tipo === 'promocao' ? 'selected' : '' ?>>Promoção</option>
         </select>
+        <button type="submit" class="btn-pesquisa">Buscar</button>
+        <?php if ($busca !== "" || $tipo !== ""): ?>
+            <a href="listarproduto.php" class="link-limpar">Limpar</a>
+        <?php endif; ?>
     </form>
 
-    <?php if (count($lista_produtos) === 0): ?>
+    <?php if (empty($lista_produtos)): ?>
         <p style="text-align:center;">Nenhum produto encontrado.</p>
     <?php else: ?>
         <div class="grid">
             <?php foreach ($lista_produtos as $produto): ?>
                 <div class="card">
                     <?php if (!empty($produto['foto'])): ?>
-                        <!-- Usa basename para pegar apenas o nome do arquivo -->
                         <img src="../fotos/<?= basename($produto['foto']) ?>" alt="<?= htmlspecialchars($produto['nome']) ?>">
                     <?php else: ?>
                         <div class="no-image">Sem imagem</div>
                     <?php endif; ?>
                     <h3><?= htmlspecialchars($produto['nome']) ?></h3>
-                    <p>Tipo: <?= $produto['tipo'] ?></p>
+                    <p>Tipo: <?= htmlspecialchars($produto['tipo']) ?></p>
                     <?php if (!empty($produto['tamanho'])): ?>
                         <p>Tamanho: <?= htmlspecialchars($produto['tamanho']) ?></p>
                     <?php endif; ?>
                     <p>R$ <?= number_format($produto['preco'], 2, ',', '.') ?></p>
                     <a href="../Forms/formproduto.php?id=<?= $produto['idproduto'] ?>" class="btn">Editar</a>
-                    <a href="../Deletar/deletarproduto.php?id=<?= $produto['idproduto'] ?>" onclick="return confirm('Deseja realmente excluir este produto?');" class="btn btn-delete">Excluir</a>
+                    <a href="../Deletar/deletarproduto.php?id=<?= $produto['idproduto'] ?>" class="btn btn-delete"
+                       onclick="return confirm('Deseja realmente excluir este produto?');">Excluir</a>
                 </div>
             <?php endforeach; ?>
         </div>

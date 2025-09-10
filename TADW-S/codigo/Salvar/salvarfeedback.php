@@ -16,7 +16,7 @@ if ($id > 0) {
 }
 
 // Redireciona para a home
-header("Location: ../home.php");
+header("Location: ../homeAdm.php");
 exit;
 
 ?>

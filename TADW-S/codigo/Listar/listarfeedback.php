@@ -1,38 +1,38 @@
-
 <?php
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-$lista_feedbacks = listar_feedbacks($conexao);
+$feedbacks = listar_feedback($conexao);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Feedbacks - Pizzaria Delícia</title>
-    <link rel="stylesheet" href="../css/lista_padrao.css">
+    <title>Listar Feedbacks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/lista_padrao.css">
 </head>
 <body>
-    <h1>Feedbacks</h1>
+<h1>Feedbacks</h1>
 
-    <?php if (count($lista_feedbacks) === 0): ?>
-        <p style="text-align:center;">Nenhum feedback encontrado.</p>
-    <?php else: ?>
-        <div class="grid">
-            <?php foreach ($lista_feedbacks as $fb): ?>
-                <div class="card">
-                    <h3>Cliente: <?= htmlspecialchars($fb['idcliente']) ?></h3>
-                    <p><?= htmlspecialchars($fb['comentario']) ?></p>
-                    <a href="../Forms/formfeedback.php?id=<?= $fb['idfeedback'] ?>" class="btn">Editar</a>
-                    <a href="../Deletar/deletarfeedback.php?id=<?= $fb['idfeedback'] ?>" onclick="return confirm('Deseja realmente excluir este feedback?');" class="btn btn-delete">Excluir</a>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+<?php if (count($feedbacks) === 0): ?>
+    <p style="text-align:center;">Nenhum feedback cadastrado.</p>
+<?php else: ?>
+    <div class="grid">
+        <?php foreach ($feedbacks as $feedback): ?>
+            <div class="card">
+                <h3><?= htmlspecialchars($feedback['assunto'] ?? '') ?></h3>
+                <p class="info"><strong>ID:</strong> <?= htmlspecialchars($feedback['idfeedback'] ?? '') ?></p>
+                <p class="info"><strong>Comentário:</strong> <?= nl2br(htmlspecialchars($feedback['comentario'] ?? '')) ?></p>
 
-    <div style="text-align:center; margin-top:20px;">
-        <a href="../homeAdm.php" class="btn-voltar">Voltar</a>
+                <a href="../Forms/formfeedback.php?id=<?= $feedback['idfeedback'] ?>" class="btn">Editar</a>
+                <a href="../Deletar/deletarfeedback.php?id=<?= $feedback['idfeedback'] ?>" class="btn-delete" onclick="return confirm('Deseja realmente excluir?')">Excluir</a>
+            </div>
+        <?php endforeach; ?>
     </div>
+<?php endif; ?>
+
+    <a href="../homeAdm.php" class="btn-voltar">Voltar</a>
+</div>
 </body>
 </html>

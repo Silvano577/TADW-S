@@ -21,7 +21,7 @@ if ($id > 0) {
 }
 
 if ($sucesso) {
-    header("Location: ../home.php");
+    header("Location: ../homeAdm.php");
     exit;
 } else {
     echo "Erro ao salvar o pedido.";

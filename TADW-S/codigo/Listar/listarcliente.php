@@ -34,7 +34,7 @@ $clientes = listar_clientes($conexao);
                 <p class="info"><strong>Telefone:</strong> <?= htmlspecialchars($cliente['telefone'] ?? '') ?></p>
 
                 <a href="../Forms/formcliente.php?id=<?= $cliente['idcliente'] ?>" class="btn">Editar</a>
-                <a href="../Deletar/deletarCliente.php?id=<?= $cliente['idcliente'] ?>&foto=<?= urlencode($cliente['foto'] ?? '') ?>" class="btn-delete" onclick="return confirm('Deseja realmente excluir?')">Excluir</a>
+                <a href="../Deletar/deletarcliente.php?id=<?= $cliente['idcliente'] ?>&foto=<?= urlencode($cliente['foto'] ?? '') ?>" class="btn-delete" onclick="return confirm('Deseja realmente excluir?')">Excluir</a>
             </div>
         <?php endforeach; ?>
     </div>

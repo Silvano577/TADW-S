@@ -1,5 +1,6 @@
 <?php
     require_once "../protege.php"; // ajuste o caminho relativo
+
     if (isset($_GET['id'])) {
         // Editar feedback existente
         require_once "../conexao.php";
@@ -7,12 +8,16 @@
 
         $id = $_GET['id'];
 
-        $feedback = buscar_feedback($conexao, $id, "");
-        if (!empty($feedback)) {
-            $feedback = $feedback[0];
-            $assunto = $feedback['assunto'];
-            $comentario = $feedback['comentario'];
+        $feedback = buscar_feedback($conexao, $id);
+
+        if ($feedback) {
+        $assunto = $feedback['assunto'] ?? "";
+        $comentario = $feedback['comentario'] ?? "";
+        } else {
+        $assunto = "";
+        $comentario = "";
         }
+
 
         $botao = "Atualizar";
     } else {
@@ -35,10 +40,10 @@
 
     <form action="../Salvar/salvarfeedback.php?id=<?php echo $id; ?>" method="post">
         Assunto:<br>
-        <input type="text" name="assunto" value="<?php echo $assunto; ?>" required><br><br>
+        <input type="text" name="assunto" value="<?php echo htmlspecialchars($assunto); ?>" required><br><br>
 
         Comentário:<br>
-        <input type="text" name="comentario" value="<?php echo $comentario; ?>" required><br><br>
+        <input type="text" name="comentario" value="<?php echo htmlspecialchars($comentario); ?>" required><br><br>
 
         <input type="submit" value="<?php echo $botao; ?>">
     </form>

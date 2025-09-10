@@ -189,29 +189,28 @@ function listar_pedidos($conexao) {
 function registrar_feedback($conexao, $assunto, $comentario) {
     $sql = "INSERT INTO feedback (assunto, comentario) VALUES (?, ?)";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ss', $assunto, $comentario);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
+    mysqli_stmt_bind_param($comando, "ss", $assunto, $comentario);
+    mysqli_stmt_execute($comando);
 }
 
-function buscar_feedback($conexao, $idfeedback) {
+function buscar_feedback($conexao, $id) {
     $sql = "SELECT * FROM feedback WHERE idfeedback = ?";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idfeedback);
+    mysqli_stmt_bind_param($comando, "i", $id);
     mysqli_stmt_execute($comando);
     $resultado = mysqli_stmt_get_result($comando);
-    mysqli_stmt_close($comando);
-    return mysqli_fetch_assoc($resultado);
+
+    return mysqli_fetch_assoc($resultado); // retorna só 1 registro
 }
 
-function atualizar_feedback($conexao, $id, $assunto, $comentario ) {
-    $sql = "UPDATE feedback SET assunto=?, comentario=? WHERE idfeedback=?";
+
+
+
+function atualizar_feedback($conexao, $id, $assunto, $comentario) {
+    $sql = "UPDATE feedback SET assunto = ?, comentario = ? WHERE idfeedback = ?";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ssi', $assunto, $comentario, $id);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
+    mysqli_stmt_bind_param($comando, "ssi", $assunto, $comentario, $id);
+    mysqli_stmt_execute($comando);
 }
 
 function deletar_feedback($conexao, $idfeedback) {
@@ -223,15 +222,18 @@ function deletar_feedback($conexao, $idfeedback) {
     return $resultado;
 }
 
-function listar_feedbacks($conexao) {
-    $sql = "SELECT * FROM feedback";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    $feedbacks = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-    mysqli_stmt_close($comando);
+function listar_feedback($conexao) {
+    $sql = "SELECT idfeedback, assunto, comentario FROM feedback ORDER BY idfeedback DESC";
+    $resultado = mysqli_query($conexao, $sql);
+
+    $feedbacks = [];
+    while ($linha = mysqli_fetch_assoc($resultado)) {
+        $feedbacks[] = $linha;
+    }
+
     return $feedbacks;
 }
+
 // Criar Produto
 function criar_produto($conexao, $nome, $tipo, $tamanho, $preco, $foto) {
     $sql = "INSERT INTO produto (nome, tipo, tamanho, preco, foto) VALUES (?, ?, ?, ?, ?)";
@@ -290,16 +292,21 @@ function listar_produtos($conexao) {
     return $lista_produtos;
 }
 
-
-
-function criar_delivery($conexao, $endereco_entrega, $tempo_entrega) {
-    $sql = "INSERT INTO delivery (endereco_entrega, tempo_entrega) VALUES (?, ?)";
+function criar_delivery($conexao, $rua, $numero, $complemento, $bairro, $cidade, $cep, $tempo_entrega_min, $latitude, $longitude){
+    $sql = "INSERT INTO delivery (rua, numero, complemento, bairro, cidade, cep, tempo_entrega_min, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ss', $endereco_entrega, $tempo_entrega);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
+    mysqli_stmt_bind_param($stmt, "ssssssidd", $rua, $numero, $complemento, $bairro, $cidade, $cep, $tempo_entrega_min, $latitude, $longitude);
+    return mysqli_stmt_execute($stmt);
 }
+
+function atualizar_delivery($conexao, $id, $rua, $numero, $complemento, $bairro, $cidade, $cep, $tempo_entrega_min, $latitude, $longitude){
+    $sql = "UPDATE delivery SET rua=?, numero=?, complemento=?, bairro=?, cidade=?, cep=?, tempo_entrega_min=?, latitude=?, longitude=? WHERE iddelivery=?";
+    $comando = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "ssssssiddi", $rua, $numero, $complemento, $bairro, $cidade, $cep, $tempo_entrega_min, $latitude, $longitude, $id);
+    return mysqli_stmt_execute($stmt);
+}
+
+
 function buscar_delivery($conexao, $iddelivery) {
     $sql = "SELECT * FROM delivery WHERE iddelivery = ?";
     $comando = mysqli_prepare($conexao, $sql);
@@ -327,23 +334,101 @@ function listar_deliveries($conexao) {
     return $deliveries;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Cadastrar pagamento
 function cadastrar_pagamento($conexao, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento) {
     $sql = "INSERT INTO pagamento (metodo_pagamento, valor, status_pagamento, data_pagamento) VALUES (?, ?, ?, ?)";
     $comando = mysqli_prepare($conexao, $sql);
+    // tipos: s = string (metodo), d = double (valor), s = string (status), s = string (data YYYY-MM-DD)
     mysqli_stmt_bind_param($comando, 'sdss', $metodo_pagamento, $valor, $status_pagamento, $data_pagamento);
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;
 }
-function listar_pagamentos($conexao) {
-    $sql = "SELECT * FROM pagamento";
+
+function atualizar_pagamento($conexao, $id, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento) {
+    $sql = "UPDATE pagamento
+            SET metodo_pagamento = ?, valor = ?, status_pagamento = ?, data_pagamento = ?
+            WHERE idpagamento = ?";
     $comando = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($comando, 'sdssi', $metodo_pagamento, $valor, $status_pagamento, $data_pagamento, $id);
+    $resultado = mysqli_stmt_execute($comando);
+    mysqli_stmt_close($comando);
+    return $resultado;
+}
+function buscar_pagamento($conexao, $id) {
+    $sql = "SELECT * FROM pagamento WHERE idpagamento = ?";
+    $comando = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($comando, 'i', $id);
     mysqli_stmt_execute($comando);
+    $resultado = mysqli_stmt_get_result($comando);
+    $pagamento = mysqli_fetch_assoc($resultado);
+    mysqli_stmt_close($comando);
+    return $pagamento ?: null;
+}
+
+
+// Listar pagamentos — aceita filtro opcional por método
+function listar_pagamentos($conexao, $metodo = null) {
+    if ($metodo === null || $metodo === '') {
+        $sql = "SELECT * FROM pagamento ORDER BY data_pagamento DESC, idpagamento DESC";
+        $comando = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_execute($comando);
+    } else {
+        $sql = "SELECT * FROM pagamento WHERE metodo_pagamento = ? ORDER BY data_pagamento DESC, idpagamento DESC";
+        $comando = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($comando, 's', $metodo);
+        mysqli_stmt_execute($comando);
+    }
     $resultado = mysqli_stmt_get_result($comando);
     $pagamentos = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
     mysqli_stmt_close($comando);
     return $pagamentos;
 }
+
+function deletar_pagamento($conexao, $id) {
+    $sql = "DELETE FROM pagamento WHERE idpagamento = ?";
+    $comando = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($comando, 'i', $id);
+    $resultado = mysqli_stmt_execute($comando);
+    mysqli_stmt_close($comando);
+    return $resultado;
+}
+
+
+// Função auxiliar para obter resumo (count e soma) por método (opcional)
+function resumo_pagamentos($conexao, $metodo = null) {
+    if ($metodo === null || $metodo === '') {
+        $sql = "SELECT COUNT(*) AS qtd, SUM(valor) AS total FROM pagamento";
+        $comando = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_execute($comando);
+    } else {
+        $sql = "SELECT COUNT(*) AS qtd, SUM(valor) AS total FROM pagamento WHERE metodo_pagamento = ?";
+        $comando = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($comando, 's', $metodo);
+        mysqli_stmt_execute($comando);
+    }
+    $resultado = mysqli_stmt_get_result($comando);
+    $row = mysqli_fetch_assoc($resultado);
+    mysqli_stmt_close($comando);
+    return $row ?: ['qtd' => 0, 'total' => 0.00];
+}
+
 
 
 function salvar_venda($conexao, $idpedido, $idproduto, $quantidade) {

@@ -14,6 +14,48 @@ h1 {
     color: #8B0000; /* vermelho escuro */
 }
 
+/* Barra de pesquisa */
+.form-pesquisa {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.input-pesquisa {
+    padding: 8px;
+    width: 250px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-pesquisa {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #8B0000;
+    color: white;
+    cursor: pointer;
+    margin-left: 5px;
+    font-family: 'Poppins', sans-serif;
+    transition: background 0.2s ease-in-out;
+}
+
+.btn-pesquisa:hover {
+    background: #a30000;
+}
+
+.link-limpar {
+    margin-left: 10px;
+    text-decoration: none;
+    color: #8B0000;
+    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
+}
+
+.link-limpar:hover {
+    text-decoration: underline;
+}
+
 /* Grid de cartões */
 .grid {
     display: grid;

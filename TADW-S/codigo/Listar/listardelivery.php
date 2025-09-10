@@ -1,4 +1,3 @@
-
 <?php
 require_once "../conexao.php";
 require_once "../funcao.php";
@@ -22,9 +21,10 @@ $lista_delivery = listar_deliveries($conexao);
         <div class="grid">
             <?php foreach ($lista_delivery as $delivery): ?>
                 <div class="card">
-                    <h3>Pedido: <?= htmlspecialchars($delivery['idpedido']) ?></h3>
-                    <p>Entregador: <?= htmlspecialchars($delivery['entregador']) ?></p>
-                    <p>Status: <?= htmlspecialchars($delivery['status']) ?></p>
+                    <h3>Delivery #<?= htmlspecialchars($delivery['iddelivery']) ?></h3>
+                    <p><strong>Endereço:</strong> <?= htmlspecialchars($delivery['endereco_entrega']) ?></p>
+                    <p><strong>Tempo estimado:</strong> <?= htmlspecialchars($delivery['tempo_entrega']) ?></p>
+                    
                     <a href="../Forms/formdelivery.php?id=<?= $delivery['iddelivery'] ?>" class="btn">Editar</a>
                     <a href="../Deletar/deletardelivery.php?id=<?= $delivery['iddelivery'] ?>" onclick="return confirm('Deseja realmente excluir este delivery?');" class="btn btn-delete">Excluir</a>
                 </div>
