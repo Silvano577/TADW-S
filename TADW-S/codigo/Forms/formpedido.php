@@ -1,7 +1,5 @@
 <?php
-
-
-require_once "protege.php"; // ajuste o caminho relativo
+    require_once "../protege.php"; // ajuste o caminho relativo
 
     require_once "../conexao.php";
     require_once "../funcao.php";
@@ -12,7 +10,7 @@ require_once "protege.php"; // ajuste o caminho relativo
         $pedido = buscar_pedido($conexao, $id);
 
         if (!empty($pedido)) {
-            $delivery = $pedido['delivery'];
+            $endentrega = $pedido['endentrega'];
             $cliente = $pedido['cliente'];
             $idfeedback = $pedido['idfeedback'];
             $idpagamento1 = $pedido['idpagamento1'];
@@ -23,7 +21,7 @@ require_once "protege.php"; // ajuste o caminho relativo
     } else {
         // Novo pedido
         $id = 0;
-        $delivery = "";
+        $endentrega = "";
         $cliente = "";
         $idfeedback = "";
         $idpagamento1 = "";
@@ -42,7 +40,7 @@ require_once "protege.php"; // ajuste o caminho relativo
     <h1><?php echo $botao; ?> Pedido</h1>
 
     <form action="../Salvar/salvarpedido.php?id=<?php echo $id; ?>" method="post">
-        Delivery:<br>
+        endentrega:<br>
         <input type="number" name="delivery" value="<?php echo $delivery; ?>" required><br><br>
 
         Cliente:<br>
