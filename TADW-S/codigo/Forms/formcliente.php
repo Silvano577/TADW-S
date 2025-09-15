@@ -18,7 +18,6 @@
             $cliente = $cliente[0];
             $nome = $cliente['nome'];
             $data_ani = $cliente['data_ani'];
-            $endereco = $cliente['endereco'];
             $telefone = $cliente['telefone'];
             $foto = $cliente['foto'];
         }
@@ -29,7 +28,6 @@
         $id = 0;
         $nome = "";
         $data_ani = "";
-        $endereco = "";
         $telefone = "";
         $foto = "";
 
@@ -60,8 +58,6 @@
         Data de Aniversário:<br>
         <input type="date" name="data_ani" value="<?php echo $data_ani; ?>" required><br><br>
 
-        Endereço:<br>
-        <input type="text" name="endereco" value="<?php echo $endereco; ?>" required><br><br>
 
         Telefone:<br>
         <input type="text" name="telefone" value="<?php echo $telefone; ?>" required><br><br>

@@ -7,7 +7,6 @@ require_once "../funcao.php";
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $nome = $_POST['nome'];
 $data_ani = $_POST['data_ani'];
-$endereco = $_POST['endereco'];
 $telefone = $_POST['telefone'];
 
 // Pasta onde as fotos serão salvas
@@ -53,9 +52,9 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
 
 // Decide se é criar ou atualizar
 if ($id > 0) {
-    atualizar_cliente($conexao, $id, $nome, $data_ani, $endereco, $telefone, $caminho_foto_final);
+    atualizar_cliente($conexao, $id, $nome, $data_ani,  $telefone, $caminho_foto_final);
 } else {
-    criar_cliente($conexao, $nome, $data_ani, $endereco, $telefone, $caminho_foto_final);
+    criar_cliente($conexao, $nome, $data_ani, $telefone, $caminho_foto_final);
 }
 
 // Redireciona para a home

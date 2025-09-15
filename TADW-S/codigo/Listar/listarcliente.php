@@ -30,7 +30,6 @@ $clientes = listar_clientes($conexao);
                 <h3><?= htmlspecialchars($cliente['nome'] ?? '') ?></h3>
                 <p class="info"><strong>ID:</strong> <?= htmlspecialchars($cliente['idcliente'] ?? '') ?></p>
                 <p class="info"><strong>Data de Nascimento:</strong> <?= htmlspecialchars($cliente['data_ani'] ?? '') ?></p>
-                <p class="info"><strong>Endereço:</strong> <?= htmlspecialchars($cliente['endereco'] ?? '') ?></p>
                 <p class="info"><strong>Telefone:</strong> <?= htmlspecialchars($cliente['telefone'] ?? '') ?></p>
 
                 <a href="../Forms/formcliente.php?id=<?= $cliente['idcliente'] ?>" class="btn">Editar</a>

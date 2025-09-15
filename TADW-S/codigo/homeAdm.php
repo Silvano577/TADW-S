@@ -47,6 +47,9 @@ protegeTipo('adm'); // garante que só ADM acesse
         <li><a href="./Forms/formpagamento.php"><i class="fas fa-credit-card"></i> Registrar Pagamento#</a></li>
         <li><a href="./Forms/formdelivery.php"><i class="fas fa-motorcycle"></i> Registrar Delivery</a></li>
         <li><a href="./Forms/formpedido.php"><i class="fas fa-receipt"></i> Registrar Pedido</a></li>
+        <li><a href="./Forms/formstatusdelivery.php"><i class="fas fa-receipt"></i> status do delivery</a></li>
+        <li><a href="./Forms/formendentrega.php"><i class="fas fa-receipt"></i> Registrar Endereço#</a></li>
+        <li><a href="./Forms/formdelivery.php"><i class="fas fa-receipt"></i> Registrar delivery#</a></li>
         <li><a href="./Listar/listarproduto.php"><i class="fas fa-list"></i> Listar Produto#</a></li>
         <li><a href="./Listar/listarcliente.php"><i class="fas fa-shopping-cart"></i> Listar Cliente#</a></li>
         <li><a href="./Listar/listarusuario.php"><i class="fas fa-shopping-cart"></i> Listar usuario#</a></li>
@@ -54,10 +57,12 @@ protegeTipo('adm'); // garante que só ADM acesse
         <li><a href="./Listar/listarpedido.php"><i class="fas fa-shopping-cart"></i> Listar Pedido</a></li>
         <li><a href="./Listar/listarfeedback.php"><i class="fas fa-shopping-cart"></i> Listar Feedback#</a></li>
         <li><a href="./Listar/listardelivery.php"><i class="fas fa-shopping-cart"></i> Listar delivery</a></li>
+        <li><a href="./Listar/listarendentrega.php"><i class="fas fa-shopping-cart"></i> Listar endereço#</a></li>
         <li><a href="./Listar/listarpagamentos.php"><i class="fas fa-shopping-cart"></i> Listar Pagamentos#</a></li>
+        <li><a href="./Listar/listardelivery.php"><i class="fas fa-shopping-cart"></i> Listar Pagamentos#</a></li>
         <li><a href="./Forms/formvenda.php"><i class="fas fa-shopping-cart"></i> Fazer Compra</a></li>
         
-
+formstatusdelivery.php
     </ul>
 </main>
 

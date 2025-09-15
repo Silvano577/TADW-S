@@ -62,10 +62,10 @@ function listar_usuarios($conexao) {
     return $usuarios;
 }///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function criar_cliente($conexao, $nome, $data_ani, $endereco, $telefone, $foto) {
-    $sql = "INSERT INTO cliente (nome, data_ani, endereco, telefone, foto) VALUES (?, ?, ?, ?, ?)";
+function criar_cliente($conexao, $nome, $data_ani, $telefone, $foto) {
+    $sql = "INSERT INTO cliente (nome, data_ani, telefone, foto) VALUES (?, ?, ?, ?)";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sssss', $nome, $data_ani, $endereco, $telefone, $foto);
+    mysqli_stmt_bind_param($comando, 'ssss', $nome, $data_ani, $telefone, $foto);
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;
@@ -82,10 +82,10 @@ function buscar_cliente($conexao, $idcliente, $nome) {
     return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
 }
 
-function atualizar_cliente($conexao, $idcliente, $nome, $data_ani, $endereco, $telefone, $foto) {
-    $sql = "UPDATE cliente SET nome = ?, data_ani = ?, endereco = ?, telefone = ?, foto = ? WHERE idcliente = ?";
+function atualizar_cliente($conexao, $idcliente, $nome, $data_ani, $telefone, $foto) {
+    $sql = "UPDATE cliente SET nome = ?, data_ani = ?, telefone = ?, foto = ? WHERE idcliente = ?";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sssssi', $nome, $data_ani, $endereco, $telefone, $foto, $idcliente);
+    mysqli_stmt_bind_param($comando, 'ssssi', $nome, $data_ani, $telefone, $foto, $idcliente);
     $resultado = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $resultado;
@@ -321,63 +321,95 @@ function listar_venda($conexao) {
     mysqli_stmt_close($comando);
     return $vendas;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function criar_endentrega($conexao, $rua, $numero, $complemento, $bairro, $cidade, $cep, $latitude, $longitude, $estado) {
-    $sql = "INSERT INTO endentrega (rua, numero, complemento, bairro, cidade, cep, latitude, longitude, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($stmt, 'ssssssdds', $rua, $numero, $complemento, $bairro, $cidade, $cep, $latitude, $longitude, $estado);
-    $res = mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
-    return $res ? mysqli_insert_id($conexao) : false;
-}
 
-function buscar_endentrega($conexao, $idendentrega = 0, $rua = '') {
-    if ($idendentrega > 0) {
-        $sql = "SELECT * FROM endentrega WHERE idendentrega = ?";
-        $stmt = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($stmt, 'i', $idendentrega);
-    } else {
-        $sql = "SELECT * FROM endentrega WHERE rua LIKE ?";
-        $stmt = mysqli_prepare($conexao, $sql);
-        $like = "%$rua%";
-        mysqli_stmt_bind_param($stmt, 's', $like);
-    }
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    mysqli_stmt_close($stmt);
-    return $rows;
-}
-
-function atualizar_endentrega($conexao, $idendentrega, $rua, $numero, $complemento, $bairro, $cidade, $cep, $latitude, $longitude, $estado) {
-    $sql = "UPDATE endentrega SET rua = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, cep = ?, latitude = ?, longitude = ?, estado = ? WHERE idendentrega = ?";
-    $stmt = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($stmt, 'ssssssdsi', $rua, $numero, $complemento, $bairro, $cidade, $cep, $latitude, $longitude, $estado, $idendentrega);
-    $res = mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
-    return $res;
-}
-
-function deletar_endentrega($conexao, $idendentrega) {
-    $sql = "DELETE FROM endentrega WHERE idendentrega = ?";
-    $stmt = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($stmt, 'i', $idendentrega);
-    $res = mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
-    return $res;
-}
-
-function listar_endentregas($conexao) {
-    $sql = "SELECT * FROM endentrega ORDER BY cidade, bairro, rua";
-    $stmt = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    mysqli_stmt_close($stmt);
-    return $rows;
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////
+function registrar_endereco($conexao, $rua, $numero, $complemento, $bairro, $cliente) {
+    $sql = "INSERT INTO endentrega (rua, numero, complemento, bairro, cliente) VALUES (?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ssssi', $rua, $numero, $complemento, $bairro, $cliente);
+    mysqli_stmt_execute($stmt);
+    return mysqli_insert_id($conexao);
+}
 
+function atualizar_endereco($conexao, $id, $rua, $numero, $complemento, $bairro, $cliente) {
+    $sql = "UPDATE endentrega SET rua=?, numero=?, complemento=?, bairro=?, cliente=? WHERE idendentrega=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ssssii', $rua, $numero, $complemento, $bairro, $cliente, $id);
+    return mysqli_stmt_execute($stmt);
+}
+
+function deletar_endereco($conexao, $id) {
+    $sql = "DELETE FROM endentrega WHERE idendentrega=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $id);
+    return mysqli_stmt_execute($stmt);
+}
+
+function buscar_endereco($conexao, $id) {
+    $sql = "SELECT * FROM endentrega WHERE idendentrega=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $id);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_assoc($resultado);
+}
+
+function listar_enderecos($conexao) {
+    $sql = "SELECT * FROM endentrega";
+    $resultado = mysqli_query($conexao, $sql);
+    $enderecos = [];
+    while ($row = mysqli_fetch_assoc($resultado)) {
+        $enderecos[] = $row;
+    }
+    return $enderecos;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Criar delivery vinculado ao pedido
+function criar_delivery($conexao, $pedido_id) {
+    $sql = "INSERT INTO delivery (pedido_id, status) VALUES (?, 'atribuido')";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $pedido_id);
+    return mysqli_stmt_execute($stmt);
+}
+
+// Atualizar status do delivery
+function atualizar_delivery($conexao, $pedido_id, $status) {
+    $sql = "UPDATE delivery SET status = ?, 
+               entregue_em = CASE WHEN ? = 'entregue' THEN NOW() ELSE entregue_em END
+            WHERE pedido_id = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ssi', $status, $status, $pedido_id);
+    return mysqli_stmt_execute($stmt);
+}
+
+// Buscar acompanhamento de delivery
+function buscar_delivery($conexao, $pedido_id) {
+    $sql = "SELECT d.iddelivery, d.status, d.iniciado_em, d.entregue_em,
+                   p.idpedido, p.total, c.nome AS cliente
+            FROM delivery d
+            INNER JOIN pedido p ON d.pedido_id = p.idpedido
+            INNER JOIN cliente c ON p.cliente = c.idcliente
+            WHERE d.pedido_id = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $pedido_id);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_assoc($resultado);
+}
+
+// Listar todos os deliveries
+function listar_deliveries($conexao) {
+    $sql = "SELECT d.iddelivery, d.status, d.iniciado_em, d.entregue_em,
+                   p.idpedido, c.nome AS cliente
+            FROM delivery d
+            INNER JOIN pedido p ON d.pedido_id = p.idpedido
+            INNER JOIN cliente c ON p.cliente = c.idcliente
+            ORDER BY d.iniciado_em DESC";
+    $resultado = mysqli_query($conexao, $sql);
+    return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+}
 
 
 ?>
