@@ -73,7 +73,7 @@ if (isset($_GET['id'])) {
     <br><br>
 
     <button type="submit" class="btn"><?= $botao ?></button>
-    <a href="../Listar/listarpagamento.php" class="btn-voltar" style="margin-left:10px;">Voltar</a>
+    <a href="../Listar/listarpagamento.php">Voltar</a>
 </form>
 </body>
 </html>

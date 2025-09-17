@@ -1,19 +1,18 @@
 <?php
-    require_once "../protege.php"; // ajuste o caminho relativo
-
+    require_once "../protege.php"; 
     require_once "../conexao.php";
     require_once "../funcao.php";
 
     if (isset($_GET['id'])) {
         // Editar pedido existente
-        $id = $_GET['id'];
+        $id = intval($_GET['id']);
         $pedido = buscar_pedido($conexao, $id);
 
         if (!empty($pedido)) {
             $endentrega = $pedido['endentrega'];
             $cliente = $pedido['cliente'];
             $idfeedback = $pedido['idfeedback'];
-            $idpagamento1 = $pedido['idpagamento1'];
+            $idpagamento = $pedido['idpagamento'];
             $valortotal = $pedido['valortotal'];
         }
 
@@ -24,7 +23,7 @@
         $endentrega = "";
         $cliente = "";
         $idfeedback = "";
-        $idpagamento1 = "";
+        $idpagamento = "";
         $valortotal = "";
 
         $botao = "Cadastrar";
@@ -40,25 +39,25 @@
     <h1><?php echo $botao; ?> Pedido</h1>
 
     <form action="../Salvar/salvarpedido.php?id=<?php echo $id; ?>" method="post">
-        endentrega:<br>
-        <input type="number" name="delivery" value="<?php echo $delivery; ?>" required><br><br>
+        Endereço de Entrega (ID):<br>
+        <input type="number" name="endentrega" value="<?php echo htmlspecialchars($endentrega); ?>" required><br><br>
 
-        Cliente:<br>
-        <input type="number" name="cliente" value="<?php echo $cliente; ?>" required><br><br>
+        Cliente (ID):<br>
+        <input type="number" name="cliente" value="<?php echo htmlspecialchars($cliente); ?>" required><br><br>
 
         ID Feedback:<br>
-        <input type="number" name="idfeedback" value="<?php echo $idfeedback; ?>"><br><br>
+        <input type="number" name="idfeedback" value="<?php echo htmlspecialchars($idfeedback); ?>"><br><br>
 
-        ID Pagamento:<br>
-        <input type="number" name="idpagamento1" value="<?php echo $idpagamento1; ?>" required><br><br>
+        Pagamento (ID):<br>
+        <input type="number" name="idpagamento" value="<?php echo htmlspecialchars($idpagamento); ?>" required><br><br>
 
         Valor Total (R$):<br>
-        <input type="number" step="0.01" name="valortotal" value="<?php echo $valortotal; ?>" required><br><br>
+        <input type="number" step="0.01" name="valortotal" value="<?php echo htmlspecialchars($valortotal); ?>" required><br><br>
 
         <input type="submit" value="<?php echo $botao; ?>">
     </form>
 
-    <form action="../home.php" method="get">
+    <form action="../homeAdm.php" method="get">
         <button type="submit">Voltar</button>
     </form>
 </body>

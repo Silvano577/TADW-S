@@ -17,18 +17,32 @@ if (empty($nome) || empty($email) || ($id == 0 && empty($senha))) {
 if ($id > 0) {
     // Atualização
     if (!empty($senha)) {
-        // Atualiza também a senha
         atualizar_usuario($conexao, $id, $nome, $email, $senha);
     } else {
-        // Mantém a senha antiga
         atualizar_usuario($conexao, $id, $nome, $email, null);
     }
+
+    // Redireciona para o login ou área administrativa
+    header("Location: ../login.php");
+    exit;
+
 } else {
     // Novo usuário
-    criar_usuario($conexao, $nome, $email, $senha);
-}
+    $idusuario = criar_usuario($conexao, $nome, $email, $senha);
 
-// Redireciona para a página de login
-header("Location: ../login.php");
-exit;
+    if ($idusuario) {
+        // Cria um cliente vinculado automaticamente
+        $idcliente = criar_cliente($conexao, $nome, null, ''); // null para data_ani, '' para telefone
+        if ($idcliente) {
+            vincular_usuario_cliente($conexao, $idusuario, $idcliente);
+        }
+
+        // Redireciona para o formcliente para completar os dados do cliente
+        header("Location: ../Forms/formcliente.php?usuario_id={$idusuario}");
+        exit;
+    } else {
+        echo "Erro ao criar usuário.";
+        exit;
+    }
+}
 ?>

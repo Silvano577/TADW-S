@@ -7,7 +7,7 @@ services:
     volumes:
       - ./codigo/:/var/www/html/
     ports:
-      - 82:80
+      - 81:80
   
   db:
     image: mariadb:10.5
@@ -19,4 +19,4 @@ services:
       - MARIADB_USER=root
       - MARIADB_ROOT_PASSWORD=123
     ports:
-      - 3306:3306
+      - 3307:3306
