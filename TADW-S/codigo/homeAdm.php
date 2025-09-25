@@ -49,7 +49,6 @@ protegeTipo('adm'); // garante que só ADM acesse
         <li><a href="./Forms/formpedido.php"><i class="fas fa-receipt"></i> Registrar Pedido</a></li>
         <li><a href="./Forms/formstatusdelivery.php"><i class="fas fa-receipt"></i> status do delivery</a></li>
         <li><a href="./Forms/formendentrega.php"><i class="fas fa-receipt"></i> Registrar Endereço#</a></li>
-        <li><a href="./Forms/formdelivery.php"><i class="fas fa-receipt"></i> Registrar delivery#</a></li>
         <li><a href="./Listar/listarproduto.php"><i class="fas fa-list"></i> Listar Produto#</a></li>
         <li><a href="./Listar/listarcliente.php"><i class="fas fa-shopping-cart"></i> Listar Cliente#</a></li>
         <li><a href="./Listar/listarusuario.php"><i class="fas fa-shopping-cart"></i> Listar usuario#</a></li>
