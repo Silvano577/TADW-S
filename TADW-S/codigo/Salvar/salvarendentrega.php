@@ -2,22 +2,20 @@
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-$id       = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$cliente  = intval($_POST['cliente'] ?? 0);
-$rua      = $_POST['rua'] ?? '';
-$numero   = $_POST['numero'] ?? '';
-$complemento = $_POST['complemento'] ?? null;
-$bairro   = $_POST['bairro'] ?? '';
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+$rua        = $_POST['rua'] ?? '';
+$numero     = $_POST['numero'] ?? '';
+$complemento= $_POST['complemento'] ?? '';
+$bairro     = $_POST['bairro'] ?? '';
+$cliente_id = $_POST['cliente'] ?? 0;
 
 if ($id > 0) {
-    // Atualiza endereço existente
-    atualizar_endereco($conexao, $id, $rua, $numero, $complemento, $bairro, $cliente);
+    atualizar_endereco($conexao, $id, $rua, $numero, $complemento, $bairro, $cliente_id);
 } else {
-    // Cria novo endereço vinculado ao cliente
-    registrar_endereco($conexao, $rua, $numero, $complemento, $bairro, $cliente);
+    criar_endereco($conexao, $rua, $numero, $complemento, $bairro, $cliente_id);
 }
 
-// Redireciona para próxima etapa ou listagem
-header("Location: ../home.php"); // ou para fluxo de pedidos, se houver
+// Fluxo final: redireciona para login
+header("Location: ../login.php");
 exit;
-?>

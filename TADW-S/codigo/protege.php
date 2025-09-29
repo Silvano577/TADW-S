@@ -4,8 +4,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Se não estiver logado, redireciona para login
-if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
+// Pega o nome do arquivo atual
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+// Se não estiver logado e não estiver no login.php, redireciona
+if ((!isset($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') && $currentPage !== 'login.php') {
     header("Location: ../login.php"); // ajuste o caminho conforme a estrutura
     exit;
 }

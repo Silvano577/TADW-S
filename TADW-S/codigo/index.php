@@ -3,7 +3,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
 require_once "conexao.php"; 
 
 // Buscar todos os produtos (pizzas e bebidas)
@@ -34,9 +33,12 @@ if ($result && $result->num_rows > 0) {
             <li><a href="index.php" class="ativo">Início</a></li>
             <li><a href="sobre.php">Sobre</a></li>
 
-            <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim' && ($_SESSION['tipo'] ?? '') === 'adm'): ?>
-
-                <li><a href="homeAdm.php">Admin</a></li>
+            <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim'): ?>
+                <?php if(($_SESSION['tipo'] ?? '') === 'adm'): ?>
+                    <li><a href="homeAdm.php">Admin</a></li>
+                <?php elseif(($_SESSION['tipo'] ?? '') === 'cliente'): ?>
+                    <li><a href="perfil.php">Perfil</a></li>
+                <?php endif; ?>
             <?php endif; ?>
 
             <li><a href="contato.php">Contato</a></li>
@@ -51,31 +53,30 @@ if ($result && $result->num_rows > 0) {
     </nav>
 </header>
 
+<main>
+    <h1>Bem-vindo à nossa Pizzaria!</h1>
+    <p>Confira nossas novidades em pizzas e bebidas.</p>
 
-    <main>
-        <h1>Bem-vindo à nossa Pizzaria!</h1>
-        <p>Confira nossas novidades em pizzas e bebidas.</p>
+    <section class="produtos">
+        <?php if (count($produtos) > 0): ?>
+            <?php foreach ($produtos as $p): ?>
+                <div class="card">
+                    <img src="<?php echo $p['foto']; ?>" alt="<?php echo $p['nome']; ?>">
+                    <h3><?php echo $p['nome']; ?></h3>
+                    <?php if (!empty($p['tamanho'])): ?>
+                        <p>Tamanho: <?php echo $p['tamanho']; ?></p>
+                    <?php endif; ?>
+                    <p class="preco">R$ <?php echo number_format($p['preco'], 2, ',', '.'); ?></p>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>Nenhum produto cadastrado ainda.</p>
+        <?php endif; ?>
+    </section>
+</main>
 
-        <section class="produtos">
-            <?php if (count($produtos) > 0): ?>
-                <?php foreach ($produtos as $p): ?>
-                    <div class="card">
-                        <img src="<?php echo $p['foto']; ?>" alt="<?php echo $p['nome']; ?>">
-                        <h3><?php echo $p['nome']; ?></h3>
-                        <?php if (!empty($p['tamanho'])): ?>
-                            <p>Tamanho: <?php echo $p['tamanho']; ?></p>
-                        <?php endif; ?>
-                        <p class="preco">R$ <?php echo number_format($p['preco'], 2, ',', '.'); ?></p>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p>Nenhum produto cadastrado ainda.</p>
-            <?php endif; ?>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; <?php echo date('Y'); ?> Pizzaria - Todos os direitos reservados.</p>
-    </footer>
+<footer>
+    <p>&copy; <?php echo date('Y'); ?> Pizzaria - Todos os direitos reservados.</p>
+</footer>
 </body>
 </html>

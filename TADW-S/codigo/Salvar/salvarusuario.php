@@ -7,33 +7,21 @@ $nome  = $_POST['nome'] ?? '';
 $email = $_POST['email'] ?? '';
 $senha = $_POST['senha'] ?? '';
 
-// Verifica campos obrigatórios
-if (empty($nome) || empty($email) || ($id == 0 && empty($senha))) {
-    header("Location: ../Forms/formusuario.php?erro=campos");
-    exit;
-}
-
 if ($id > 0) {
-    // Atualização de usuário existente
-    if (!empty($senha)) {
-        atualizar_usuario($conexao, $id, $nome, $email, $senha);
-    } else {
-        atualizar_usuario($conexao, $id, $nome, $email, null);
-    }
-    header("Location: ../login.php");
-    exit;
-
+    // Atualiza usuário existente
+    atualizar_usuario($conexao, $id, $nome, $email, $senha);
+    $usuario_id = $id;
+    // Redireciona para edição/criação de cliente vinculado
+    header("Location: ../Forms/formcliente.php?usuario_id={$usuario_id}");
 } else {
-    // Criação de novo usuário
-    $idusuario = criar_usuario($conexao, $nome, $email, $senha);
+    // Cria novo usuário
+    $usuario_id = criar_usuario($conexao, $nome, $email, $senha);
 
-    if ($idusuario) {
-        // Redireciona para cadastro do cliente vinculando o usuário
-        header("Location: ../Forms/formcliente.php?usuario_id={$idusuario}");
-        exit;
+    if ($usuario_id > 0) {
+        // Redireciona para criar cliente vinculado
+        header("Location: ../Forms/formcliente.php?usuario_id={$usuario_id}");
     } else {
-        echo "Erro ao criar usuário.";
-        exit;
+        echo "Erro ao cadastrar usuário!";
     }
 }
-?>
+exit;
