@@ -3,97 +3,87 @@ require_once "../conexao.php";
 require_once "../funcao.php";
 session_start();
 
-// Config
-$taxaEntrega = 5.00; // ou busque do banco
+$taxaEntrega = 5.00; // ou buscar do banco
 
-// Dados vindos do form (ou do processo de pagamento)
 $cliente = isset($_POST['cliente']) ? intval($_POST['cliente']) : 0;
 $endentrega = isset($_POST['endentrega']) ? intval($_POST['endentrega']) : 0;
-$pagamento_id = isset($_POST['pagamento_id']) ? intval($_POST['pagamento_id']) : 0; // já criado ou 0
-$idfeedback = null; // opcional
+$pagamento_id = isset($_POST['idpagamento']) ? intval($_POST['idpagamento']) : 0;
+$idfeedback = null;
 
-// Pega carrinho da session (exemplo)
-$cart = $_SESSION['cart'] ?? []; // cada item: ['produto_id'=>X,'qtd'=>Y]
+$idprodutos = $_POST['idproduto'] ?? [];
+$quantidades = $_POST['quantidade'] ?? [];
 
-// validações básicas
-if ($cliente <= 0 || $endentrega <= 0 || empty($cart)) {
-    die("Dados inválidos.");
+if ($cliente <= 0 || $endentrega <= 0 || empty($idprodutos)) {
+    die("Dados inválidos. Verifique cliente, endereço ou produtos selecionados.");
 }
 
-// começa transação
 mysqli_begin_transaction($conexao);
 
 try {
-    // 1) calcular valor dos itens (buscar preço do produto)
-    $valorPedido = 0.0;
-    $itensParaInserir = []; // armazenar para inserir depois
-    $sqlProduto = "SELECT idproduto, nome, preco FROM produto WHERE idproduto = ?";
-    $stmtProduto = mysqli_prepare($conexao, $sqlProduto);
+    // 1) calcular valor total
+    $valortotal = 0;
+    $itensParaInserir = [];
 
-    foreach ($cart as $item) {
-        $pid = intval($item['produto_id']);
-        $qtd = intval($item['qtd']);
+    foreach ($idprodutos as $idproduto) {
+        $idproduto = intval($idproduto);
+        $qtd = intval($quantidades[$idproduto] ?? 1);
 
-        mysqli_stmt_bind_param($stmtProduto, "i", $pid);
-        mysqli_stmt_execute($stmtProduto);
-        $res = mysqli_stmt_get_result($stmtProduto);
-        $prod = mysqli_fetch_assoc($res);
-        if (!$prod) throw new Exception("Produto {$pid} não existe.");
+        $sql = "SELECT preco FROM produto WHERE idproduto = ?";
+        $stmt = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $idproduto);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        $produto = mysqli_fetch_assoc($res);
+        mysqli_stmt_close($stmt);
 
-        $subtotal = floatval($prod['preco']) * $qtd;
-        $valorPedido += $subtotal;
+        if (!$produto) throw new Exception("Produto {$idproduto} não existe.");
+
+        $subtotal = $produto['preco'] * $qtd;
+        $valortotal += $subtotal;
 
         $itensParaInserir[] = [
-            'idproduto' => $pid,
-            'qtd' => $qtd,
-            'preco_unit' => floatval($prod['preco'])
+            'idproduto' => $idproduto,
+            'quantidade' => $qtd,
+            'preco_unit' => $produto['preco']
         ];
     }
-    mysqli_stmt_close($stmtProduto);
 
-    // 2) calcular total com taxa
-    $valortotal = $valorPedido + $taxaEntrega;
+    // 2) total com taxa
+    $valortotal += $taxaEntrega;
 
-    // 3) se pagamento ainda não existe, registre (opcional)
-    // se $pagamento_id == 0 -> cria pagamento e pega id (ex: pagamento pendente)
+    // 3) criar pagamento se necessário
     if ($pagamento_id <= 0) {
-        // função registrar_pagamento fictícia: crie conforme sua tabela pagamento
         $pagamento_id = registrar_pagamento($conexao, $cliente, 'pendente', $valortotal);
         if (!$pagamento_id) throw new Exception("Erro ao criar pagamento.");
     }
 
-    // 4) inserir pedido e pegar id
-    // usamos a função salvarPedido que você já tem:
+    // 4) criar pedido
     $idpedido = salvarPedido($conexao, $endentrega, $cliente, $pagamento_id, $valortotal, $idfeedback);
     if (!$idpedido) throw new Exception("Erro ao criar pedido.");
 
-    // 5) inserir itens em pedido_produto (supondo tabela pedido_produto(idpedido,idproduto,quantidade,preco_unit))
+    // 5) inserir itens no pedido_produto
     $sqlItem = "INSERT INTO pedido_produto (idpedido, idproduto, quantidade, preco_unit) VALUES (?, ?, ?, ?)";
     $stmtItem = mysqli_prepare($conexao, $sqlItem);
 
     foreach ($itensParaInserir as $it) {
-        mysqli_stmt_bind_param($stmtItem, "iiid", $idpedido, $it['idproduto'], $it['qtd'], $it['preco_unit']);
-        if (!mysqli_stmt_execute($stmtItem)) {
-            throw new Exception("Erro ao inserir item do pedido.");
-        }
+        mysqli_stmt_bind_param($stmtItem, "iiid", $idpedido, $it['idproduto'], $it['quantidade'], $it['preco_unit']);
+        if (!mysqli_stmt_execute($stmtItem)) throw new Exception("Erro ao inserir item do pedido.");
     }
     mysqli_stmt_close($stmtItem);
 
-    // 6) criar delivery para o pedido
-    $iddelivery = criar_delivery($conexao, $idpedido); // função que insere delivery
+    // 6) criar delivery
+    $iddelivery = criar_delivery($conexao, $idpedido);
     if (!$iddelivery) throw new Exception("Erro ao criar delivery.");
 
-    // 7) commit e limpar carrinho
     mysqli_commit($conexao);
     unset($_SESSION['cart']);
 
-    // 8) redireciona para a listagem do pedido (pode passar id do pedido na query)
+    // 7) redirecionamento
     header("Location: ../Listar/listarpedido.php?id={$idpedido}");
     exit;
 
 } catch (Exception $e) {
     mysqli_rollback($conexao);
-    // log de erro aqui se quiser
     echo "Erro: " . $e->getMessage();
     exit;
 }

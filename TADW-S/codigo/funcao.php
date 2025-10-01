@@ -431,8 +431,10 @@ function resumo_pagamentos($conexao, $metodo = null) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function salvar_venda($conexao, $idpedido, $idproduto, $quantidade) {
-    $sql = "INSERT INTO pedido_produto (idpedido, idproduto, quantidade) VALUES (?, ?, ?) 
-    ON DUPLICATE KEY UPDATE quantidade = quantidade + VALUES(quantidade)";
+    // Inserir ou atualizar quantidade do item no pedido
+    $sql = "INSERT INTO pedido_produto (idpedido, idproduto, quantidade) 
+            VALUES (?, ?, ?) 
+            ON DUPLICATE KEY UPDATE quantidade = quantidade + VALUES(quantidade)";
 
     $comando = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($comando, 'iii', $idpedido, $idproduto, $quantidade);
@@ -440,8 +442,14 @@ function salvar_venda($conexao, $idpedido, $idproduto, $quantidade) {
     $sucesso = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
 
+    // Se deu certo, atualizar o valor total do pedido
+    if ($sucesso) {
+        atualizar_total_pedido($conexao, $idpedido);
+    }
+
     return $sucesso;
 }
+
 function listar_venda($conexao) {
     $sql = "SELECT * FROM pedido_produto";
     $comando = mysqli_prepare($conexao, $sql);
@@ -458,11 +466,34 @@ function listar_venda($conexao) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Criar delivery vinculado ao pedido
+
+function salvarPedido($conexao, $endentrega, $cliente, $idpagamento, $valortotal, $idfeedback = null) {
+    $status = 'pendente'; // garante que status nunca será NULL
+
+    $sql = "INSERT INTO pedido (endentrega, cliente, idpagamento, valortotal, idfeedback, status) 
+            VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conexao, $sql);
+    if (!$stmt) return false;
+
+    mysqli_stmt_bind_param($stmt, "iiiids", $endentrega, $cliente, $idpagamento, $valortotal, $idfeedback, $status);
+    $sucesso = mysqli_stmt_execute($stmt);
+    if (!$sucesso) {
+        mysqli_stmt_close($stmt);
+        return false;
+    }
+
+    $idpedido = mysqli_insert_id($conexao);
+    mysqli_stmt_close($stmt);
+    return $idpedido;
+}
+
+
 function criar_delivery($conexao, $idpedido) {
     $sql = "INSERT INTO delivery (pedido_id) VALUES (?)";
     $comando = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($comando, 'i', $idpedido);
     if (!mysqli_stmt_execute($comando)) {
+        mysqli_stmt_close($comando);
         return false;
     }
     $iddelivery = mysqli_insert_id($conexao);
@@ -512,6 +543,9 @@ function listar_deliveries($conexao) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Criar (Registrar) Pedido
 // Criar novo pedido
+
+
+
 
 
 // Atualizar Pedido
@@ -592,6 +626,32 @@ function listar_itens_pedido($conexao, $idpedido) {
     $itens = mysqli_fetch_all($res, MYSQLI_ASSOC);
     mysqli_stmt_close($comando);
     return $itens;
+}
+function atualizar_total_pedido($conexao, $idpedido) {
+    // 1. Calcular o valor total somando (preco * quantidade)
+    $sql = "SELECT SUM(p.preco * pp.quantidade) AS total
+            FROM pedido_produto pp
+            INNER JOIN produto p ON p.idproduto = pp.idproduto
+            WHERE pp.idpedido = ?";
+    
+    $comando = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($comando, 'i', $idpedido);
+    mysqli_stmt_execute($comando);
+    $resultado = mysqli_stmt_get_result($comando);
+    $dados = mysqli_fetch_assoc($resultado);
+    mysqli_stmt_close($comando);
+
+    $total = $dados['total'] ?? 0.00;
+
+    // 2. Atualizar o pedido com o novo valor
+    $sql_update = "UPDATE pedido SET valortotal = ? WHERE idpedido = ?";
+    $comando_update = mysqli_prepare($conexao, $sql_update);
+    mysqli_stmt_bind_param($comando_update, 'di', $total, $idpedido);
+
+    $sucesso = mysqli_stmt_execute($comando_update);
+    mysqli_stmt_close($comando_update);
+
+    return $sucesso ? $total : false;
 }
 
 

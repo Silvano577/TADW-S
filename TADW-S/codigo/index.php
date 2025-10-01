@@ -31,6 +31,7 @@ if ($result && $result->num_rows > 0) {
     <nav>
         <ul>
             <li><a href="index.php" class="ativo">Início</a></li>
+            <li><a href="cardapio.php">Cardápio</a></li> <!-- 🔹 Novo item do menu -->
             <li><a href="sobre.php">Sobre</a></li>
 
             <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim'): ?>

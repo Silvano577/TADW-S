@@ -11,8 +11,8 @@ $telefone  = $_POST['telefone'] ?? '';
 $foto      = ""; // será preenchido pelo upload
 
 // Diretórios para a foto
-$pasta_fotos = "/var/www/html/fotos_cliente/";
-$caminho_relativo = "fotos_cliente/";
+$pasta_fotos = "/var/www/html/fotos/";
+$caminho_relativo = "fotos/";
 $caminho_foto_final = "";
 
 // Verificação e envio da imagem

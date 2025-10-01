@@ -13,7 +13,7 @@ $cliente_id = $_POST['cliente'] ?? 0;
 if ($id > 0) {
     atualizar_endereco($conexao, $id, $rua, $numero, $complemento, $bairro, $cliente_id);
 } else {
-    criar_endereco($conexao, $rua, $numero, $complemento, $bairro, $cliente_id);
+    registrar_endereco($conexao, $rua, $numero, $complemento, $bairro, $cliente_id);
 }
 
 // Fluxo final: redireciona para login

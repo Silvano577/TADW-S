@@ -2,7 +2,8 @@
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-$lista_pagamentos = listar_pagamentos($conexao);
+// Buscar todas as vendas
+$vendas = listar_venda($conexao);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -15,17 +16,31 @@ $lista_pagamentos = listar_pagamentos($conexao);
 <body>
     <h1>Vendas</h1>
 
-    <?php if (count($lista_pagamentos) === 0): ?>
+    <?php if (empty($vendas)): ?>
         <p style="text-align:center;">Nenhuma venda encontrada.</p>
     <?php else: ?>
         <div class="grid">
-            <?php foreach ($lista_pagamentos as $pagamento): ?>
+            <?php foreach ($vendas as $venda): ?>
                 <div class="card">
-                    <h3>Pedido: <?= htmlspecialchars($pagamento['idpedido']) ?></h3>
-                    <p>Método: <?= htmlspecialchars($pagamento['metodo']) ?></p>
-                    <p>Valor: R$ <?= number_format($pagamento['valor'], 2, ',', '.') ?></p>
-                    <a href="../Forms/formpagamento.php?id=<?= $pagamento['idpagamento'] ?>" class="btn">Editar</a>
-                    <a href="../Deletar/deletarpagamento.php?id=<?= $pagamento['idpagamento'] ?>" onclick="return confirm('Deseja realmente excluir esta venda?');" class="btn btn-delete">Excluir</a>
+                    <h3>Pedido: <?= htmlspecialchars($venda['idpedido'] ?? '') ?></h3>
+                    <p>Método: <?= htmlspecialchars($venda['metodo'] ?? '-') ?></p>
+                    <p>Valor Total: R$ <?= number_format($venda['valortotal'] ?? 0, 2, ',', '.') ?></p>
+                    <p>Produtos:</p>
+                    <ul>
+                        <?php 
+                        $itens = listar_itens_pedido($conexao, $venda['idpedido'] ?? 0);
+                        if (!empty($itens)):
+                            foreach ($itens as $item): ?>
+                                <li><?= htmlspecialchars($item['nome'] ?? '') ?> (Qtd: <?= intval($item['quantidade'] ?? 0) ?>)</li>
+                            <?php endforeach; 
+                        else: ?>
+                            <li>Nenhum produto</li>
+                        <?php endif; ?>
+                    </ul>
+                    <div class="acoes">
+                        <a href="../Forms/formpedido.php?id=<?= $venda['idpedido'] ?>" class="btn">Editar</a>
+                        <a href="../Deletar/deletarpedido.php?id=<?= $venda['idpedido'] ?>" onclick="return confirm('Deseja realmente excluir este pedido?');" class="btn btn-delete">Excluir</a>
+                    </div>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -36,4 +51,3 @@ $lista_pagamentos = listar_pagamentos($conexao);
     </div>
 </body>
 </html>
-
