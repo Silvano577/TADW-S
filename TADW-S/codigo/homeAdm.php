@@ -61,7 +61,7 @@ protegeTipo('adm'); // garante que só ADM acesse
         <li><a href="./Listar/listardelivery.php"><i class="fas fa-shopping-cart"></i> Listar Pagamentos#</a></li>
         <li><a href="./Forms/formvenda.php"><i class="fas fa-shopping-cart"></i> Fazer Compra</a></li>
         
-formstatusdelivery.php
+
     </ul>
 </main>
 

@@ -168,6 +168,7 @@ function listar_clientes($conexao) {
     $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
     mysqli_stmt_close($stmt);
     return $rows;
+    //////////////////////////////////////////////////////////////////////////////////////////////////
 }
 function registrar_endereco($conexao, $rua, $numero, $complemento, $bairro, $cliente) {
     $sql = "INSERT INTO endentrega (rua, numero, complemento, bairro, cliente) VALUES (?, ?, ?, ?, ?)";
@@ -349,16 +350,46 @@ function listar_produtos($conexao) {
     return $lista_produtos;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function cadastrar_pagamento($conexao, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento) {
-    $sql = "INSERT INTO pagamento (metodo_pagamento, valor, status_pagamento, data_pagamento) VALUES (?, ?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    // tipos: s = string (metodo), d = double (valor), s = string (status), s = string (data YYYY-MM-DD)
-    mysqli_stmt_bind_param($comando, 'sdss', $metodo_pagamento, $valor, $status_pagamento, $data_pagamento);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
+// adiciona no seu arquivo de funções (funcao.php ou funcoes.php)
+function pesquisarProdutoId($conexao, $idproduto) {
+    $sql = "SELECT idproduto, nome, tipo, preco, tamanho, foto FROM produto WHERE idproduto = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $idproduto);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_assoc($resultado);
 }
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function registrar_pagamento($conexao, $cliente, $status, $valortotal) {
+    // Define status padrão, se vier vazio
+    if (empty($status)) {
+        $status = 'pendente';
+    }
+
+    $sql = "INSERT INTO pagamento (cliente, status, valortotal, data_pagamento)
+            VALUES (?, ?, ?, NOW())";
+    $stmt = mysqli_prepare($conexao, $sql);
+    if (!$stmt) return false;
+
+    mysqli_stmt_bind_param($stmt, "isd", $cliente, $status, $valortotal);
+
+    $sucesso = mysqli_stmt_execute($stmt);
+    if (!$sucesso) {
+        mysqli_stmt_close($stmt);
+        return false;
+    }
+
+    $idpagamento = mysqli_insert_id($conexao);
+    mysqli_stmt_close($stmt);
+    return $idpagamento; // retorna o ID do pagamento criado
+}
+
+
 
 function atualizar_pagamento($conexao, $id, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento) {
     $sql = "UPDATE pagamento
@@ -468,14 +499,16 @@ function listar_venda($conexao) {
 // Criar delivery vinculado ao pedido
 
 function salvarPedido($conexao, $endentrega, $cliente, $idpagamento, $valortotal, $idfeedback = null) {
-    $status = 'pendente'; // garante que status nunca será NULL
+    $status = 'pendente'; // Status inicial padrão
 
     $sql = "INSERT INTO pedido (endentrega, cliente, idpagamento, valortotal, idfeedback, status) 
             VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conexao, $sql);
     if (!$stmt) return false;
 
-    mysqli_stmt_bind_param($stmt, "iiiids", $endentrega, $cliente, $idpagamento, $valortotal, $idfeedback, $status);
+    // Correção dos tipos — d = double (para o valor total)
+    mysqli_stmt_bind_param($stmt, "iiidis", $endentrega, $cliente, $idpagamento, $valortotal, $idfeedback, $status);
+
     $sucesso = mysqli_stmt_execute($stmt);
     if (!$sucesso) {
         mysqli_stmt_close($stmt);
@@ -484,22 +517,31 @@ function salvarPedido($conexao, $endentrega, $cliente, $idpagamento, $valortotal
 
     $idpedido = mysqli_insert_id($conexao);
     mysqli_stmt_close($stmt);
-    return $idpedido;
+    return $idpedido; // retorna o ID do pedido criado
 }
 
 
 function criar_delivery($conexao, $idpedido) {
-    $sql = "INSERT INTO delivery (pedido_id) VALUES (?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idpedido);
-    if (!mysqli_stmt_execute($comando)) {
-        mysqli_stmt_close($comando);
+    $status = 'em preparo'; // Status inicial padrão da entrega
+
+    $sql = "INSERT INTO delivery (idpedido, status, data_envio)
+            VALUES (?, ?, NOW())";
+    $stmt = mysqli_prepare($conexao, $sql);
+    if (!$stmt) return false;
+
+    mysqli_stmt_bind_param($stmt, "is", $idpedido, $status);
+
+    $sucesso = mysqli_stmt_execute($stmt);
+    if (!$sucesso) {
+        mysqli_stmt_close($stmt);
         return false;
     }
+
     $iddelivery = mysqli_insert_id($conexao);
-    mysqli_stmt_close($comando);
-    return $iddelivery;
+    mysqli_stmt_close($stmt);
+    return $iddelivery; // retorna o ID da entrega criada
 }
+
 
 
 // Atualizar status do delivery
@@ -652,6 +694,83 @@ function atualizar_total_pedido($conexao, $idpedido) {
     mysqli_stmt_close($comando_update);
 
     return $sucesso ? $total : false;
+}
+
+function criarPedidoCompleto($conexao, $cliente, $endentrega, $itens, $valortotal, $taxaEntrega = 5.00) {
+    // Inicia a transação
+    mysqli_begin_transaction($conexao);
+
+    try {
+        // --- 1️⃣ Criar pagamento ---
+        $status_pagamento = 'pendente';
+        $sqlPagamento = "INSERT INTO pagamento (cliente, status, valortotal, data_pagamento) 
+                         VALUES (?, ?, ?, NOW())";
+        $stmtPag = mysqli_prepare($conexao, $sqlPagamento);
+        if (!$stmtPag) throw new Exception("Erro ao preparar pagamento.");
+        mysqli_stmt_bind_param($stmtPag, "isd", $cliente, $status_pagamento, $valortotal);
+        if (!mysqli_stmt_execute($stmtPag)) throw new Exception("Erro ao registrar pagamento.");
+        $idpagamento = mysqli_insert_id($conexao);
+        mysqli_stmt_close($stmtPag);
+
+        // --- 2️⃣ Criar pedido ---
+        $status_pedido = 'pendente';
+        $sqlPedido = "INSERT INTO pedido (endentrega, cliente, idpagamento, valortotal, idfeedback, status)
+                      VALUES (?, ?, ?, ?, NULL, ?)";
+        $stmtPed = mysqli_prepare($conexao, $sqlPedido);
+        if (!$stmtPed) throw new Exception("Erro ao preparar pedido.");
+        mysqli_stmt_bind_param($stmtPed, "iiids", $endentrega, $cliente, $idpagamento, $valortotal, $status_pedido);
+        if (!mysqli_stmt_execute($stmtPed)) throw new Exception("Erro ao salvar pedido.");
+        $idpedido = mysqli_insert_id($conexao);
+        mysqli_stmt_close($stmtPed);
+
+        // --- 3️⃣ Inserir produtos no pedido ---
+        $sqlItem = "INSERT INTO pedido_produto (idpedido, idproduto, quantidade, preco_unit) 
+                    VALUES (?, ?, ?, ?)";
+        $stmtItem = mysqli_prepare($conexao, $sqlItem);
+        if (!$stmtItem) throw new Exception("Erro ao preparar itens do pedido.");
+
+        foreach ($itens as $item) {
+            mysqli_stmt_bind_param($stmtItem, "iiid", 
+                $idpedido,
+                $item['idproduto'],
+                $item['quantidade'],
+                $item['preco_unit']
+            );
+            if (!mysqli_stmt_execute($stmtItem)) {
+                throw new Exception("Erro ao inserir item do pedido.");
+            }
+        }
+        mysqli_stmt_close($stmtItem);
+
+        // --- 4️⃣ Criar delivery ---
+        $status_delivery = 'em preparo';
+        $sqlDelivery = "INSERT INTO delivery (idpedido, status, data_envio) VALUES (?, ?, NOW())";
+        $stmtDel = mysqli_prepare($conexao, $sqlDelivery);
+        if (!$stmtDel) throw new Exception("Erro ao preparar delivery.");
+        mysqli_stmt_bind_param($stmtDel, "is", $idpedido, $status_delivery);
+        if (!mysqli_stmt_execute($stmtDel)) throw new Exception("Erro ao criar delivery.");
+        $iddelivery = mysqli_insert_id($conexao);
+        mysqli_stmt_close($stmtDel);
+
+        // --- 5️⃣ Concluir transação ---
+        mysqli_commit($conexao);
+
+        // --- 6️⃣ Retornar dados completos ---
+        return [
+            'sucesso' => true,
+            'idpedido' => $idpedido,
+            'idpagamento' => $idpagamento,
+            'iddelivery' => $iddelivery,
+            'valortotal' => $valortotal
+        ];
+
+    } catch (Exception $e) {
+        mysqli_rollback($conexao); // desfaz tudo se algo falhar
+        return [
+            'sucesso' => false,
+            'erro' => $e->getMessage()
+        ];
+    }
 }
 
 
