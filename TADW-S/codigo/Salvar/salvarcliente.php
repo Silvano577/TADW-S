@@ -2,9 +2,9 @@
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-$id         = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$usuario_id = isset($_POST['usuario_id']) ? intval($_POST['usuario_id']) : 0;
-
+// Recebe os dados do POST
+$id        = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$idusuario = isset($_POST['idusuario']) ? intval($_POST['idusuario']) : 0;
 $nome      = $_POST['nome'] ?? '';
 $data_ani  = $_POST['data_ani'] ?? '';
 $telefone  = $_POST['telefone'] ?? '';
@@ -32,33 +32,52 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
         $caminho_foto_final = $caminho_relativo . $novo_nome;
 
         if (!move_uploaded_file($caminho_temporario, $caminho_destino)) {
-            echo "Erro: Falha ao mover a imagem.";
-            exit;
+            die("Erro: Falha ao mover a imagem.");
         }
     } else {
-        echo "Erro: Tipo de imagem não permitido.";
-        exit;
+        die("Erro: Tipo de imagem não permitido.");
     }
 } elseif ($id > 0) {
     // Mantém a foto atual se não veio uma nova
-    $cliente = buscar_cliente($conexao, $id, '');
-    if (!empty($cliente)) {
-        $caminho_foto_final = $cliente[0]['foto'];
+    $idcliente = buscar_cliente($conexao, $id, '');
+    if (!empty($idcliente)) {
+        $caminho_foto_final = $idcliente[0]['foto'];
     }
 }
 
+// Verifica se idusuario é válido
+if ($idusuario > 0) {
+    $sql_check = "SELECT idusuario FROM usuario WHERE idusuario = ?";
+    $stmt_check = mysqli_prepare($conexao, $sql_check);
+    mysqli_stmt_bind_param($stmt_check, "i", $idusuario);
+    mysqli_stmt_execute($stmt_check);
+    mysqli_stmt_store_result($stmt_check);
+    if (mysqli_stmt_num_rows($stmt_check) == 0) {
+        die("Erro: Usuário informado não existe!");
+    }
+    mysqli_stmt_close($stmt_check);
+} else {
+    // Cria um usuário temporário se não houver idusuario
+    $login = "user_" . uniqid();
+    $email = $login . "@example.com"; // e-mail temporário
+    $senha = "123456"; // senha padrão
+    $idusuario = criar_usuario($conexao, $login, $email, $senha);
+    if (!$idusuario) {
+        die("Erro: Não foi possível criar o usuário temporário.");
+    }
+}
+
+// Cria ou atualiza o cliente
 if ($id > 0) {
-    // Atualiza cliente existente
-    atualizar_cliente($conexao, $id, $nome, $data_ani, $telefone, $caminho_foto_final);
+    atualizar_cliente($conexao, $id, $nome, $data_ani, $telefone, $caminho_foto_final, $idusuario);
     $idcliente = $id;
 } else {
-    // Cria cliente novo
-    $idcliente = criar_cliente($conexao, $nome, $data_ani, $telefone, $caminho_foto_final, $usuario_id);
+    $idcliente = criar_cliente($conexao, $nome, $data_ani, $telefone, $caminho_foto_final, $idusuario);
 }
 
 // Redireciona para cadastro de endereço
 if ($idcliente > 0) {
-    header("Location: ../Forms/formendentrega.php?cliente_id={$idcliente}");
+    header("Location: ../Forms/formentrega.php?cliente_id={$idcliente}");
     exit;
 } else {
     echo "Erro ao cadastrar cliente!";

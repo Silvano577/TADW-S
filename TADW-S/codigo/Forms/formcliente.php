@@ -2,7 +2,7 @@
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-$usuario_id = isset($_GET['usuario_id']) ? intval($_GET['usuario_id']) : 0;
+$idusuario = isset($_GET['idusuario']) ? intval($_GET['idusuario']) : 0;
 $id         = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 $nome     = '';
@@ -12,14 +12,14 @@ $foto     = '';
 $botao    = 'Cadastrar';
 
 if ($id > 0) {
-    $cliente = buscar_cliente($conexao, $id, '');
-    if (!empty($cliente)) {
-        $c = $cliente[0];
-        $nome     = $c['nome'];
+    $idcliente = buscar_cliente($conexao, $id, '');
+    if (!empty($idcliente)) {
+        $c = $idcliente[0];
+        $nome = $c['nome'];
         $data_ani = $c['data_ani'];
         $telefone = $c['telefone'];
-        $foto     = $c['foto'];
-        $botao    = 'Atualizar';
+        $foto = $c['foto'];
+        $botao = 'Atualizar';
     }
 }
 ?>
@@ -48,7 +48,7 @@ Foto:<br>
 <?php endif; ?>
 <br>
 
-<input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
+<input type="hidden" name="idusuario" value="<?= $idusuario ?>">
 
 <input type="submit" value="<?= $botao ?>">
 </form>

@@ -10,16 +10,16 @@ $senha = $_POST['senha'] ?? '';
 if ($id > 0) {
     // Atualiza usuário existente
     atualizar_usuario($conexao, $id, $nome, $email, $senha);
-    $usuario_id = $id;
+    $idusuario = $id;
     // Redireciona para edição/criação de cliente vinculado
-    header("Location: ../Forms/formcliente.php?usuario_id={$usuario_id}");
+    header("Location: ../Forms/formcliente.php?usuario_id={$idusuario}");
 } else {
     // Cria novo usuário
-    $usuario_id = criar_usuario($conexao, $nome, $email, $senha);
+    $idusuario = criar_usuario($conexao, $nome, $email, $senha);
 
-    if ($usuario_id > 0) {
+    if ($idusuario > 0) {
         // Redireciona para criar cliente vinculado
-        header("Location: ../Forms/formcliente.php?usuario_id={$usuario_id}");
+        header("Location: ../Forms/formcliente.php?usuario_id={$idusuario}");
     } else {
         echo "Erro ao cadastrar usuário!";
     }

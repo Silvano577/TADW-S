@@ -170,20 +170,20 @@ function listar_clientes($conexao) {
     return $rows;
     //////////////////////////////////////////////////////////////////////////////////////////////////
 }
-function registrar_endereco($conexao, $rua, $numero, $complemento, $bairro, $cliente) {
-    $sql = "INSERT INTO endentrega (rua, numero, complemento, bairro, cliente) VALUES (?, ?, ?, ?, ?)";
+function registrar_endereco($conexao, $rua, $numero, $complemento, $bairro, $idcliente) {
+    $sql = "INSERT INTO endentrega (rua, numero, complemento, bairro, idcliente) VALUES (?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($stmt, 'ssssi', $rua, $numero, $complemento, $bairro, $cliente);
+    mysqli_stmt_bind_param($stmt, 'ssssi', $rua, $numero, $complemento, $bairro, $idcliente);
     mysqli_stmt_execute($stmt);
     $id = mysqli_insert_id($conexao);
     mysqli_stmt_close($stmt);
     return $id;
 }
 
-function atualizar_endereco($conexao, $id, $rua, $numero, $complemento, $bairro, $cliente) {
-    $sql = "UPDATE endentrega SET rua=?, numero=?, complemento=?, bairro=?, cliente=? WHERE idendentrega=?";
+function atualizar_endereco($conexao, $id, $rua, $numero, $complemento, $bairro, $idcliente) {
+    $sql = "UPDATE endentrega SET rua=?, numero=?, complemento=?, bairro=?, idcliente=? WHERE idendentrega=?";
     $stmt = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($stmt, 'ssssii', $rua, $numero, $complemento, $bairro, $cliente, $id);
+    mysqli_stmt_bind_param($stmt, 'ssssii', $rua, $numero, $complemento, $bairro, $idcliente, $id);
     $exec = mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
     return $exec;
@@ -228,7 +228,7 @@ function listar_enderecos($conexao) {
 
 // Listar endereços por cliente
 function listar_enderecos_por_cliente($conexao, $idcliente) {
-    $sql = "SELECT * FROM endentrega WHERE cliente = ?";
+    $sql = "SELECT * FROM endentrega WHERE idcliente = ?";
     $comando = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($comando, 'i', $idcliente);
     mysqli_stmt_execute($comando);
@@ -365,36 +365,25 @@ function pesquisarProdutoId($conexao, $idproduto) {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function registrar_pagamento($conexao, $cliente, $status, $valortotal) {
-    // Define status padrão, se vier vazio
-    if (empty($status)) {
-        $status = 'pendente';
-    }
-
-    $sql = "INSERT INTO pagamento (cliente, status, valortotal, data_pagamento)
-            VALUES (?, ?, ?, NOW())";
+function registrar_pagamento($conexao, $idcliente, $metodo_pagamento, $valor, $data_pagamento) {
+    $status_pagamento = 'pendente';
+    $sql = "INSERT INTO pagamento (idcliente, metodo_pagamento, valor, status_pagamento, data_pagamento)
+            VALUES (?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conexao, $sql);
     if (!$stmt) return false;
 
-    mysqli_stmt_bind_param($stmt, "isd", $cliente, $status, $valortotal);
+    mysqli_stmt_bind_param($stmt, "isdss", $idcliente, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento);
+    mysqli_stmt_execute($stmt);
 
-    $sucesso = mysqli_stmt_execute($stmt);
-    if (!$sucesso) {
-        mysqli_stmt_close($stmt);
-        return false;
-    }
-
-    $idpagamento = mysqli_insert_id($conexao);
-    mysqli_stmt_close($stmt);
-    return $idpagamento; // retorna o ID do pagamento criado
+    return mysqli_insert_id($conexao);
 }
 
 
 
+
 function atualizar_pagamento($conexao, $id, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento) {
-    $sql = "UPDATE pagamento
-            SET metodo_pagamento = ?, valor = ?, status_pagamento = ?, data_pagamento = ?
-            WHERE idpagamento = ?";
+    $sql = "UPDATE pagamento SET metodo_pagamento = ?, valor = ?, status_pagamento = ?, data_pagamento = ?
+    WHERE idpagamento = ?";
     $comando = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($comando, 'sdssi', $metodo_pagamento, $valor, $status_pagamento, $data_pagamento, $id);
     $resultado = mysqli_stmt_execute($comando);
@@ -498,16 +487,16 @@ function listar_venda($conexao) {
 
 // Criar delivery vinculado ao pedido
 
-function salvarPedido($conexao, $endentrega, $cliente, $idpagamento, $valortotal, $idfeedback = null) {
+function salvarPedido($conexao, $endentrega, $idcliente, $idpagamento, $valortotal, $idfeedback = null) {
     $status = 'pendente'; // Status inicial padrão
 
-    $sql = "INSERT INTO pedido (endentrega, cliente, idpagamento, valortotal, idfeedback, status) 
+    $sql = "INSERT INTO pedido (endentrega, idcliente, idpagamento, valortotal, idfeedback, status) 
             VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conexao, $sql);
     if (!$stmt) return false;
 
     // Correção dos tipos — d = double (para o valor total)
-    mysqli_stmt_bind_param($stmt, "iiidis", $endentrega, $cliente, $idpagamento, $valortotal, $idfeedback, $status);
+    mysqli_stmt_bind_param($stmt, "iiidis", $endentrega, $idcliente, $idpagamento, $valortotal, $idfeedback, $status);
 
     $sucesso = mysqli_stmt_execute($stmt);
     if (!$sucesso) {
@@ -591,16 +580,16 @@ function listar_deliveries($conexao) {
 
 
 // Atualizar Pedido
-function atualizar_pedido($conexao, $idpedido, $endentrega, $cliente, $idfeedback, $idpagamento, $valortotal) {
-    $sql = "UPDATE pedido SET endentrega=?, cliente=?, idfeedback=?, idpagamento=?, valortotal=? WHERE idpedido=?";
+function atualizar_pedido($conexao, $idpedido, $endentrega, $idcliente, $idfeedback, $idpagamento, $valortotal) {
+    $sql = "UPDATE pedido SET endentrega=?, idcliente=?, idfeedback=?, idpagamento=?, valortotal=? WHERE idpedido=?";
     $comando = mysqli_prepare($conexao, $sql);
 
     // idfeedback pode ser null
     if ($idfeedback === null) {
         // Bind ignorando idfeedback (vai como NULL)
-        mysqli_stmt_bind_param($comando, 'iiiidi', $endentrega, $cliente, $idfeedback, $idpagamento, $valortotal, $idpedido);
+        mysqli_stmt_bind_param($comando, 'iiiidi', $endentrega, $idcliente, $idfeedback, $idpagamento, $valortotal, $idpedido);
     } else {
-        mysqli_stmt_bind_param($comando, 'iiiidi', $endentrega, $cliente, $idfeedback, $idpagamento, $valortotal, $idpedido);
+        mysqli_stmt_bind_param($comando, 'iiiidi', $endentrega, $idcliente, $idfeedback, $idpagamento, $valortotal, $idpedido);
     }
 
     $res = mysqli_stmt_execute($comando);
@@ -772,6 +761,5 @@ function criarPedidoCompleto($conexao, $cliente, $endentrega, $itens, $valortota
         ];
     }
 }
-
 
 ?>

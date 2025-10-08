@@ -8,9 +8,9 @@ $email = '';
 $botao = 'Cadastrar';
 
 if ($id > 0) {
-    $usuario = buscar_usuario($conexao, $id, '');
-    if (!empty($usuario)) {
-        $u = $usuario[0];
+    $idusuario = buscar_usuario($conexao, $id, '');
+    if (!empty($idusuario)) {
+        $u = $idusuario[0];
         $nome  = $u['usuario'];
         $email = $u['email'];
         $botao = 'Atualizar';

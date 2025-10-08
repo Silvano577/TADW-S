@@ -1,95 +1,53 @@
 <?php
-require_once "../protege.php";
-require_once "../conexao.php";
-require_once "../funcao.php";
+include '../conexao.php';
+session_start();
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Se não houver carrinho, redireciona ou mostra mensagem
-if (empty($_SESSION['carrinho']) || !is_array($_SESSION['carrinho'])) {
-    echo "<p>Seu carrinho está vazio. <a href='../cardapio.php'>Voltar ao cardápio</a></p>";
+if (!isset($_SESSION['idcliente'])) {
+    echo "Você precisa estar logado para fazer um pedido.";
     exit;
 }
 
-// Preparar dados do pedido a partir da sessão
-$carrinho = $_SESSION['carrinho'];
-$total = 0.0;
-$itens = [];
+$idcliente = $_SESSION['idcliente'];
 
-foreach ($carrinho as $id => $qtd) {
-    $id = intval($id);
-    $qtd = max(1, intval($qtd));
-    $produto = pesquisarProdutoId($conexao, $id); // ajusta conforme sua função
-    if (!$produto) continue;
-    $preco = (float)$produto['preco'];
-    $subtotal = $preco * $qtd;
-    $total += $subtotal;
-    $itens[] = [
-        'id' => $id,
-        'nome' => $produto['nome'],
-        'tamanho' => $produto['tamanho'] ?? '',
-        'preco' => $preco,
-        'qtd' => $qtd,
-        'subtotal' => $subtotal,
-    ];
-}
+// Buscar endereços do cliente
+$sql = "SELECT idendentrega, rua, numero, bairro FROM endentrega WHERE cliente = ?";
+$stmt = mysqli_prepare($conexao, $sql);
+mysqli_stmt_bind_param($stmt, "i", $idcliente);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
-// Prefill cliente se estiver em sessão (opcional)
-$clienteId = isset($_SESSION['cliente_id']) ? intval($_SESSION['cliente_id']) : '';
-$endentregaId = '';
-$idpagamento = '';
-$botao = "Finalizar Pedido";
+// Buscar endereço ponto fixo
+$sqlPontoFixo = "SELECT idendentrega, rua, numero, bairro FROM endentrega WHERE tipo = 'ponto_fixo' LIMIT 1";
+$resPontoFixo = mysqli_query($conexao, $sqlPontoFixo);
+$pontoFixo = mysqli_fetch_assoc($resPontoFixo);
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title><?php echo $botao; ?></title>
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-    <h1><?php echo $botao; ?></h1>
+<h2>Finalizar Pedido</h2>
 
-    <form action="../Salvar/salvarpedido.php" method="post">
-        <label>Cliente (ID):</label><br>
-        <input type="number" name="cliente" value="<?php echo htmlspecialchars($clienteId); ?>" required><br><br>
+<form action="salvarpedido.php" method="POST">
 
-        <label>Endereço de Entrega (ID):</label><br>
-        <input type="number" name="endentrega" value="<?php echo htmlspecialchars($endentregaId); ?>" required><br><br>
+    <label>Escolha a forma de entrega:</label><br><br>
 
-        <label>Pagamento (ID) (opcional):</label><br>
-        <input type="number" name="idpagamento" value="<?php echo htmlspecialchars($idpagamento); ?>"><br><br>
+    <input type="radio" name="tipo_entrega" value="cliente" checked> Entrega no meu endereço<br><br>
 
-        <h3>Resumo do Pedido</h3>
-        <table>
-            <thead>
-                <tr><th>Produto</th><th>Tamanho</th><th>Preço</th><th>Qtd</th><th>Subtotal</th></tr>
-            </thead>
-            <tbody>
-                <?php foreach ($itens as $it): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($it['nome']); ?></td>
-                        <td><?php echo htmlspecialchars($it['tamanho']); ?></td>
-                        <td>R$ <?php echo number_format($it['preco'], 2, ',', '.'); ?></td>
-                        <td><?php echo $it['qtd']; ?></td>
-                        <td>R$ <?php echo number_format($it['subtotal'], 2, ',', '.'); ?></td>
-                    </tr>
+    <select name="endentrega_cliente">
+        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+            <option value="<?php echo $row['identrega']; ?>">
+                <?php echo $row['rua'] . ', ' . $row['numero'] . ' - ' . $row['bairro']; ?>
+            </option>
+        <?php } ?>
+    </select>
+    <br><br>
 
-                    <!-- inputs ocultos para enviar os produtos/quantidades ao salvarpedido.php -->
-                    <input type="hidden" name="idproduto[]" value="<?php echo $it['id']; ?>">
-                    <input type="hidden" name="quantidade[<?php echo $it['id']; ?>]" value="<?php echo $it['qtd']; ?>">
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+    <input type="radio" name="tipo_entrega" value="ponto_fixo"> Retirar no ponto fixo<br>
+    <?php if ($pontoFixo) { ?>
+        <p><strong>Endereço:</strong> <?php echo $pontoFixo['rua'] . ', ' . $pontoFixo['numero'] . ' - ' . $pontoFixo['bairro']; ?></p>
+        <input type="hidden" name="endentrega_ponto_fixo" value="<?php echo $pontoFixo['identrega']; ?>">
+    <?php } else { ?>
+        <p style="color:red;">Nenhum ponto fixo cadastrado no sistema.</p>
+    <?php } ?>
 
-        <p><strong>Total: R$ <?php echo number_format($total, 2, ',', '.'); ?></strong></p>
+    <br><br>
+    <input type="submit" value="Confirmar Pedido">
 
-        <input type="submit" value="<?php echo $botao; ?>">
-    </form>
-
-    <p><a href="../carrinho.php">Voltar ao carrinho</a></p>
-</body>
-</html>
+</form>

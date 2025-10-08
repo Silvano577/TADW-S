@@ -15,7 +15,7 @@ if (isset($_GET['id'])) {
     $status = "atribuido";
     $botao = "Cadastrar";
 }
-?>
+?> 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>

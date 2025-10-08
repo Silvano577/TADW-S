@@ -4,7 +4,7 @@ require_once "../conexao.php";
 require_once "../funcao.php";
 
 // Recebe o cliente_id do redirecionamento após cadastro
-$cliente_id = isset($_GET['cliente_id']) ? intval($_GET['cliente_id']) : 0;
+$idcliente = isset($_GET['idcliente']) ? intval($_GET['idcliente']) : 0;
 
 // Verifica se está editando um endereço existente
 if (isset($_GET['id'])) {
@@ -15,14 +15,14 @@ if (isset($_GET['id'])) {
         $numero = $endereco['numero'];
         $complemento = $endereco['complemento'];
         $bairro = $endereco['bairro'];
-        $cliente = $endereco['cliente'];
+        $idcliente = $endereco['idcliente'];
     }
     $botao = "Atualizar";
 } else {
     // Novo endereço
     $id = 0;
     $rua = $numero = $complemento = $bairro = "";
-    $cliente = $cliente_id; // pré-preenche com o cliente que acabou de se cadastrar
+    $idcliente = $idcliente; // pré-preenche com o cliente que acabou de se cadastrar
     $botao = "Cadastrar";
 }
 ?>
@@ -49,7 +49,7 @@ if (isset($_GET['id'])) {
     <input type="text" name="bairro" value="<?= htmlspecialchars($bairro) ?>" required><br><br>
 
     Cliente ID:<br>
-    <input type="number" name="cliente" value="<?= htmlspecialchars($cliente) ?>" readonly required><br><br>
+    <input type="number" name="idcliente" value="<?= htmlspecialchars($idcliente) ?>" readonly required><br><br>
 
     <input type="submit" value="<?= $botao ?>">
 </form>
@@ -65,7 +65,7 @@ if (isset($_GET['id'])) {
                     <h3><?= htmlspecialchars($endereco['rua']) ?>, <?= htmlspecialchars($endereco['numero']) ?></h3>
                     <p class="info"><strong>Bairro:</strong> <?= htmlspecialchars($endereco['bairro']) ?></p>
                     <p class="info"><strong>Complemento:</strong> <?= htmlspecialchars($endereco['complemento']) ?></p>
-                    <p class="info"><strong>ID Cliente:</strong> <?= $endereco['cliente'] ?></p>
+                    <p class="info"><strong>ID Cliente:</strong> <?= $endereco['idcliente'] ?></p>
 
                     <a href="../Forms/formendentrega.php?id=<?= $endereco['idendentrega'] ?>" class="btn">Editar</a>
                     <a href="../Deletar/deletarendentrega.php?id=<?= $endereco['idendentrega'] ?>" class="btn-delete" onclick="return confirm('Deseja realmente excluir?')">Excluir</a>

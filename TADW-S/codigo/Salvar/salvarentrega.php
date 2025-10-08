@@ -8,12 +8,12 @@ $rua        = $_POST['rua'] ?? '';
 $numero     = $_POST['numero'] ?? '';
 $complemento= $_POST['complemento'] ?? '';
 $bairro     = $_POST['bairro'] ?? '';
-$cliente_id = $_POST['cliente'] ?? 0;
+$idcliente = $_POST['idcliente'] ?? 0;
 
 if ($id > 0) {
-    atualizar_endereco($conexao, $id, $rua, $numero, $complemento, $bairro, $cliente_id);
+    atualizar_endereco($conexao, $id, $rua, $numero, $complemento, $bairro, $idcliente);
 } else {
-    registrar_endereco($conexao, $rua, $numero, $complemento, $bairro, $cliente_id);
+    registrar_endereco($conexao, $rua, $numero, $complemento, $bairro, $idcliente);
 }
 
 // Fluxo final: redireciona para login
