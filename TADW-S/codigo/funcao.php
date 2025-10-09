@@ -131,16 +131,6 @@ function buscar_cliente($conexao, $idcliente = 0, $nome = '') {
 }
 
 // **Apenas uma** definição: buscar_cliente_por_usuario
-function buscar_cliente_por_usuario($conexao, $idusuario) {
-    $sql = "SELECT * FROM cliente WHERE idusuario = ?";
-    $stmt = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($stmt, 'i', $idusuario);
-    mysqli_stmt_execute($stmt);
-    $res = mysqli_stmt_get_result($stmt);
-    $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
-    mysqli_stmt_close($stmt);
-    return $rows;
-}
 
 function atualizar_cliente($conexao, $idcliente, $nome, $data_ani, $telefone, $foto) {
     $sql = "UPDATE cliente SET nome = ?, data_ani = ?, telefone = ?, foto = ? WHERE idcliente = ?";
@@ -226,16 +216,6 @@ function listar_enderecos($conexao) {
 // Buscar cliente pelo idusuario
 
 
-// Listar endereços por cliente
-function listar_enderecos_por_cliente($conexao, $idcliente) {
-    $sql = "SELECT * FROM endentrega WHERE idcliente = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idcliente);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    mysqli_stmt_close($comando);
-    return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-}
 
 
 
@@ -481,6 +461,28 @@ function listar_venda($conexao) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
+function buscar_cliente_por_usuario($conexao, $idusuario) {
+    $sql = "SELECT * FROM cliente WHERE idusuario = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idusuario);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $rows;
+}
+
+
+function buscar_enderecos_por_cliente($conexao, $idcliente) {
+    $sql = "SELECT * FROM endentrega WHERE idcliente = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idcliente);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+    $enderecos = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $enderecos;
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -572,8 +574,7 @@ function listar_deliveries($conexao) {
     return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Criar (Registrar) Pedido
-// Criar novo pedido
+
 
 
 

@@ -12,9 +12,9 @@ $foto     = '';
 $botao    = 'Cadastrar';
 
 if ($id > 0) {
-    $idcliente = buscar_cliente($conexao, $id, '');
-    if (!empty($idcliente)) {
-        $c = $idcliente[0];
+    $cliente = buscar_cliente($conexao, $id, '');
+    if (!empty($cliente)) {
+        $c = $cliente[0];
         $nome = $c['nome'];
         $data_ani = $c['data_ani'];
         $telefone = $c['telefone'];

@@ -16,8 +16,7 @@ $usuario = buscar_usuario($conexao, $usuario_id, "");
 $usuario = $usuario[0] ?? null;
 
 // Buscar cliente vinculado
-$cliente = buscar_cliente_por_usuario($conexao, $usuario_id);
-$cliente = $cliente[0] ?? null;
+$cliente = buscar_cliente_por_usuario($conexao, $usuario_id); // já retorna assoc único
 
 // Buscar endereços
 $enderecos = [];
@@ -25,7 +24,7 @@ if ($cliente) {
     $enderecos = listar_enderecos_por_cliente($conexao, $cliente['idcliente']);
 }
 
-// Tratar exclusão de endereço se houver GET delete_endereco
+// Tratar exclusão de endereço
 if (isset($_GET['delete_endereco'])) {
     $id_endereco = intval($_GET['delete_endereco']);
     deletar_endereco($conexao, $id_endereco);
@@ -33,7 +32,7 @@ if (isset($_GET['delete_endereco'])) {
     exit;
 }
 
-// Tratar exclusão da conta inteira se houver GET delete_conta
+// Tratar exclusão da conta inteira
 if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
     if ($cliente) {
         $cliente_id = $cliente['idcliente'];
@@ -45,7 +44,7 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
 
         // Deletar foto do cliente
         if (!empty($cliente['foto'])) {
-            $arquivo = "/var/www/html/fotos/" . basename($cliente['foto']);
+            $arquivo = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($cliente['foto'], '/');
             if (file_exists($arquivo)) unlink($arquivo);
         }
 
@@ -75,9 +74,9 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
 
     <div>
         <h2>Dados do Usuário</h2>
-        <p><strong>Nome de Usuário:</strong> <?= htmlspecialchars($usuario['usuario']) ?></p>
-        <p><strong>Email:</strong> <?= htmlspecialchars($usuario['email']) ?></p>
-        <p><strong>Tipo:</strong> <?= htmlspecialchars($usuario['tipo']) ?></p>
+        <p><strong>Nome de Usuário:</strong> <?= htmlspecialchars($usuario['usuario'] ?? '') ?></p>
+        <p><strong>Email:</strong> <?= htmlspecialchars($usuario['email'] ?? '') ?></p>
+        <p><strong>Tipo:</strong> <?= htmlspecialchars($usuario['tipo'] ?? '') ?></p>
         <a href="Forms/formusuario.php?id=<?= $usuario_id ?>">Editar Usuário</a>
     </div>
 
@@ -90,17 +89,17 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
             <p><strong>Nome:</strong> <?= htmlspecialchars($cliente['nome']) ?></p>
             <p><strong>Data de Aniversário:</strong> <?= htmlspecialchars($cliente['data_ani']) ?></p>
             <p><strong>Telefone:</strong> <?= htmlspecialchars($cliente['telefone']) ?></p>
-            <a href="Forms/formcliente.php?id=<?= $cliente['idcliente'] ?>&usuario_id=<?= $usuario_id ?>">Editar Cliente</a>
+            <a href="Forms/formcliente.php?id=<?= $cliente['idcliente'] ?>&idusuario=<?= $usuario_id ?>">Editar Cliente</a>
         </div>
 
         <div>
             <h2>Endereços</h2>
-            <?php if (count($enderecos) > 0): ?>
+            <?php if (!empty($enderecos)): ?>
                 <ul>
                     <?php foreach ($enderecos as $end): ?>
                         <li>
                             <?= htmlspecialchars($end['rua']) ?>, <?= htmlspecialchars($end['numero']) ?> - 
-                            <?= htmlspecialchars($end['bairro']) ?> (<?= htmlspecialchars($end['complemento']) ?>)
+                            <?= htmlspecialchars($end['bairro']) ?> (<?= htmlspecialchars($end['complemento'] ?? '') ?>)
                             <a href="Forms/formendentrega.php?id=<?= $end['idendentrega'] ?>&cliente_id=<?= $cliente['idcliente'] ?>">Editar</a>
                             <a href="perfil.php?delete_endereco=<?= $end['idendentrega'] ?>" onclick="return confirm('Deseja realmente excluir este endereço?');">Deletar</a>
                         </li>
@@ -114,7 +113,7 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
     <?php else: ?>
         <div>
             <p>Você ainda não cadastrou seus dados de cliente.</p>
-            <a href="Forms/formcliente.php?usuario_id=<?= $usuario_id ?>">Cadastrar agora</a>
+            <a href="Forms/formcliente.php?idusuario=<?= $usuario_id ?>">Cadastrar agora</a>
         </div>
     <?php endif; ?>
 

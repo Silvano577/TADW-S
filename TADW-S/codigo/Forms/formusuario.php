@@ -3,15 +3,15 @@ require_once "../conexao.php";
 require_once "../funcao.php";
 
 $id    = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$nome  = '';
+$usuario  = '';
 $email = '';
 $botao = 'Cadastrar';
 
 if ($id > 0) {
-    $idusuario = buscar_usuario($conexao, $id, '');
-    if (!empty($idusuario)) {
-        $u = $idusuario[0];
-        $nome  = $u['usuario'];
+    $dados_usuario = buscar_usuario($conexao, $id, '');
+    if (!empty($dados_usuario)) {
+        $u = $dados_usuario[0];
+        $usuario  = $u['usuario'];
         $email = $u['email'];
         $botao = 'Atualizar';
     }
@@ -26,8 +26,8 @@ if ($id > 0) {
 <body>
 <h1><?= $botao ?> Usuário</h1>
 <form action="../Salvar/salvarusuario.php?id=<?= $id ?>" method="post">
-Nome:<br>
-<input type="text" name="nome" value="<?= htmlspecialchars($nome) ?>" required><br><br>
+Nome de Usuário:<br>
+<input type="text" name="usuario" value="<?= htmlspecialchars($usuario) ?>" required><br><br>
 
 E-mail:<br>
 <input type="email" name="email" value="<?= htmlspecialchars($email) ?>" required><br><br>
