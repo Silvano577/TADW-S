@@ -11,12 +11,10 @@ if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
 
 $usuario_id = $_SESSION['idusuario'] ?? 0;
 
-
 // Buscar dados do usuário
-$usuario = buscar_usuario($conexao, $usuario_id, "");
-$usuario = $usuario[0] ?? null;
+$usuario = buscar_usuario($conexao, $usuario_id); // já retorna 1 usuário ou null
 
-// Buscar dados do cliente vinculado (função corrigida retorna só 1 cliente)
+// Buscar dados do cliente vinculado
 $idcliente = buscar_cliente_por_usuario($conexao, $usuario_id);
 
 // Garantir que seja um array válido
@@ -95,7 +93,7 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
             <p><strong>Nome:</strong> <?= htmlspecialchars($idcliente['nome'] ?? '') ?></p>
             <p><strong>Data de Aniversário:</strong> <?= htmlspecialchars($idcliente['data_ani'] ?? '') ?></p>
             <p><strong>Telefone:</strong> <?= htmlspecialchars($idcliente['telefone'] ?? '') ?></p>
-            <a href="Forms/formcliente.php?id=<?= $idcliente['idcliente'] ?? 0 ?>&idusuario=<?= $usuario_id ?>">Editar Cliente</a>
+            <a href="Forms/formcliente.php?id=<?= $idcliente['idcliente'] ?>&idusuario=<?= $usuario_id ?>">Editar Cliente</a>
         </div>
 
         <div>
@@ -116,7 +114,7 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
             <?php else: ?>
                 <p>Nenhum endereço cadastrado.</p>
             <?php endif; ?>
-            <a href="Forms/formentrega.php?cliente_id=<?= $idcliente['idcliente'] ?? 0 ?>">Adicionar Endereço</a>
+            <a href="Forms/formentrega.php?cliente_id=<?= $idcliente['idcliente'] ?>">Adicionar Endereço</a>
         </div>
     <?php else: ?>
         <div>

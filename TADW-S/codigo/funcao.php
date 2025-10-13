@@ -359,10 +359,12 @@ function registrar_pagamento($conexao, $idcliente, $metodo_pagamento, $valor, $d
     if (!$stmt) return false;
 
     mysqli_stmt_bind_param($stmt, "isdss", $idcliente, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento);
-    mysqli_stmt_execute($stmt);
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
 
-    return mysqli_insert_id($conexao);
+    return $ok ? mysqli_insert_id($conexao) : false;
 }
+
 
 
 
