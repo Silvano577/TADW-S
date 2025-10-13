@@ -42,7 +42,7 @@ if ($id > 0) {
 }
 
 if ($idcliente > 0) {
-    header("Location: formentrega.php?cliente_id={$idcliente}");
+    header("Location: ../Forms/formentrega.php?cliente_id={$idcliente}");
     exit;
 } else {
     echo "Erro ao cadastrar cliente!";

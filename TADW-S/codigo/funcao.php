@@ -20,35 +20,41 @@ function criar_usuario($conexao, $usuario, $email, $senha) {
 }
 
 function buscar_usuario($conexao, $idusuario = 0, $usuario = '') {
+    // 🔹 Se for buscar por ID
     if ($idusuario > 0) {
         $sql = "SELECT * FROM usuario WHERE idusuario = ?";
         $stmt = mysqli_prepare($conexao, $sql);
         mysqli_stmt_bind_param($stmt, 'i', $idusuario);
         mysqli_stmt_execute($stmt);
         $res = mysqli_stmt_get_result($stmt);
-        $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
+        $row = mysqli_fetch_assoc($res); // apenas um usuário
         mysqli_stmt_close($stmt);
-        return $rows;
-    } elseif ($usuario !== '') {
+        return $row ?: null; // retorna 1 usuário ou null
+    }
+
+    // 🔹 Se for buscar por nome de usuário (LIKE)
+    if ($usuario !== '') {
         $sql = "SELECT * FROM usuario WHERE usuario LIKE ?";
         $like = "%{$usuario}%";
         $stmt = mysqli_prepare($conexao, $sql);
         mysqli_stmt_bind_param($stmt, 's', $like);
         mysqli_stmt_execute($stmt);
         $res = mysqli_stmt_get_result($stmt);
-        $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
-        mysqli_stmt_close($stmt);
-        return $rows;
-    } else {
-        $sql = "SELECT * FROM usuario";
-        $stmt = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_execute($stmt);
-        $res = mysqli_stmt_get_result($stmt);
-        $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
+        $rows = mysqli_fetch_all($res, MYSQLI_ASSOC); // pode haver vários
         mysqli_stmt_close($stmt);
         return $rows;
     }
+
+    // 🔹 Se não passou parâmetros → lista todos
+    $sql = "SELECT * FROM usuario";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $rows;
 }
+
 
 function atualizar_usuario($conexao, $idusuario, $usuario, $email, $senha = null) {
     if ($senha !== null && $senha !== '') {
@@ -467,9 +473,9 @@ function buscar_cliente_por_usuario($conexao, $idusuario) {
     mysqli_stmt_bind_param($stmt, 'i', $idusuario);
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
-    $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    $row = mysqli_fetch_assoc($res); // retorna só um cliente
     mysqli_stmt_close($stmt);
-    return $rows;
+    return $row ?: null;
 }
 
 
@@ -483,7 +489,6 @@ function buscar_enderecos_por_cliente($conexao, $idcliente) {
     mysqli_stmt_close($stmt);
     return $enderecos;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

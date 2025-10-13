@@ -3,39 +3,45 @@ require_once "../protege.php";
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-// Recebe o cliente_id do redirecionamento após cadastro
-$idcliente = isset($_GET['idcliente']) ? intval($_GET['idcliente']) : 0;
+// Recebe o cliente_id do redirecionamento (novo endereço) ou do endereço existente (edição)
+$idcliente = intval($_GET['idcliente'] ?? $_GET['cliente_id'] ?? 0);
 
 // Verifica se está editando um endereço existente
-if (isset($_GET['id'])) {
-    $id = intval($_GET['id']);
+$id = intval($_GET['id'] ?? 0);
+if ($id > 0) {
     $endereco = buscar_endereco($conexao, $id);
     if ($endereco) {
         $rua = $endereco['rua'];
         $numero = $endereco['numero'];
         $complemento = $endereco['complemento'];
         $bairro = $endereco['bairro'];
-        $idcliente = $endereco['idcliente'];
+        $idcliente = $endereco['idcliente']; // garante vínculo correto
+    } else {
+        // endereço não encontrado
+        $rua = $numero = $complemento = $bairro = "";
     }
     $botao = "Atualizar";
 } else {
-    // Novo endereço
-    $id = 0;
+    // novo endereço
     $rua = $numero = $complemento = $bairro = "";
-    $idcliente = $idcliente; // pré-preenche com o cliente que acabou de se cadastrar
     $botao = "Cadastrar";
+}
+
+// Se não houver cliente definido, redireciona
+if ($idcliente <= 0) {
+    die("Erro: ID do cliente não definido. Volte ao perfil e tente novamente.");
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title><?= $botao ?> Endereço</title>
+    <title><?= htmlspecialchars($botao) ?> Endereço</title>
 </head>
 <body>
-<h1><?= $botao ?> Endereço</h1>
+<h1><?= htmlspecialchars($botao) ?> Endereço</h1>
 
-<form action="../Salvar/salvarendentrega.php?id=<?= $id ?>" method="post">
+<form action="../Salvar/salvarentrega.php?id=<?= $id ?>" method="post">
     Rua:<br>
     <input type="text" name="rua" value="<?= htmlspecialchars($rua) ?>" required><br><br>
 
@@ -49,34 +55,11 @@ if (isset($_GET['id'])) {
     <input type="text" name="bairro" value="<?= htmlspecialchars($bairro) ?>" required><br><br>
 
     Cliente ID:<br>
-    <input type="number" name="idcliente" value="<?= htmlspecialchars($idcliente) ?>" readonly required><br><br>
+    <input type="number" name="idcliente" value="<?= $idcliente ?>" readonly required><br><br>
 
-    <input type="submit" value="<?= $botao ?>">
+    <input type="submit" value="<?= htmlspecialchars($botao) ?>">
 </form>
 
-<?php if ($cliente_id === 0): // Se não veio de um cadastro novo, mostra lista ?>
-    <?php
-    $enderecos = listar_enderecos($conexao);
-    if (count($enderecos) > 0): ?>
-        <h2>Endereços Cadastrados</h2>
-        <div class="grid">
-            <?php foreach ($enderecos as $endereco): ?>
-                <div class="card">
-                    <h3><?= htmlspecialchars($endereco['rua']) ?>, <?= htmlspecialchars($endereco['numero']) ?></h3>
-                    <p class="info"><strong>Bairro:</strong> <?= htmlspecialchars($endereco['bairro']) ?></p>
-                    <p class="info"><strong>Complemento:</strong> <?= htmlspecialchars($endereco['complemento']) ?></p>
-                    <p class="info"><strong>ID Cliente:</strong> <?= $endereco['idcliente'] ?></p>
-
-                    <a href="../Forms/formendentrega.php?id=<?= $endereco['idendentrega'] ?>" class="btn">Editar</a>
-                    <a href="../Deletar/deletarendentrega.php?id=<?= $endereco['idendentrega'] ?>" class="btn-delete" onclick="return confirm('Deseja realmente excluir?')">Excluir</a>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <p>Nenhum endereço cadastrado.</p>
-    <?php endif; ?>
-<?php endif; ?>
-
-<a href="../homeAdm.php" class="btn-voltar">Voltar</a>
+<a href="../perfil.php">Voltar</a>
 </body>
 </html>

@@ -66,7 +66,7 @@ if (!function_exists('pesquisarProdutoId')) {
         echo "<p class='acoes'>
                 <a href='destruir.php' class='limpar' onclick=\"return confirm('Deseja esvaziar o carrinho?')\">🧹 Limpar Carrinho</a>
                 <a href='cardapio.php' class='voltar'>⬅️ Voltar ao Cardápio</a>
-                <a href='formpagamento.php' class='finalizar'>✅ Finalizar Pedido</a>
+                <a href='../Forms/formpagamento.php' class='finalizar'>✅ Finalizar Pedido</a>
               </p>";
     }
     ?>

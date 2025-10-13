@@ -3,7 +3,7 @@ session_start();
 require_once "conexao.php";
 require_once "funcao.php";
 
-// Verifica se usuário está logado
+// Verifica se o usuário está logado
 if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
     header("Location: login.php");
     exit;
@@ -11,17 +11,23 @@ if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
 
 $usuario_id = $_SESSION['idusuario'] ?? 0;
 
-// Buscar usuário
+
+// Buscar dados do usuário
 $usuario = buscar_usuario($conexao, $usuario_id, "");
 $usuario = $usuario[0] ?? null;
 
-// Buscar cliente vinculado
-$cliente = buscar_cliente_por_usuario($conexao, $usuario_id); // já retorna assoc único
+// Buscar dados do cliente vinculado (função corrigida retorna só 1 cliente)
+$idcliente = buscar_cliente_por_usuario($conexao, $usuario_id);
 
-// Buscar endereços
+// Garantir que seja um array válido
+if (!is_array($idcliente) || empty($idcliente)) {
+    $idcliente = null;
+}
+
+// Buscar endereços do cliente
 $enderecos = [];
-if ($cliente) {
-    $enderecos = listar_enderecos_por_cliente($conexao, $cliente['idcliente']);
+if (!empty($idcliente['idcliente'])) {
+    $enderecos = buscar_enderecos_por_cliente($conexao, $idcliente['idcliente']);
 }
 
 // Tratar exclusão de endereço
@@ -34,17 +40,17 @@ if (isset($_GET['delete_endereco'])) {
 
 // Tratar exclusão da conta inteira
 if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
-    if ($cliente) {
-        $cliente_id = $cliente['idcliente'];
+    if (!empty($idcliente['idcliente'])) {
+        $cliente_id = $idcliente['idcliente'];
 
-        // Deletar endereços
+        // Deletar endereços vinculados
         foreach ($enderecos as $end) {
             deletar_endereco($conexao, $end['idendentrega']);
         }
 
         // Deletar foto do cliente
-        if (!empty($cliente['foto'])) {
-            $arquivo = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($cliente['foto'], '/');
+        if (!empty($idcliente['foto'])) {
+            $arquivo = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($idcliente['foto'], '/');
             if (file_exists($arquivo)) unlink($arquivo);
         }
 
@@ -80,16 +86,16 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
         <a href="Forms/formusuario.php?id=<?= $usuario_id ?>">Editar Usuário</a>
     </div>
 
-    <?php if ($cliente): ?>
+    <?php if ($idcliente): ?>
         <div>
             <h2>Dados do Cliente</h2>
-            <?php if (!empty($cliente['foto'])): ?>
-                <img src="<?= htmlspecialchars($cliente['foto']) ?>" width="120" alt="Foto do cliente"><br>
+            <?php if (!empty($idcliente['foto'])): ?>
+                <img src="<?= htmlspecialchars($idcliente['foto']) ?>" width="120" alt="Foto do Cliente"><br>
             <?php endif; ?>
-            <p><strong>Nome:</strong> <?= htmlspecialchars($cliente['nome']) ?></p>
-            <p><strong>Data de Aniversário:</strong> <?= htmlspecialchars($cliente['data_ani']) ?></p>
-            <p><strong>Telefone:</strong> <?= htmlspecialchars($cliente['telefone']) ?></p>
-            <a href="Forms/formcliente.php?id=<?= $cliente['idcliente'] ?>&idusuario=<?= $usuario_id ?>">Editar Cliente</a>
+            <p><strong>Nome:</strong> <?= htmlspecialchars($idcliente['nome'] ?? '') ?></p>
+            <p><strong>Data de Aniversário:</strong> <?= htmlspecialchars($idcliente['data_ani'] ?? '') ?></p>
+            <p><strong>Telefone:</strong> <?= htmlspecialchars($idcliente['telefone'] ?? '') ?></p>
+            <a href="Forms/formcliente.php?id=<?= $idcliente['idcliente'] ?? 0 ?>&idusuario=<?= $usuario_id ?>">Editar Cliente</a>
         </div>
 
         <div>
@@ -98,9 +104,11 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
                 <ul>
                     <?php foreach ($enderecos as $end): ?>
                         <li>
-                            <?= htmlspecialchars($end['rua']) ?>, <?= htmlspecialchars($end['numero']) ?> - 
-                            <?= htmlspecialchars($end['bairro']) ?> (<?= htmlspecialchars($end['complemento'] ?? '') ?>)
-                            <a href="Forms/formendentrega.php?id=<?= $end['idendentrega'] ?>&cliente_id=<?= $cliente['idcliente'] ?>">Editar</a>
+                            <?= htmlspecialchars($end['rua'] ?? '') ?>, 
+                            <?= htmlspecialchars($end['numero'] ?? '') ?> - 
+                            <?= htmlspecialchars($end['bairro'] ?? '') ?> 
+                            (<?= htmlspecialchars($end['complemento'] ?? '') ?>)
+                            <a href="Forms/formendentrega.php?id=<?= $end['idendentrega'] ?>&cliente_id=<?= $idcliente['idcliente'] ?>">Editar</a>
                             <a href="perfil.php?delete_endereco=<?= $end['idendentrega'] ?>" onclick="return confirm('Deseja realmente excluir este endereço?');">Deletar</a>
                         </li>
                     <?php endforeach; ?>
@@ -108,7 +116,7 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
             <?php else: ?>
                 <p>Nenhum endereço cadastrado.</p>
             <?php endif; ?>
-            <a href="Forms/formendentrega.php?cliente_id=<?= $cliente['idcliente'] ?>">Adicionar Endereço</a>
+            <a href="Forms/formentrega.php?cliente_id=<?= $idcliente['idcliente'] ?? 0 ?>">Adicionar Endereço</a>
         </div>
     <?php else: ?>
         <div>
