@@ -2,7 +2,7 @@
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-$id    = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $usuario  = '';
 $email = '';
 $botao = 'Cadastrar';
@@ -13,6 +13,7 @@ if ($id > 0) {
         $u = $dados_usuario[0];
         $usuario  = $u['usuario'];
         $email = $u['email'];
+        $senha = $u['senha'];
         $botao = 'Atualizar';
     }
 }

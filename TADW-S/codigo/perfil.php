@@ -106,7 +106,7 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
                             <?= htmlspecialchars($end['numero'] ?? '') ?> - 
                             <?= htmlspecialchars($end['bairro'] ?? '') ?> 
                             (<?= htmlspecialchars($end['complemento'] ?? '') ?>)
-                            <a href="Forms/formendentrega.php?id=<?= $end['idendentrega'] ?>&cliente_id=<?= $idcliente['idcliente'] ?>">Editar</a>
+                            <a href="Forms/formentrega.php?id=<?= $end['idendentrega'] ?>&cliente_id=<?= $idcliente['idcliente'] ?>">Editar</a>
                             <a href="perfil.php?delete_endereco=<?= $end['idendentrega'] ?>" onclick="return confirm('Deseja realmente excluir este endereço?');">Deletar</a>
                         </li>
                     <?php endforeach; ?>
