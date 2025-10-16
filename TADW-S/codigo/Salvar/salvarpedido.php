@@ -1,54 +1,80 @@
 <?php
-include '../conexao.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Verifica se o cliente está logado
-if (!isset($_SESSION['idcliente'])) {
-    echo "Você precisa estar logado para fazer um pedido.";
+require_once "../conexao.php";
+require_once "../funcao.php";
+
+// 🔹 Verifica se usuário está logado
+$usuario_id = $_SESSION['idusuario'] ?? 0;
+if (!$usuario_id) {
+    header("Location: ../login.php");
     exit;
 }
 
-$idcliente = $_SESSION['idcliente'];
-
-// Recebe o tipo de entrega (cliente ou ponto fixo)
-$tipo_entrega = $_POST['tipo_entrega'] ?? 'cliente';
-
-// Define o endereço de entrega conforme a escolha
-if ($tipo_entrega === 'cliente') {
-    // Endereço normal do cliente
-    if (empty($_POST['endentrega_cliente'])) {
-        echo "Por favor, selecione um endereço de entrega.";
-        exit;
-    }
-    $endentrega = intval($_POST['endentrega_cliente']);
-} else {
-    // Ponto fixo da pizzaria
-    $sqlPonto = "SELECT idendentrega FROM endentrega WHERE tipo = 'ponto_fixo' LIMIT 1";
-    $res = mysqli_query($conexao, $sqlPonto);
-    $ponto = mysqli_fetch_assoc($res);
-
-    if (!$ponto) {
-        echo "Nenhum ponto fixo está cadastrado no sistema. Contate o administrador.";
-        exit;
-    }
-
-    $endentrega = $ponto['identrega'];
+// 🔹 Buscar cliente vinculado ao usuário
+$cliente = buscar_cliente_por_usuario($conexao, $usuario_id); // retorna array associativo único
+if (!$cliente) {
+    echo "<p style='color:red;'>Erro: cliente não encontrado. Cadastre seus dados no perfil antes de finalizar o pedido.</p>";
+    echo "<a href='../Forms/formcliente.php?idusuario=$usuario_id'>Cadastrar Cliente</a>";
+    exit;
 }
 
-// Cria o pedido no banco
-$sqlPedido = "INSERT INTO pedido (idcliente, idendentrega, data_pedido, status_pedido)
-              VALUES (?, ?, NOW(), 'Aguardando Pagamento')";
-$stmt = mysqli_prepare($conexao, $sqlPedido);
-mysqli_stmt_bind_param($stmt, "ii", $idcliente, $endentrega);
+$idcliente = $cliente['idcliente'];
+// 🔹 Coleta dados do formulário
+$idcliente = $_SESSION['idcliente'];
+$endentrega = $_POST['endentrega'] ?? null;
+$tipo_entrega = $_POST['tipo_entrega'] ?? 'retirada';
+$observacoes = $_POST['observacoes'] ?? '';
+
+// 🔹 Valor total vem da sessão do carrinho
+$valortotal = $_SESSION['total_compra'] ?? 0;
+
+// 🔹 Define o status e data do pedido
+$status_pedido = "Pendente";
+$data_pedido = date("Y-m-d H:i:s");
+
+// ⚙️ Verificação básica
+if ($valortotal <= 0) {
+    echo "<p>Erro: valor total inválido. Adicione produtos ao carrinho.</p>";
+    exit;
+}
+
+// 🔹 Insere o pedido no banco
+$sql = "INSERT INTO pedido (idcliente, idendentrega, tipo_entrega, observacoes, data_pedido, status_pedido, valortotal)
+        VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+$stmt = mysqli_prepare($conexao, $sql);
+if (!$stmt) {
+    die("Erro na preparação da query: " . mysqli_error($conexao));
+}
+
+mysqli_stmt_bind_param($stmt, "iissssd",
+    $idcliente,
+    $endentrega,
+    $tipo_entrega,
+    $observacoes,
+    $data_pedido,
+    $status_pedido,
+    $valortotal
+);
 
 if (mysqli_stmt_execute($stmt)) {
+    // 🔹 Pega o ID do pedido recém-criado
     $idpedido = mysqli_insert_id($conexao);
 
-    echo "<h3>Pedido criado com sucesso!</h3>";
-    echo "<p>ID do Pedido: <strong>$idpedido</strong></p>";
-    echo "<p>Status: Aguardando Pagamento</p>";
-    echo "<p><a href='gerarpagamento.php?idpedido=$idpedido'>Clique aqui para gerar o pagamento</a></p>";
+    // 🔹 Salva o ID do pedido na sessão (para o pagamento)
+    $_SESSION['idpedido'] = $idpedido;
+
+    echo "<script>
+            alert('✅ Pedido realizado com sucesso!');
+            window.location.href = '../Forms/formpagamento.php';
+          </script>";
 } else {
-    echo "Erro ao salvar pedido: " . mysqli_error($conexao);
+    echo "<p>Erro ao salvar pedido: " . mysqli_error($conexao) . "</p>";
 }
+
+mysqli_stmt_close($stmt);
+mysqli_close($conexao);
 ?>
