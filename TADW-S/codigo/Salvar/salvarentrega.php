@@ -11,6 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Recebe o ID do endereço (0 = novo)
 $id = intval($_GET['id'] ?? 0);
 
+// Captura a origem (ex: formpedido ou perfil)
+$origem = $_GET['origem'] ?? '';
+
 // Coleta e sanitiza os dados do formulário
 $rua         = trim($_POST['rua'] ?? '');
 $numero      = trim($_POST['numero'] ?? '');
@@ -37,7 +40,12 @@ if (!$ok) {
     die("Erro ao salvar o endereço. Tente novamente.");
 }
 
-// Redireciona de volta ao perfil
-header("Location: ../perfil.php?msg=endereco_salvo");
-exit;
+// ✅ Redireciona de volta conforme a origem
+if ($origem === 'formpedido') {
+    header("Location: ../Forms/formpedido.php");
+    exit;
+} else {
+    header("Location: ../perfil.php?msg=endereco_salvo");
+    exit;
+}
 ?>

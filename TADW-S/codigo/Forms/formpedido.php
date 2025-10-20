@@ -1,27 +1,28 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+session_start();
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-// 🔹 Verifica se usuário está logado
 $usuario_id = $_SESSION['idusuario'] ?? 0;
-if (!$usuario_id) {
-    header("Location: ../login.php");
-    exit;
-}
+if (!$usuario_id) header("Location: ../login.php");
 
-// 🔹 Buscar cliente vinculado ao usuário
-$cliente = buscar_cliente_por_usuario($conexao, $usuario_id); // retorna array associativo único
-if (!$cliente) {
-    echo "<p style='color:red;'>Erro: cliente não encontrado. Cadastre seus dados no perfil antes de finalizar o pedido.</p>";
-    echo "<a href='../Forms/formcliente.php?idusuario=$usuario_id'>Cadastrar Cliente</a>";
-    exit;
-}
+$cliente = buscar_cliente_por_usuario($conexao, $usuario_id);
+$idcliente = $cliente['idcliente'];
 
+$idpedido = intval($_GET['id'] ?? 0);
+if ($idpedido <= 0) die("Pedido inválido.");
 
+// 🔹 Buscar pedido
+$sql = "SELECT * FROM pedido WHERE idpedido = ? AND idcliente = ?";
+$stmt = mysqli_prepare($conexao, $sql);
+mysqli_stmt_bind_param($stmt, "ii", $idpedido, $idcliente);
+mysqli_stmt_execute($stmt);
+$res = mysqli_stmt_get_result($stmt);
+$pedido = mysqli_fetch_assoc($res);
+if (!$pedido) die("Pedido não encontrado ou não é seu.");
+
+// Só permite editar pedidos pendentes
+if ($pedido['status'] !== 'pendente') die("Só é possível editar pedidos pendentes.");
 
 // 🔹 Buscar endereços do cliente
 $sql = "SELECT idendentrega, rua, numero, bairro FROM endentrega WHERE idcliente = ?";
@@ -30,69 +31,62 @@ mysqli_stmt_bind_param($stmt, "i", $idcliente);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
-// 🔹 Buscar ponto fixo (da pizzaria)
+// 🔹 Buscar ponto fixo
 $sqlPontoFixo = "SELECT idendentrega, rua, numero, bairro FROM endentrega WHERE tipo = 'ponto_fixo' LIMIT 1";
 $resPontoFixo = mysqli_query($conexao, $sqlPontoFixo);
 $pontoFixo = mysqli_fetch_assoc($resPontoFixo);
 
-// 🔹 Valor total do carrinho
-$valor_total = $_SESSION['total_compra'] ?? 0;
-if ($valor_total <= 0) {
-    echo "<p style='color:red;'>Erro: carrinho vazio. Adicione produtos antes de fazer o pedido.</p>";
-    echo "<a href='../carrinho.php'>Voltar ao Carrinho</a>";
-    exit;
-}
+$valor_total = $pedido['valortotal'];
+$idpagamento = $pedido['idpagamento'];
+$identrega_atual = $pedido['identrega'];
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Finalizar Pedido</title>
+    <title>Editar Pedido #<?= $pedido['idpedido'] ?></title>
     <link rel="stylesheet" href="../css/lista_padrao.css">
 </head>
 <body>
+<h1>Editar Pedido #<?= $pedido['idpedido'] ?></h1>
 
-<h2>Finalizar Pedido</h2>
+<form action="../Salvar/salvarpedidoeditar.php" method="POST" id="form-pedido">
 
-<form action="../Salvar/salvarpedido.php" method="POST">
+    <input type="hidden" name="idpedido" value="<?= $pedido['idpedido'] ?>">
+    <input type="hidden" name="idpagamento" value="<?= $idpagamento ?>">
 
-    <!-- ID do cliente -->
-    <input type="hidden" name="idcliente" value="<?php echo $idcliente; ?>">
+    <label>Valor total do pedido:</label><br>
+    <input type="number" name="valortotal" step="0.01" value="<?= htmlspecialchars($valor_total) ?>" readonly><br><br>
 
-    <label>Escolha a forma de entrega:</label><br><br>
+    <h3>Escolha a forma de entrega:</h3>
 
-    <input type="radio" name="tipo_entrega" value="cliente" checked> Entrega no meu endereço<br><br>
+    <input type="radio" name="tipo_entrega" value="cliente" id="entrega_cliente" <?= in_array($identrega_atual, array_column(mysqli_fetch_all($result, MYSQLI_ASSOC), 'idendentrega')) ? 'checked' : '' ?>>
+    <label for="entrega_cliente">Entrega no meu endereço</label><br>
 
-    <select name="endentrega_cliente" required>
-        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
-            <option value="<?php echo $row['idendentrega']; ?>">
-                <?php echo htmlspecialchars($row['rua'] . ', ' . $row['numero'] . ' - ' . $row['bairro']); ?>
+    <select id="select_cliente">
+        <?php
+        mysqli_data_seek($result, 0); // reset do resultado
+        while ($row = mysqli_fetch_assoc($result)) { ?>
+            <option value="<?= $row['idendentrega'] ?>" <?= ($row['idendentrega'] == $identrega_atual ? 'selected' : '') ?>>
+                <?= htmlspecialchars($row['rua'] . ', ' . $row['numero'] . ' - ' . $row['bairro']) ?>
             </option>
         <?php } ?>
     </select>
     <br><br>
 
-    <input type="radio" name="tipo_entrega" value="ponto_fixo"> Retirar no ponto fixo<br>
+    <input type="radio" name="tipo_entrega" value="ponto_fixo" id="entrega_ponto" <?= ($pontoFixo && $pontoFixo['idendentrega'] == $identrega_atual ? 'checked' : '') ?>>
+    <label for="entrega_ponto">Retirar no ponto fixo</label><br>
+
     <?php if ($pontoFixo) { ?>
-        <p><strong>Endereço:</strong> 
-            <?php echo htmlspecialchars($pontoFixo['rua'] . ', ' . $pontoFixo['numero'] . ' - ' . $pontoFixo['bairro']); ?>
-        </p>
-        <input type="hidden" name="endentrega_ponto_fixo" value="<?php echo $pontoFixo['idendentrega']; ?>">
-    <?php } else { ?>
-        <p style="color:red;">Nenhum ponto fixo cadastrado no sistema.</p>
+        <p><strong>Endereço:</strong> <?= htmlspecialchars($pontoFixo['rua'] . ', ' . $pontoFixo['numero'] . ' - ' . $pontoFixo['bairro']); ?></p>
+        <input type="hidden" id="input_ponto" value="<?= $pontoFixo['idendentrega'] ?>">
     <?php } ?>
 
     <br><br>
-
-    <!-- Valor total do pedido -->
-    <label>Valor total do pedido:</label><br>
-    <input type="number" name="valortotal" step="0.01" value="<?php echo htmlspecialchars($valor_total); ?>" readonly>
-    <br><br>
-
-    <input type="submit" value="Confirmar Pedido" class="btn">
-
+    <input type="submit" value="Atualizar Pedido" class="btn">
 </form>
 
+<script src="../js/formpedido.js"></script>
 </body>
 </html>

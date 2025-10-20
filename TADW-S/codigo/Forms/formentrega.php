@@ -3,8 +3,9 @@ require_once "../protege.php";
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-// Recebe o cliente_id do redirecionamento (novo endereço) ou do endereço existente (edição)
+// Recebe o cliente_id e origem (para redirecionar depois)
 $idcliente = intval($_GET['idcliente'] ?? $_GET['cliente_id'] ?? 0);
+$origem = $_GET['origem'] ?? '';
 
 // Verifica se está editando um endereço existente
 $id = intval($_GET['id'] ?? 0);
@@ -15,14 +16,12 @@ if ($id > 0) {
         $numero = $endereco['numero'];
         $complemento = $endereco['complemento'];
         $bairro = $endereco['bairro'];
-        $idcliente = $endereco['idcliente']; // garante vínculo correto
+        $idcliente = $endereco['idcliente'];
     } else {
-        // endereço não encontrado
         $rua = $numero = $complemento = $bairro = "";
     }
     $botao = "Atualizar";
 } else {
-    // novo endereço
     $rua = $numero = $complemento = $bairro = "";
     $botao = "Cadastrar";
 }
@@ -41,7 +40,7 @@ if ($idcliente <= 0) {
 <body>
 <h1><?= htmlspecialchars($botao) ?> Endereço</h1>
 
-<form action="../Salvar/salvarentrega.php?id=<?= $id ?>" method="post">
+<form action="../Salvar/salvarentrega.php?id=<?= $id ?>&origem=<?= urlencode($origem) ?>" method="post">
     Rua:<br>
     <input type="text" name="rua" value="<?= htmlspecialchars($rua) ?>" required><br><br>
 
@@ -60,6 +59,7 @@ if ($idcliente <= 0) {
     <input type="submit" value="<?= htmlspecialchars($botao) ?>">
 </form>
 
-<a href="../perfil.php">Voltar</a>
+<a href="<?= $origem === 'formpedido' ? '../Forms/formpedido.php' : '../perfil.php' ?>">Voltar</a>
+
 </body>
 </html>

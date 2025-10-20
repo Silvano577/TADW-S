@@ -145,3 +145,18 @@ h1 {
 .btn-voltar:hover {
     background-color: #333;
 }
+
+.btn-novo-endereco {
+    display: inline-block;
+    margin-top: 8px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    }
+    .btn-novo-endereco:hover {
+    background-color: #45a049;
+    }
