@@ -1,75 +1,97 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+session_start();
 require_once "conexao.php";
 require_once "funcao.php";
 
-if (!function_exists('pesquisarProdutoId')) {
-    die("Erro: função pesquisarProdutoId() não encontrada.");
+if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
+    header("Location: login.php");
+    exit;
 }
+
+$usuario_id = $_SESSION['idusuario'] ?? 0;
+$cliente = buscar_cliente_por_usuario($conexao, $usuario_id);
+$idcliente = $cliente['idcliente'] ?? 0;
+
+if (!$idcliente) {
+    die("Cliente não encontrado.");
+}
+
+// Buscar itens do carrinho
+$sql = "SELECT c.idcarrinho, c.quantidade, 
+               p.nome AS nome_produto, p.preco, p.foto
+        FROM carrinho c
+        INNER JOIN produto p ON c.idproduto = p.idproduto
+        WHERE c.idcliente = ?";
+$stmt = mysqli_prepare($conexao, $sql);
+mysqli_stmt_bind_param($stmt, "i", $idcliente);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+$total_geral = 0;
 ?>
+
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Carrinho de Compras</title>
-    <link rel="stylesheet" href="../css/carrinho.css">
+    <title>Seu Carrinho</title>
+    <link rel="stylesheet" href="css/carrinho.css">
 </head>
 <body>
-<div class="container">
-    <h1>🛍️ Carrinho de Compras</h1>
 
-    <?php
-    if (empty($_SESSION['carrinho']) || !is_array($_SESSION['carrinho'])) {
-        echo "<p class='vazio'>Seu carrinho está vazio.</p>";
-    } else {
-        $total = 0.0;
-        echo "<table>";
-        echo "<thead><tr>
-                <th>Tipo</th>
-                <th>Produto</th>
-                <th>Tamanho</th>
-                <th>Preço</th>
-                <th>Quantidade</th>
-                <th>Total</th>
-                <th>Ação</th>
-              </tr></thead><tbody>";
+<h1>🛒 Seu Carrinho</h1>
+<div class="carrinho-container">
 
-        foreach ($_SESSION['carrinho'] as $id => $quantidade) {
-            $produto = pesquisarProdutoId($conexao, intval($id));
-            if (!$produto) continue;
+<?php if (mysqli_num_rows($result) > 0): ?>
+    <table>
+        <tr>
+            <th>Foto</th>
+            <th>Produto</th>
+            <th>Preço</th>
+            <th>Quantidade</th>
+            <th>Total</th>
+            <th>Ação</th>
+        </tr>
 
-            $quantidade = max(1, intval($quantidade));
-            $preco = (float)($produto['preco'] ?? 0);
-            $subtotal = $preco * $quantidade;
-            $total += $subtotal;
+        <?php while ($item = mysqli_fetch_assoc($result)): 
+            $subtotal = $item['preco'] * $item['quantidade'];
+            $total_geral += $subtotal;
+        ?>
+        <tr>
+            <td><img src="fotos/<?php echo htmlspecialchars($item['foto']); ?>" alt=""></td>
+            <td><?php echo htmlspecialchars($item['nome_produto']); ?></td>
+            <td>R$ <?php echo number_format($item['preco'], 2, ',', '.'); ?></td>
+            <td>
+                <form action="../Forms/atualizar_carrinho.php" method="POST" class="form-qtd">
+                    <input type="hidden" name="idcarrinho" value="<?php echo $item['idcarrinho']; ?>">
+                    <button type="submit" name="acao" value="menos" class="btn-qtd">−</button>
+                    <span><?php echo $item['quantidade']; ?></span>
+                    <button type="submit" name="acao" value="mais" class="btn-qtd">+</button>
+                </form>
+            </td>
+            <td>R$ <?php echo number_format($subtotal, 2, ',', '.'); ?></td>
+            <td>
+                <form action="../Deletar/remover_carrinho.php" method="POST" style="display:inline;">
+                    <input type="hidden" name="idcarrinho" value="<?php echo $item['idcarrinho']; ?>">
+                    <button type="submit" class="btn btn-remover">Remover</button>
+                </form>
+            </td>
+        </tr>
+        <?php endwhile; ?>
+    </table>
 
-            echo "<tr>
-                    <td>".htmlspecialchars($produto['tipo'] ?? '-')."</td>
-                    <td>".htmlspecialchars($produto['nome'] ?? '-')."</td>
-                    <td>".htmlspecialchars($produto['tamanho'] ?? '-')."</td>
-                    <td>R$ ".number_format($preco, 2, ',', '.')."</td>
-                    <td>{$quantidade}</td>
-                    <td>R$ ".number_format($subtotal, 2, ',', '.')."</td>
-                    <td><a href='remover.php?id=$id' class='remover'>Remover</a></td>
-                  </tr>";
-        }
+    <div class="total">
+        Total Geral: R$ <?php echo number_format($total_geral, 2, ',', '.'); ?>
+    </div>
 
-        echo "</tbody></table>";
-        echo "<h3 class='total'>Total da compra: R$ " . number_format($total, 2, ',', '.') . "</h3>";
+    <form action="../Forms/formpedido.php" method="POST">
+        <button type="submit" class="btn btn-finalizar">Finalizar Compra</button>
+    </form>
 
-        // Guardar total para o pagamento
-        $_SESSION['total_compra'] = $total;
+<?php else: ?>
+    <div class="vazio">Seu carrinho está vazio 😢</div>
+<?php endif; ?>
 
-        echo "<p class='acoes'>
-                <a href='destruir.php' class='limpar' onclick=\"return confirm('Deseja esvaziar o carrinho?')\">🧹 Limpar Carrinho</a>
-                <a href='cardapio.php' class='voltar'>⬅️ Voltar ao Cardápio</a>
-                <a href='../Forms/formpagamento.php' class='finalizar'>✅ Finalizar Pedido</a>
-              </p>";
-    }
-    ?>
 </div>
 </body>
 </html>

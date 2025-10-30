@@ -351,14 +351,14 @@ function pesquisarProdutoId($conexao, $idproduto) {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function registrar_pagamento($conexao, $idcliente, $metodo_pagamento, $valor, $data_pagamento) {
+function registrar_pagamento($conexao, $idcliente, $idpedido, $metodo_pagamento, $valor, $data_pagamento) {
     $status_pagamento = 'pendente';
-    $sql = "INSERT INTO pagamento (idcliente, metodo_pagamento, valor, status_pagamento, data_pagamento)
-            VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO pagamento (idcliente, idpedido, metodo_pagamento, valor, status_pagamento, data_pagamento)
+            VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conexao, $sql);
     if (!$stmt) return false;
 
-    mysqli_stmt_bind_param($stmt, "isdss", $idcliente, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento);
+    mysqli_stmt_bind_param($stmt, "iisdss", $idcliente, $idpedido, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento);
     $ok = mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
 
@@ -458,15 +458,19 @@ function salvar_venda($conexao, $idpedido, $idproduto, $quantidade) {
     return $sucesso;
 }
 
-function listar_venda($conexao) {
-    $sql = "SELECT * FROM pedido_produto";
+function listarvenda($conexao) {
+    $sql = "SELECT p.idpedido, p.valortotal, pag.metodo_pagamento AS metodo FROM pedido p
+    LEFT JOIN pagamento pag ON pag.idpedido = p.idpedido ORDER BY p.idpedido DESC";
     $comando = mysqli_prepare($conexao, $sql);
     mysqli_stmt_execute($comando);
     $resultado = mysqli_stmt_get_result($comando);
     $vendas = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
     mysqli_stmt_close($comando);
+
     return $vendas;
 }
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 function buscar_cliente_por_usuario($conexao, $idusuario) {

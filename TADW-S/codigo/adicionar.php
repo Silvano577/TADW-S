@@ -1,23 +1,54 @@
 <?php
 session_start();
+require_once "conexao.php";
+require_once "funcao.php";
 
-if (!isset($_SESSION['carrinho'])) {
-    $_SESSION['carrinho'] = [];
+if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
+    header("Location: login.php");
+    exit;
 }
 
-if (!empty($_POST['idproduto'])) {
-    $selecionados = $_POST['idproduto'];
-    foreach ($selecionados as $id) {
-        $quantidade = (int)($_POST['quantidade'][$id] ?? 1);
-        if ($quantidade < 1) $quantidade = 1;
+$usuario_id = $_SESSION['idusuario'] ?? 0;
+$cliente = buscar_cliente_por_usuario($conexao, $usuario_id);
+$idcliente = $cliente['idcliente'] ?? 0;
 
-        if (isset($_SESSION['carrinho'][$id])) {
-            $_SESSION['carrinho'][$id] += $quantidade;
-        } else {
-            $_SESSION['carrinho'][$id] = $quantidade;
-        }
+if (!$idcliente) {
+    die("Cliente não encontrado.");
+}
+
+if (!isset($_POST['idproduto']) || !is_array($_POST['idproduto'])) {
+    die("Nenhum produto selecionado.");
+}
+
+foreach ($_POST['idproduto'] as $idproduto) {
+    $quantidade = intval($_POST['quantidade'][$idproduto] ?? 1);
+
+    // Verificar se já existe no carrinho
+    $sql_check = "SELECT idcarrinho, quantidade FROM carrinho WHERE idcliente = ? AND idproduto = ?";
+    $stmt_check = mysqli_prepare($conexao, $sql_check);
+    mysqli_stmt_bind_param($stmt_check, "ii", $idcliente, $idproduto);
+    mysqli_stmt_execute($stmt_check);
+    $res = mysqli_stmt_get_result($stmt_check);
+
+    if ($row = mysqli_fetch_assoc($res)) {
+        // Atualiza a quantidade existente
+        $nova_qtd = $row['quantidade'] + $quantidade;
+        $sql_upd = "UPDATE carrinho 
+                    SET quantidade = ?, data_adicionado = NOW() 
+                    WHERE idcarrinho = ?";
+        $stmt_upd = mysqli_prepare($conexao, $sql_upd);
+        mysqli_stmt_bind_param($stmt_upd, "ii", $nova_qtd, $row['idcarrinho']);
+        mysqli_stmt_execute($stmt_upd);
+    } else {
+        // Insere novo item
+        $sql_ins = "INSERT INTO carrinho (idproduto, idcliente, quantidade, data_adicionado)
+                    VALUES (?, ?, ?, NOW())";
+        $stmt_ins = mysqli_prepare($conexao, $sql_ins);
+        mysqli_stmt_bind_param($stmt_ins, "iii", $idproduto, $idcliente, $quantidade);
+        mysqli_stmt_execute($stmt_ins);
     }
 }
 
-header("Location:carrinho.php");
+// Redireciona para o carrinho
+header("Location: carrinho.php");
 exit;

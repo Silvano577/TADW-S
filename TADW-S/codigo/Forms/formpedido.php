@@ -3,90 +3,88 @@ session_start();
 require_once "../conexao.php";
 require_once "../funcao.php";
 
+if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
+    header("Location: ../login.php");
+    exit;
+}
+
 $usuario_id = $_SESSION['idusuario'] ?? 0;
-if (!$usuario_id) header("Location: ../login.php");
-
 $cliente = buscar_cliente_por_usuario($conexao, $usuario_id);
-$idcliente = $cliente['idcliente'];
+$idcliente = $cliente['idcliente'] ?? 0;
 
-$idpedido = intval($_GET['id'] ?? 0);
-if ($idpedido <= 0) die("Pedido inválido.");
+if (!$idcliente) {
+    die("Cliente não encontrado.");
+}
 
-// 🔹 Buscar pedido
-$sql = "SELECT * FROM pedido WHERE idpedido = ? AND idcliente = ?";
-$stmt = mysqli_prepare($conexao, $sql);
-mysqli_stmt_bind_param($stmt, "ii", $idpedido, $idcliente);
-mysqli_stmt_execute($stmt);
-$res = mysqli_stmt_get_result($stmt);
-$pedido = mysqli_fetch_assoc($res);
-if (!$pedido) die("Pedido não encontrado ou não é seu.");
+// Buscar produtos do carrinho
+$sql_carrinho = "SELECT c.idproduto, c.quantidade, p.nome, p.preco 
+                 FROM carrinho c 
+                 JOIN produto p ON c.idproduto = p.idproduto 
+                 WHERE c.idcliente = ?";
+$stmt_carrinho = mysqli_prepare($conexao, $sql_carrinho);
+mysqli_stmt_bind_param($stmt_carrinho, "i", $idcliente);
+mysqli_stmt_execute($stmt_carrinho);
+$res_carrinho = mysqli_stmt_get_result($stmt_carrinho);
 
-// Só permite editar pedidos pendentes
-if ($pedido['status'] !== 'pendente') die("Só é possível editar pedidos pendentes.");
+if (mysqli_num_rows($res_carrinho) == 0) {
+    die("Seu carrinho está vazio. Adicione produtos antes de finalizar o pedido.");
+}
 
-// 🔹 Buscar endereços do cliente
-$sql = "SELECT idendentrega, rua, numero, bairro FROM endentrega WHERE idcliente = ?";
-$stmt = mysqli_prepare($conexao, $sql);
-mysqli_stmt_bind_param($stmt, "i", $idcliente);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+// Calcular total
+$total = 0;
+while ($item = mysqli_fetch_assoc($res_carrinho)) {
+    $total += $item['preco'] * $item['quantidade'];
+}
 
-// 🔹 Buscar ponto fixo
-$sqlPontoFixo = "SELECT idendentrega, rua, numero, bairro FROM endentrega WHERE tipo = 'ponto_fixo' LIMIT 1";
-$resPontoFixo = mysqli_query($conexao, $sqlPontoFixo);
-$pontoFixo = mysqli_fetch_assoc($resPontoFixo);
+// Taxa de entrega
+$taxa_entrega = 15.00;
+$total_com_taxa = $total + $taxa_entrega;
 
-$valor_total = $pedido['valortotal'];
-$idpagamento = $pedido['idpagamento'];
-$identrega_atual = $pedido['identrega'];
+// Buscar endereços do cliente
+$sql_end = "SELECT idendentrega, rua, numero, complemento, bairro 
+            FROM endentrega 
+            WHERE idcliente = ?";
+$stmt_end = mysqli_prepare($conexao, $sql_end);
+mysqli_stmt_bind_param($stmt_end, "i", $idcliente);
+mysqli_stmt_execute($stmt_end);
+$res_end = mysqli_stmt_get_result($stmt_end);
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Editar Pedido #<?= $pedido['idpedido'] ?></title>
+    <title>Finalizar Pedido</title>
     <link rel="stylesheet" href="../css/lista_padrao.css">
 </head>
 <body>
-<h1>Editar Pedido #<?= $pedido['idpedido'] ?></h1>
+<h1>Finalizar Pedido</h1>
 
-<form action="../Salvar/salvarpedidoeditar.php" method="POST" id="form-pedido">
-
-    <input type="hidden" name="idpedido" value="<?= $pedido['idpedido'] ?>">
-    <input type="hidden" name="idpagamento" value="<?= $idpagamento ?>">
-
-    <label>Valor total do pedido:</label><br>
-    <input type="number" name="valortotal" step="0.01" value="<?= htmlspecialchars($valor_total) ?>" readonly><br><br>
-
-    <h3>Escolha a forma de entrega:</h3>
-
-    <input type="radio" name="tipo_entrega" value="cliente" id="entrega_cliente" <?= in_array($identrega_atual, array_column(mysqli_fetch_all($result, MYSQLI_ASSOC), 'idendentrega')) ? 'checked' : '' ?>>
-    <label for="entrega_cliente">Entrega no meu endereço</label><br>
-
-    <select id="select_cliente">
-        <?php
-        mysqli_data_seek($result, 0); // reset do resultado
-        while ($row = mysqli_fetch_assoc($result)) { ?>
-            <option value="<?= $row['idendentrega'] ?>" <?= ($row['idendentrega'] == $identrega_atual ? 'selected' : '') ?>>
-                <?= htmlspecialchars($row['rua'] . ', ' . $row['numero'] . ' - ' . $row['bairro']) ?>
+<form action="../Salvar/salvarpedido.php" method="post">
+    <input type="hidden" name="idcliente" value="<?= $idcliente ?>">
+    
+    <label>Endereço de Entrega:</label><br>
+    <select name="endentrega" required>
+        <option value="">-- selecione --</option>
+        <?php while ($end = mysqli_fetch_assoc($res_end)): ?>
+            <option value="<?= $end['idendentrega'] ?>">
+                <?= htmlspecialchars($end['rua'] . ', ' . $end['numero'] . 
+                    (!empty($end['complemento']) ? ' (' . $end['complemento'] . ')' : '') .
+                    ' - ' . $end['bairro']) ?>
             </option>
-        <?php } ?>
+        <?php endwhile; ?>
     </select>
     <br><br>
 
-    <input type="radio" name="tipo_entrega" value="ponto_fixo" id="entrega_ponto" <?= ($pontoFixo && $pontoFixo['idendentrega'] == $identrega_atual ? 'checked' : '') ?>>
-    <label for="entrega_ponto">Retirar no ponto fixo</label><br>
-
-    <?php if ($pontoFixo) { ?>
-        <p><strong>Endereço:</strong> <?= htmlspecialchars($pontoFixo['rua'] . ', ' . $pontoFixo['numero'] . ' - ' . $pontoFixo['bairro']); ?></p>
-        <input type="hidden" id="input_ponto" value="<?= $pontoFixo['idendentrega'] ?>">
-    <?php } ?>
-
+    <a href="formentrega.php?idcliente=<?= $idcliente ?>&origem=formpedido">+ Cadastrar novo endereço</a>
     <br><br>
-    <input type="submit" value="Atualizar Pedido" class="btn">
-</form>
 
-<script src="../js/formpedido.js"></script>
+    <p>Total dos produtos: R$ <?= number_format($total, 2, ',', '.') ?></p>
+    <p>Taxa de entrega: R$ <?= number_format($taxa_entrega, 2, ',', '.') ?></p>
+    <h3>Total a pagar: R$ <?= number_format($total_com_taxa, 2, ',', '.') ?></h3>
+
+    <button type="submit">Criar Pedido</button>
+    <a href="../carrinho.php">Voltar ao Carrinho</a>
+</form>
 </body>
 </html>

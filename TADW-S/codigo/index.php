@@ -26,7 +26,7 @@ if ($result && $result->num_rows > 0) {
 <body>
 <header>
     <div class="logo">
-        <img src="../fotosc/images.png" alt="Logo Pizzaria">
+        <img src="../fotosc/logo.png" alt="Logo Pizzaria">
     </div>
     <nav>
         <ul>

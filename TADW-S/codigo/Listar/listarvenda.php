@@ -2,6 +2,35 @@
 require_once "../conexao.php";
 require_once "../funcao.php";
 
+// Função para listar vendas com método de pagamento e valor total
+function listar_venda($conexao) {
+    $sql = "SELECT p.idpedido, pg.metodo_pagamento AS metodo, p.valortotal
+            FROM pedido p
+            LEFT JOIN pagamento pg ON p.idpedido = pg.idpedido
+            ORDER BY p.idpedido DESC";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $vendas = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $vendas;
+}
+
+// Função para listar apenas os nomes dos produtos de um pedido
+function listar_itens_pedido($conexao, $idpedido) {
+    $sql = "SELECT p.nome, pp.quantidade
+            FROM pedido_produto pp
+            JOIN produto p ON pp.idproduto = p.idproduto
+            WHERE pp.idpedido = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $idpedido);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $itens = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $itens;
+}
+
 // Buscar todas as vendas
 $vendas = listar_venda($conexao);
 ?>
@@ -24,14 +53,14 @@ $vendas = listar_venda($conexao);
                 <div class="card">
                     <h3>Pedido: <?= htmlspecialchars($venda['idpedido'] ?? '') ?></h3>
                     <p>Método: <?= htmlspecialchars($venda['metodo'] ?? '-') ?></p>
-                    <p>Valor Total: R$ <?= number_format($venda['valortotal'] ?? 0, 2, ',', '.') ?></p>
+                    <p>Valor Total: R$ <?= number_format(floatval($venda['valortotal'] ?? 0), 2, ',', '.') ?></p>
                     <p>Produtos:</p>
                     <ul>
                         <?php 
                         $itens = listar_itens_pedido($conexao, $venda['idpedido'] ?? 0);
                         if (!empty($itens)):
                             foreach ($itens as $item): ?>
-                                <li><?= htmlspecialchars($item['nome'] ?? '') ?> (Qtd: <?= intval($item['quantidade'] ?? 0) ?>)</li>
+                                <li><?= htmlspecialchars($item['nome'] ?? '-') ?> (Qtd: <?= intval($item['quantidade'] ?? 0) ?>)</li>
                             <?php endforeach; 
                         else: ?>
                             <li>Nenhum produto</li>

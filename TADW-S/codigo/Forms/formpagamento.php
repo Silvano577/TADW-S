@@ -1,72 +1,36 @@
 <?php
-// Inicia sessão somente se ainda não foi iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+session_start();
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-// Verifica se usuário está logado
-$usuario_id = $_SESSION['idusuario'] ?? 0;
-if (!$usuario_id) {
+// Verifica login
+if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
     header("Location: ../login.php");
     exit;
 }
 
-// Buscar cliente vinculado ao usuário
-$cliente = buscar_cliente_por_usuario($conexao, $usuario_id); // retorna array associativo único
-if (!$cliente) {
-    echo "<p style='color:red;'>Erro: cliente não encontrado. Cadastre seus dados no perfil antes de finalizar o pedido.</p>";
-    echo "<a href='../Forms/formcliente.php?idusuario=$usuario_id'>Cadastrar Cliente</a>";
-    exit;
-}
+$usuario_id = $_SESSION['idusuario'] ?? 0;
+$cliente = buscar_cliente_por_usuario($conexao, $usuario_id);
+$idcliente = $cliente['idcliente'] ?? 0;
 
-// Valor do carrinho vindo da sessão
-$valor = $_SESSION['total_compra'] ?? 0;
-if ($valor <= 0) {
-    echo "<p style='color:red;'>Erro: carrinho vazio. Adicione produtos antes de finalizar o pedido.</p>";
-    echo "<a href='../carrinho.php'>Voltar ao Carrinho</a>";
-    exit;
-}
-
-// Dados iniciais do pagamento
-$botao = "Gerar Pagamento";
-$data_pagamento = date('Y-m-d');
+$idpedido = intval($_GET['idpedido'] ?? 0);
+$total = floatval($_GET['valor_total'] ?? 0);
 ?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title><?= htmlspecialchars($botao) ?></title>
-    <link rel="stylesheet" href="../css/lista_padrao.css">
-</head>
-<body>
-<h1><?= htmlspecialchars($botao) ?></h1>
 
-<form action="../Salvar/salvarpagamento.php" method="post" class="form-padrao">
-    <!-- ID do cliente -->
-    <input type="hidden" name="idcliente" value="<?= $cliente['idcliente'] ?>">
+<h2>Pagamento do Pedido #<?= $idpedido ?></h2>
+<p>Valor total: R$ <?= number_format($total, 2, ',', '.') ?></p>
 
-    <label>Forma de pagamento</label><br>
-    <select name="metodo_pagamento" class="input-pesquisa" required>
-        <option value="">-- selecione --</option>
+<form method="POST" action="../Salvar/salvarpagamento.php">
+    <input type="hidden" name="idpedido" value="<?= $idpedido ?>">
+    <input type="hidden" name="valor" value="<?= $total ?>">
+    
+    <label>Método de pagamento:</label>
+    <select name="metodo" required>
         <option value="pix">PIX</option>
-        <option value="cartao debito">Cartão débito</option>
-        <option value="cartao credito">Cartão crédito</option>
+        <option value="cartao_debito">Cartão de Débito</option>
+        <option value="cartao_credito">Cartão de Crédito</option>
         <option value="dinheiro">Dinheiro</option>
     </select>
     <br><br>
-
-    <label>Valor Total</label><br>
-    <input type="number" step="0.01" name="valor" class="input-pesquisa" value="<?= htmlspecialchars($valor) ?>" readonly>
-    <br><br>
-
-    <input type="hidden" name="status_pagamento" value="pendente">
-    <input type="hidden" name="data_pagamento" value="<?= $data_pagamento ?>">
-
-    <button type="submit" class="btn">💰 <?= htmlspecialchars($botao) ?></button>
-    <a href="../carrinho.php">Voltar ao Carrinho</a>
+    <button type="submit">Registrar Pagamento</button>
 </form>
-</body>
-</html>
