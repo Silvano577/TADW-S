@@ -773,5 +773,47 @@ function criarPedidoCompleto($conexao, $cliente, $endentrega, $itens, $valortota
         ];
     }
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function contar_itens_carrinho($conexao, $idcliente) {
+    $sql = "SELECT SUM(quantidade) AS total FROM carrinho WHERE idcliente = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idcliente);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+
+    $linha = mysqli_fetch_assoc($resultado);
+    return intval($linha['total'] ?? 0);
+}
+
+function adicionar_ao_carrinho($conexao, $idcliente, $idproduto, $quantidade = 1) {
+    // Verifica se o produto já existe no carrinho do cliente
+    $sql_verificar = "SELECT quantidade FROM carrinho WHERE idcliente = ? AND idproduto = ?";
+    $stmt = mysqli_prepare($conexao, $sql_verificar);
+    mysqli_stmt_bind_param($stmt, 'ii', $idcliente, $idproduto);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+
+    if ($linha = mysqli_fetch_assoc($resultado)) {
+        // Se já existe, atualiza a quantidade
+        $nova_qtd = $linha['quantidade'] + $quantidade;
+        $sql_update = "UPDATE carrinho SET quantidade = ? WHERE idcliente = ? AND idproduto = ?";
+        $stmt_update = mysqli_prepare($conexao, $sql_update);
+        mysqli_stmt_bind_param($stmt_update, 'iii', $nova_qtd, $idcliente, $idproduto);
+        mysqli_stmt_execute($stmt_update);
+    } else {
+        // Caso contrário, insere novo item
+        $sql_inserir = "INSERT INTO carrinho (idcliente, idproduto, quantidade) VALUES (?, ?, ?)";
+        $stmt_inserir = mysqli_prepare($conexao, $sql_inserir);
+        mysqli_stmt_bind_param($stmt_inserir, 'iii', $idcliente, $idproduto, $quantidade);
+        mysqli_stmt_execute($stmt_inserir);
+    }
+}
+
+function remover_do_carrinho($conexao, $idcliente, $idproduto) {
+    $sql = "DELETE FROM carrinho WHERE idcliente = ? AND idproduto = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ii', $idcliente, $idproduto);
+    mysqli_stmt_execute($stmt);
+}
 
 ?>

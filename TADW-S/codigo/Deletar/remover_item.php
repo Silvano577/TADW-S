@@ -11,5 +11,5 @@ if ($id > 0) {
     mysqli_stmt_execute($stmt);
 }
 
-header("Location: carrinho.php");
+header("Location: ../carrinho.php");
 exit;

@@ -1,3 +1,13 @@
+<?php
+// Inicia a sessão antes de qualquer saída HTML
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Verifica se o usuário está logado
+$usuario_logado = !empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim';
+$nome_usuario = $_SESSION['nomeusuario'] ?? ''; // Ajuste conforme o nome da variável da sua sessão
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,21 +18,22 @@
 </head>
 <body>
     <header>
-        <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-?>
-
         <div class="logo">
-            <img src="../fotosc/images.png" alt="Logo Pizzaria">
+            <img src="../fotosc/logo.png" alt="Logo Pizzaria">
         </div>
+
         <nav>
             <ul>
                 <li><a href="index.php">Início</a></li>
                 <li><a href="sobre.php" class="ativo">Sobre</a></li>
                 <li><a href="contato.php">Contato</a></li>
-                <li><a href="login.php">Login</a></li>
+
+                <?php if ($usuario_logado): ?>
+                    <li><a href="perfil.php">👤 Olá, <?php echo htmlspecialchars($nome_usuario); ?></a></li>
+                    <li><a href="deslogar.php">Sair</a></li>
+                <?php else: ?>
+                    <li><a href="login.php">Login</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
     </header>

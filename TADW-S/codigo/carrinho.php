@@ -58,7 +58,7 @@ $total_geral = 0;
             $total_geral += $subtotal;
         ?>
         <tr>
-            <td><img src="fotos/<?php echo htmlspecialchars($item['foto']); ?>" alt=""></td>
+           <td> <img src="<?php echo htmlspecialchars($item['foto']); ?>" alt="" width="50"> </td>
             <td><?php echo htmlspecialchars($item['nome_produto']); ?></td>
             <td>R$ <?php echo number_format($item['preco'], 2, ',', '.'); ?></td>
             <td>
@@ -71,7 +71,7 @@ $total_geral = 0;
             </td>
             <td>R$ <?php echo number_format($subtotal, 2, ',', '.'); ?></td>
             <td>
-                <form action="../Deletar/remover_carrinho.php" method="POST" style="display:inline;">
+                <form action="../Deletar/remover.php" method="POST" style="display:inline;">
                     <input type="hidden" name="idcarrinho" value="<?php echo $item['idcarrinho']; ?>">
                     <button type="submit" class="btn btn-remover">Remover</button>
                 </form>

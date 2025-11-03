@@ -1,0 +1,163 @@
+/* ======= ESTILO GERAL ======= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background-color: #fafafa;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ======= CABEÇALHO ======= */
+header {
+    background-color: #fff;
+    border-bottom: 1px solid #e6e6e6;
+    padding: 20px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 1.8em;
+    color: #d32f2f;
+    font-weight: 700;
+}
+
+nav a {
+    text-decoration: none;
+    color: #555;
+    margin: 0 10px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+nav a:hover,
+nav a.ativo {
+    color: #d32f2f;
+}
+
+/* ======= LAYOUT PRINCIPAL ======= */
+main {
+    display: flex;
+    gap: 30px;
+    padding: 30px 5%;
+    flex: 1;
+}
+
+/* ======= PRODUTOS ======= */
+.produtos {
+    flex: 3;
+}
+
+.grid-produtos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.card h3 {
+    font-size: 1.1em;
+    color: #222;
+    margin-bottom: 5px;
+}
+
+.card p {
+    margin: 5px 0;
+}
+
+.preco {
+    font-weight: 600;
+    color: #d32f2f;
+    font-size: 1.1em;
+}
+
+input[type="number"] {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+    margin: 5px 0;
+}
+
+.card label {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+
+.card input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+/* ======= BOTÕES ======= */
+.botoes {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn {
+    background-color: #d32f2f;
+    color: #fff;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: 0.3s;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #b71c1c;
+}
+
+/* ======= SEÇÃO "MEU PEDIDO" (iframe do carrinho) ======= */
+iframe#carrinho-frame {
+    flex: 1.2;
+    height: 80vh;
+    border: none;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+/* ======= RODAPÉ ======= */
+footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 0.9em;
+    color: #777;
+    background-color: #fff;
+    border-top: 1px solid #e6e6e6;
+}

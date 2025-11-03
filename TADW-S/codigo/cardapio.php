@@ -12,15 +12,17 @@ $produtos = listar_produtos($conexao);
 <head>
     <meta charset="UTF-8">
     <title>Cardápio - Pizzaria</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/cardapio.css">
+    <script defer src="./js/cardapio.js"></script> <!-- JavaScript separado -->
 </head>
 <body>
+
 <header>
     <h1>Nosso Cardápio</h1>
     <nav>
         <a href="index.php">Início</a> |
         <a href="cardapio.php" class="ativo">Cardápio</a> |
-        <a href="carrinho.php">🛒 Carrinho</a> |
+        <a href="carrinho.php" class="carrinho-status">🛒 0 itens</a> |
         <a href="contato.php">Contato</a>
     </nav>
 </header>
@@ -28,7 +30,7 @@ $produtos = listar_produtos($conexao);
 <main>
     <section class="produtos">
         <?php if (count($produtos) > 0): ?>
-            <form action="adicionar.php" method="post">
+            <form id="form-adicionar" action="adicionar.php" method="post">
                 <div class="grid-produtos">
                     <?php foreach ($produtos as $p): ?>
                         <div class="card">
@@ -52,17 +54,20 @@ $produtos = listar_produtos($conexao);
 
                 <div class="botoes">
                     <button type="submit" class="btn">Adicionar ao Carrinho</button>
-                    <a href="carrinho.php" class="btn">Ver Carrinho</a>
                 </div>
             </form>
         <?php else: ?>
             <p>Nenhum produto disponível no momento.</p>
         <?php endif; ?>
     </section>
+
+    <!-- IFRAME DO CARRINHO -->
+    <iframe id="carrinho-frame" src="carrinho.php"></iframe>
 </main>
 
 <footer>
     <p>&copy; <?php echo date("Y"); ?> Pizzaria</p>
 </footer>
+
 </body>
 </html>

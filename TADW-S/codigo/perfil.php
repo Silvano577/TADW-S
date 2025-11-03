@@ -95,7 +95,7 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
             <p><strong>Telefone:</strong> <?= htmlspecialchars($idcliente['telefone'] ?? '') ?></p>
             <a href="Forms/formcliente.php?id=<?= $idcliente['idcliente'] ?>&idusuario=<?= $usuario_id ?>">Editar Cliente</a>
         </div>
-
+<a href="meus_pedidos.php">Meus Pedidos</a>
         <div>
             <h2>Endereços</h2>
             <?php if (!empty($enderecos)): ?>
@@ -107,8 +107,10 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
                             <?= htmlspecialchars($end['bairro'] ?? '') ?> 
                             (<?= htmlspecialchars($end['complemento'] ?? '') ?>)
                             <a href="Forms/formentrega.php?id=<?= $end['idendentrega'] ?>&cliente_id=<?= $idcliente['idcliente'] ?>">Editar</a>
+                            <a href="meus_pedidos.php">Meus Pedidos</a>
                             <a href="perfil.php?delete_endereco=<?= $end['idendentrega'] ?>" onclick="return confirm('Deseja realmente excluir este endereço?');">Deletar</a>
-                        </li>
+                            
+                        </li>              
                     <?php endforeach; ?>
                 </ul>
             <?php else: ?>
@@ -117,10 +119,12 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
             <a href="Forms/formentrega.php?cliente_id=<?= $idcliente['idcliente'] ?>">Adicionar Endereço</a>
         </div>
     <?php else: ?>
+
         <div>
             <p>Você ainda não cadastrou seus dados de cliente.</p>
             <a href="Forms/formcliente.php?idusuario=<?= $usuario_id ?>">Cadastrar agora</a>
         </div>
+
     <?php endif; ?>
 
     <div>
