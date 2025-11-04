@@ -1,4 +1,6 @@
-/* ======= ESTILO GERAL ======= */
+/* ===========================
+   ESTILO GERAL
+=========================== */
 * {
     margin: 0;
     padding: 0;
@@ -7,29 +9,47 @@
 }
 
 body {
-    background-color: #fafafa;
+    background: #f7f7f7;
     color: #333;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-/* ======= CABEÇALHO ======= */
+/* ===========================
+   CABEÇALHO
+=========================== */
 header {
-    background-color: #fff;
+    background: #fff;
     border-bottom: 1px solid #e6e6e6;
-    padding: 20px 5%;
+    padding: 15px 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-header h1 {
+/* 🔹 Container da logo e título */
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-container h1 {
     font-size: 1.8em;
     color: #d32f2f;
     font-weight: 700;
+    white-space: nowrap;
 }
 
+/* 🔹 Logo */
+.logo {
+    width: 75px;
+    height: 75px;
+    object-fit: contain;
+}
+
+/* 🔹 Navegação */
 nav a {
     text-decoration: none;
     color: #555;
@@ -43,31 +63,100 @@ nav a.ativo {
     color: #d32f2f;
 }
 
-/* ======= LAYOUT PRINCIPAL ======= */
+/* ===========================
+   LAYOUT PRINCIPAL
+=========================== */
 main {
     display: flex;
-    gap: 30px;
-    padding: 30px 5%;
+    padding: 25px 5%;
     flex: 1;
+    gap: 0; /* 🔹 sem espaço entre filtro e produtos */
 }
 
-/* ======= PRODUTOS ======= */
+/* ===========================
+   FILTROS
+=========================== */
+aside {
+    flex: 0 0 170px;
+    background: #fff;
+    border-radius: 14px 0 0 14px;
+    border: 1px solid #e0e0e0;
+    border-right: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    height: fit-content;
+    overflow: hidden;
+}
+
+aside h2 {
+    font-size: 1.1em;
+    background: #d32f2f;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+
+/* 🔹 Botões do filtro sem espaçamento */
+.filtro {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtro button {
+    background: #fff;
+    border: none;
+    border-top: 1px solid #eee;
+    color: #d32f2f;
+    padding: 10px 0;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9em;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.filtro button:first-child {
+    border-top: none;
+}
+
+.filtro button:hover,
+.filtro button.ativo {
+    background: #d32f2f;
+    color: #fff;
+}
+
+/* ===========================
+   PRODUTOS
+=========================== */
 .produtos {
     flex: 3;
+    background: #fff;
+    border-radius: 0 14px 14px 0;
+    border: 1px solid #e0e0e0;
+    border-left: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 25px;
 }
 
+/* 🔹 Fundo branco enquadrado nos produtos */
 .grid-produtos {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
 }
 
+/* ===========================
+   CARD DE PRODUTO
+=========================== */
 .card {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 12px;
     text-align: center;
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     transition: transform 0.2s ease;
 }
 
@@ -77,87 +166,125 @@ main {
 
 .card img {
     width: 100%;
-    height: 160px;
+    height: 130px;
     object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 10px;
+    border-radius: 8px;
 }
 
 .card h3 {
-    font-size: 1.1em;
+    font-size: 1em;
+    margin: 8px 0 4px;
     color: #222;
-    margin-bottom: 5px;
 }
 
 .card p {
-    margin: 5px 0;
+    font-size: 0.9em;
+    color: #555;
+    margin: 2px 0;
 }
 
 .preco {
     font-weight: 600;
     color: #d32f2f;
-    font-size: 1.1em;
+    font-size: 1em;
 }
 
 input[type="number"] {
-    width: 60px;
-    padding: 5px;
+    width: 50px;
+    padding: 4px;
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 6px;
     text-align: center;
-    margin: 5px 0;
+    margin-top: 4px;
 }
 
-.card label {
-    display: block;
-    margin-top: 8px;
-    font-size: 0.9em;
-}
-
-.card input[type="checkbox"] {
-    margin-right: 5px;
-}
-
-/* ======= BOTÕES ======= */
+/* ===========================
+   BOTÕES
+=========================== */
 .botoes {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-top: 30px;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 .btn {
-    background-color: #d32f2f;
+    background: #d32f2f;
     color: #fff;
-    padding: 10px 25px;
+    padding: 7px 15px;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 0.9em;
     transition: 0.3s;
     text-decoration: none;
 }
 
 .btn:hover {
-    background-color: #b71c1c;
+    background: #b71c1c;
 }
 
-/* ======= SEÇÃO "MEU PEDIDO" (iframe do carrinho) ======= */
+/* ===========================
+   CARRINHO (iframe)
+=========================== */
 iframe#carrinho-frame {
     flex: 1.2;
     height: 80vh;
     border: none;
-    border-radius: 12px;
-    background-color: #fff;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* ======= RODAPÉ ======= */
+/* ===========================
+   RODAPÉ
+=========================== */
 footer {
     text-align: center;
-    padding: 15px;
-    font-size: 0.9em;
+    padding: 10px;
+    font-size: 0.85em;
     color: #777;
-    background-color: #fff;
+    background: #fff;
     border-top: 1px solid #e6e6e6;
+}
+
+/* ===========================
+   RESPONSIVO
+=========================== */
+@media (max-width: 1100px) {
+    .grid-produtos {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    main {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    aside {
+        width: 100%;
+        border-radius: 14px;
+        border-right: 1px solid #e0e0e0;
+    }
+
+    .produtos {
+        border-radius: 14px;
+        border-left: 1px solid #e0e0e0;
+    }
+
+    .grid-produtos {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .grid-produtos {
+        grid-template-columns: 1fr;
+    }
+
+    iframe#carrinho-frame {
+        height: 350px;
+    }
 }

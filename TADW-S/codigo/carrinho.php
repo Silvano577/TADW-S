@@ -62,7 +62,7 @@ $total_geral = 0;
             <td><?php echo htmlspecialchars($item['nome_produto']); ?></td>
             <td>R$ <?php echo number_format($item['preco'], 2, ',', '.'); ?></td>
             <td>
-                <form action="../Forms/atualizar_carrinho.php" method="POST" class="form-qtd">
+                <form action="../Forms/atualizar_carrinho_ajax.php" method="POST" class="form-qtd">
                     <input type="hidden" name="idcarrinho" value="<?php echo $item['idcarrinho']; ?>">
                     <button type="submit" name="acao" value="menos" class="btn-qtd">−</button>
                     <span><?php echo $item['quantidade']; ?></span>
@@ -71,7 +71,7 @@ $total_geral = 0;
             </td>
             <td>R$ <?php echo number_format($subtotal, 2, ',', '.'); ?></td>
             <td>
-                <form action="../Deletar/remover.php" method="POST" style="display:inline;">
+                <form action="../Deletar/remover_ajax.php" method="POST" style="display:inline;">
                     <input type="hidden" name="idcarrinho" value="<?php echo $item['idcarrinho']; ?>">
                     <button type="submit" class="btn btn-remover">Remover</button>
                 </form>

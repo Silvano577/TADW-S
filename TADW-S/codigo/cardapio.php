@@ -13,12 +13,15 @@ $produtos = listar_produtos($conexao);
     <meta charset="UTF-8">
     <title>Cardápio - Pizzaria</title>
     <link rel="stylesheet" href="./css/cardapio.css">
-    <script defer src="./js/cardapio.js"></script> <!-- JavaScript separado -->
+    <script defer src="./js/cardapio.js"></script>
 </head>
 <body>
 
 <header>
-    <h1>Nosso Cardápio</h1>
+    <div class="logo-container">
+        <img src="./fotosc/logo.png" alt="Logo da Pizzaria" class="logo">
+        <h1>Nosso Cardápio</h1>
+    </div>
     <nav>
         <a href="index.php">Início</a> |
         <a href="cardapio.php" class="ativo">Cardápio</a> |
@@ -28,41 +31,44 @@ $produtos = listar_produtos($conexao);
 </header>
 
 <main>
+    <!-- FILTRO LATERAL -->
+    <aside class="filtro">
+        <button class="btn-filtro ativo" data-categoria="todas">TODOS</button>
+        <button class="btn-filtro" data-categoria="pizza">PIZZAS</button>
+        <button class="btn-filtro" data-categoria="bebida">BEBIDAS</button>
+        <button class="btn-filtro" data-categoria="promocao">PROMOÇÕES</button>
+    </aside>
+
+    <!-- PRODUTOS -->
     <section class="produtos">
         <?php if (count($produtos) > 0): ?>
-            <form id="form-adicionar" action="adicionar.php" method="post">
-                <div class="grid-produtos">
-                    <?php foreach ($produtos as $p): ?>
-                        <div class="card">
-                            <img src="<?php echo htmlspecialchars($p['foto']); ?>" alt="<?php echo htmlspecialchars($p['nome']); ?>">
-                            <h3><?php echo htmlspecialchars($p['nome']); ?></h3>
+            <div class="grid-produtos">
+                <?php foreach ($produtos as $p): ?>
+                    <div class="card" data-categoria="<?php echo htmlspecialchars($p['tipo']); ?>">
+                        <img src="<?php echo htmlspecialchars($p['foto']); ?>" alt="<?php echo htmlspecialchars($p['nome']); ?>">
+                        <h3><?php echo htmlspecialchars($p['nome']); ?></h3>
 
-                            <?php if (!empty($p['tamanho'])): ?>
-                                <p>Tamanho: <?php echo htmlspecialchars($p['tamanho']); ?></p>
-                            <?php endif; ?>
+                        <?php if (!empty($p['tamanho'])): ?>
+                            <p>Tamanho: <?php echo htmlspecialchars($p['tamanho']); ?></p>
+                        <?php endif; ?>
 
-                            <p class="preco">R$ <?php echo number_format($p['preco'], 2, ',', '.'); ?></p>
+                        <p class="preco">R$ <?php echo number_format($p['preco'], 2, ',', '.'); ?></p>
+                            
 
-                            <label>Qtd:</label>
-                            <input type="number" name="quantidade[<?= $p['idproduto'] ?>]" value="1" min="1" max="10">
+                        <input type="hidden" id="qtd<?= $p['idproduto'] ?>" value="1">
 
-                            <input type="checkbox" name="idproduto[]" value="<?= $p['idproduto'] ?>" id="prod<?= $p['idproduto'] ?>">
-                            <label for="prod<?= $p['idproduto'] ?>">Selecionar</label>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
 
-                <div class="botoes">
-                    <button type="submit" class="btn">Adicionar ao Carrinho</button>
-                </div>
-            </form>
+                        <button type="button" class="btn-adicionar" data-id="<?= $p['idproduto'] ?>">Adicionar ao Carrinho</button>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         <?php else: ?>
             <p>Nenhum produto disponível no momento.</p>
         <?php endif; ?>
     </section>
 
-    <!-- IFRAME DO CARRINHO -->
-    <iframe id="carrinho-frame" src="carrinho.php"></iframe>
+    <!-- Container do carrinho (dinâmico) -->
+    <section id="carrinho-container" class="carrinho-ajax"></section>
 </main>
 
 <footer>
