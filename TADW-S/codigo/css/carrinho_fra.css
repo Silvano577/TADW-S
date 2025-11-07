@@ -27,7 +27,7 @@ main#carrinho-main {
    CONTAINER PRINCIPAL
 =========================== */
 .carrinho-container {
-    background: #ffffff;
+    background: #333;
     width: 100%;
     max-width: 475px;
     padding: 20px;
@@ -72,10 +72,6 @@ main#carrinho-main {
     background: #ffffff;
 }
 
-.carrinho-container tbody tr:hover {
-    background: #ffffff;
-    transition: 0.2s ease;
-}
 
 .carrinho-container img {
     width: 45px;
@@ -214,6 +210,6 @@ main#carrinho-main {
 =========================== */
 @media (min-width: 1400px) {
     .carrinho-container {
-        max-width: 600px;
+        max-width: 456px;
     }
 }
