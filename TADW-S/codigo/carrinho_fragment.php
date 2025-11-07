@@ -3,9 +3,9 @@ session_start();
 require_once "conexao.php";
 require_once "funcao.php";
 
-// Verifica login
+
 if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
-    echo "Você precisa estar logado para visualizar o carrinho.";
+    echo "<div class='erro-carrinho'>⚠️ Você precisa estar logado para visualizar o carrinho.</div>";
     exit;
 }
 
@@ -14,11 +14,11 @@ $cliente = buscar_cliente_por_usuario($conexao, $usuario_id);
 $idcliente = $cliente['idcliente'] ?? 0;
 
 if (!$idcliente) {
-    echo "Cliente não encontrado.";
+    echo "<div class='erro-carrinho'>❌ Cliente não encontrado.</div>";
     exit;
 }
 
-// Buscar itens do carrinho
+
 $sql = "SELECT c.idcarrinho, c.quantidade, p.nome AS nome_produto, p.preco, p.foto
         FROM carrinho c
         INNER JOIN produto p ON c.idproduto = p.idproduto
@@ -30,15 +30,15 @@ $result = mysqli_stmt_get_result($stmt);
 
 $total_geral = 0;
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <title>Meu Carrinho</title>
-    <link rel="stylesheet" href="./css/carrinho_frag.css">
+
 </head>
 <body>
-
 <main>
     <div class="carrinho-container">
         <h2>🛒 Meu Carrinho</h2>
@@ -54,17 +54,17 @@ $total_geral = 0;
                     </tr>
                 </thead>
                 <tbody>
-                <?php while ($item = mysqli_fetch_assoc($result)): 
-                    $subtotal = $item['preco'] * $item['quantidade'];
-                    $total_geral += $subtotal;
-                ?>
-                    <tr>
-                        <td><img src="<?= htmlspecialchars($item['foto']) ?>" alt="Produto"></td>
-                        <td><?= htmlspecialchars($item['nome_produto']) ?></td>
-                        <td>R$ <?= number_format($item['preco'], 2, ',', '.') ?></td>
-                        <td class="qtd"><?= htmlspecialchars($item['quantidade']) ?></td>
-                    </tr>
-                <?php endwhile; ?>
+                    <?php while ($item = mysqli_fetch_assoc($result)):
+                        $subtotal = $item['preco'] * $item['quantidade'];
+                        $total_geral += $subtotal;
+                    ?>
+                        <tr>
+                            <td><img src="<?= htmlspecialchars($item['foto']) ?>" alt="Produto"></td>
+                            <td><?= htmlspecialchars($item['nome_produto']) ?></td>
+                            <td>R$ <?= number_format($item['preco'], 2, ',', '.') ?></td>
+                            <td class="qtd"><?= htmlspecialchars($item['quantidade']) ?></td>
+                        </tr>
+                    <?php endwhile; ?>
                 </tbody>
             </table>
 
@@ -79,6 +79,5 @@ $total_geral = 0;
         <?php endif; ?>
     </div>
 </main>
-
 </body>
 </html>

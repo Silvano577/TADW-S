@@ -16,7 +16,6 @@ if (!$idcliente) {
     die("Cliente não encontrado.");
 }
 
-// Buscar itens do carrinho
 $sql = "SELECT c.idcarrinho, c.quantidade, 
                p.nome AS nome_produto, p.preco, p.foto
         FROM carrinho c
@@ -35,7 +34,7 @@ $total_geral = 0;
 <head>
     <meta charset="UTF-8">
     <title>Seu Carrinho</title>
-    <link rel="stylesheet" href="css/carrinho.css">
+    <link rel="stylesheet" href="./css/a.css">
 </head>
 <body>
 

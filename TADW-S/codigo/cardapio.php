@@ -3,7 +3,6 @@ session_start();
 require_once "conexao.php";
 require_once "funcao.php";
 
-// Buscar todos os produtos
 $produtos = listar_produtos($conexao);
 ?>
 
@@ -12,14 +11,15 @@ $produtos = listar_produtos($conexao);
 <head>
     <meta charset="UTF-8">
     <title>Cardápio - Pizzaria</title>
-    <link rel="stylesheet" href="./css/cardapio.css">
+    <link rel="stylesheet" href="./css/carrinho_fra.css">
+    <link rel="stylesheet" href="./css/c.css">
     <script defer src="./js/cardapio.js"></script>
 </head>
 <body>
 
 <header>
     <div class="logo-container">
-        <img src="./fotosc/logo.png" alt="Logo da Pizzaria" class="logo">
+        <img src="./fotosc/l.png" alt="Logo da Pizzaria" class="logo">
         <h1>Nosso Cardápio</h1>
     </div>
     <nav>
@@ -31,7 +31,7 @@ $produtos = listar_produtos($conexao);
 </header>
 
 <main>
-    <!-- FILTRO LATERAL -->
+
     <aside class="filtro">
         <button class="btn-filtro ativo" data-categoria="todas">TODOS</button>
         <button class="btn-filtro" data-categoria="pizza">PIZZAS</button>
@@ -39,7 +39,6 @@ $produtos = listar_produtos($conexao);
         <button class="btn-filtro" data-categoria="promocao">PROMOÇÕES</button>
     </aside>
 
-    <!-- PRODUTOS -->
     <section class="produtos">
         <?php if (count($produtos) > 0): ?>
             <div class="grid-produtos">
@@ -67,7 +66,6 @@ $produtos = listar_produtos($conexao);
         <?php endif; ?>
     </section>
 
-    <!-- Container do carrinho (dinâmico) -->
     <section id="carrinho-container" class="carrinho-ajax"></section>
 </main>
 

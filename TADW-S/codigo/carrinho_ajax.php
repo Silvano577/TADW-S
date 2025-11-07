@@ -17,12 +17,10 @@ if (!$cliente) {
     exit;
 }
 
-// Se for atualização do carrinho (mais/menos)
 if (isset($_POST['idcarrinho']) && isset($_POST['acao'])) {
     $idcarrinho = intval($_POST['idcarrinho']);
     $acao = $_POST['acao'];
 
-    // Buscar quantidade atual
     $sql = "SELECT quantidade FROM carrinho WHERE idcarrinho = ?";
     $stmt = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($stmt, "i", $idcarrinho);
@@ -49,7 +47,6 @@ if (isset($_POST['idcarrinho']) && isset($_POST['acao'])) {
     exit;
 }
 
-// Se for adicionar produto do cardápio
 if (isset($_POST['idproduto'])) {
     $idproduto = intval($_POST['idproduto']);
     $quantidade = intval($_POST['quantidade'] ?? 1);
@@ -59,7 +56,6 @@ if (isset($_POST['idproduto'])) {
         exit;
     }
 
-    // Verifica se já existe no carrinho
     $sql = "SELECT idcarrinho, quantidade FROM carrinho WHERE idcliente = ? AND idproduto = ?";
     $stmt = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($stmt, "ii", $cliente['idcliente'], $idproduto);

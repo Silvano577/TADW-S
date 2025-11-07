@@ -1,0 +1,219 @@
+/* ===========================
+   CARRINHO - VERSÃO COMPACTA E AJUSTADA
+=========================== */
+body#carrinho-body {
+    background: #ffffff;
+    font-family: "Poppins", sans-serif;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-size: 0.9rem;
+    overflow-x: hidden; /* impede barra horizontal */
+}
+
+/* ===========================
+   CONTEÚDO GERAL
+=========================== */
+main#carrinho-main {
+    display: flex;
+    justify-content: flex-end; /* empurra o carrinho para a direita */
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px 25px; /* espaçamento da borda direita */
+    box-sizing: border-box;
+}
+
+/* ===========================
+   CONTAINER PRINCIPAL
+=========================== */
+.carrinho-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 475px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    animation: fadeIn 0.4s ease;
+    box-sizing: border-box;
+    margin-right: 0; /* encosta mais à direita */
+}
+
+.carrinho-container h2 {
+    text-align: center;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #ffffff;
+}
+
+/* ===========================
+   TABELA DE ITENS
+=========================== */
+.carrinho-container table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.carrinho-container th,
+.carrinho-container td {
+    padding: 8px 6px;
+    text-align: center;
+    font-size: 0.85rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.carrinho-container thead {
+    background: #ff4d4d;
+    color: #ffffff;
+}
+
+.carrinho-container tbody tr:nth-child(even) {
+    background: #ffffff;
+}
+
+.carrinho-container tbody tr:hover {
+    background: #ffffff;
+    transition: 0.2s ease;
+}
+
+.carrinho-container img {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* ===========================
+   RODAPÉ DO CARRINHO
+=========================== */
+.rodape-carrinho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    gap: 5px;
+}
+
+.rodape-carrinho .btn {
+    background: #ff4d4d;
+    border: none;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: 0.3s ease;
+}
+
+.rodape-carrinho .btn:hover {
+    background: #e63939;
+    transform: translateY(-1px);
+}
+
+.rodape-carrinho .total {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* ===========================
+   MENSAGENS
+=========================== */
+.vazio {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #ffffff;
+}
+
+.erro-carrinho {
+    text-align: center;
+    background: #ffffff;
+    color: #a00;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 15px auto;
+    max-width: 400px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    font-size: 0.85rem;
+}
+
+/* ===========================
+   ANIMAÇÃO
+=========================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===========================
+   RESPONSIVIDADE
+=========================== */
+@media (max-width: 768px) {
+    main#carrinho-main {
+        justify-content: center; /* centraliza no mobile */
+        padding: 10px;
+    }
+
+    .carrinho-container {
+        width: 95%;
+        margin: 0 auto;
+    }
+
+    .carrinho-container table {
+        display: block;
+        width: 100%;
+    }
+
+    .carrinho-container thead {
+        display: none;
+    }
+
+    .carrinho-container tr {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ffffff;
+        border-radius: 8px;
+        background: #ffffff;
+        margin-bottom: 10px;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    .carrinho-container td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 8px;
+    }
+
+    .carrinho-container td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #ffffff;
+        font-size: 0.8rem;
+    }
+
+    .rodape-carrinho {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 5px;
+    }
+
+    .rodape-carrinho .btn {
+        width: 100%;
+        padding: 10px;
+    }
+}
+
+/* ===========================
+   GRANDES TELAS
+=========================== */
+@media (min-width: 1400px) {
+    .carrinho-container {
+        max-width: 600px;
+    }
+}

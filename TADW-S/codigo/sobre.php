@@ -1,12 +1,12 @@
 <?php
-// Inicia a sessão antes de qualquer saída HTML
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Verifica se o usuário está logado
+
 $usuario_logado = !empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim';
-$nome_usuario = $_SESSION['nomeusuario'] ?? ''; // Ajuste conforme o nome da variável da sua sessão
+$nome_usuario = $_SESSION['nomeusuario'] ?? ''; 
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">

@@ -3,7 +3,6 @@ session_start();
 require_once "conexao.php";
 require_once "funcao.php";
 
-// Verifica se o usuário está logado
 if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
     header("Location: login.php");
     exit;
@@ -11,24 +10,23 @@ if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
 
 $usuario_id = $_SESSION['idusuario'] ?? 0;
 
-// Buscar dados do usuário
-$usuario = buscar_usuario($conexao, $usuario_id); // já retorna 1 usuário ou null
 
-// Buscar dados do cliente vinculado
+$usuario = buscar_usuario($conexao, $usuario_id); 
+
 $idcliente = buscar_cliente_por_usuario($conexao, $usuario_id);
 
-// Garantir que seja um array válido
+
 if (!is_array($idcliente) || empty($idcliente)) {
     $idcliente = null;
 }
 
-// Buscar endereços do cliente
+
 $enderecos = [];
 if (!empty($idcliente['idcliente'])) {
     $enderecos = buscar_enderecos_por_cliente($conexao, $idcliente['idcliente']);
 }
 
-// Tratar exclusão de endereço
+
 if (isset($_GET['delete_endereco'])) {
     $id_endereco = intval($_GET['delete_endereco']);
     deletar_endereco($conexao, $id_endereco);
@@ -36,30 +34,28 @@ if (isset($_GET['delete_endereco'])) {
     exit;
 }
 
-// Tratar exclusão da conta inteira
+
 if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
     if (!empty($idcliente['idcliente'])) {
         $cliente_id = $idcliente['idcliente'];
 
-        // Deletar endereços vinculados
+
         foreach ($enderecos as $end) {
             deletar_endereco($conexao, $end['idendentrega']);
         }
 
-        // Deletar foto do cliente
+
         if (!empty($idcliente['foto'])) {
             $arquivo = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($idcliente['foto'], '/');
             if (file_exists($arquivo)) unlink($arquivo);
         }
-
-        // Deletar cliente
         deletar_cliente($conexao, $cliente_id);
     }
 
-    // Deletar usuário
+
     deletar_usuario($conexao, $usuario_id);
 
-    // Finalizar sessão
+
     session_unset();
     session_destroy();
 

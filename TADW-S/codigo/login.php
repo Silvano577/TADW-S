@@ -3,12 +3,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Se já estiver logado, vai para a home do cliente ou admin
+
 if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim') {
     if (!empty($_SESSION['tipo']) && $_SESSION['tipo'] === 'adm') {
         header("Location: homeAdm.php");
     } else {
-        header("Location: index.php"); // página principal do cliente
+        header("Location: index.php"); 
     }
     exit;
 }

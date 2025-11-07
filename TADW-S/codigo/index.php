@@ -2,18 +2,6 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-require_once "conexao.php"; 
-
-// Buscar todos os produtos (pizzas e bebidas)
-$sql = "SELECT * FROM produto WHERE tipo IN ('pizza', 'bebida')";
-$result = $conexao->query($sql);
-$produtos = [];
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $produtos[] = $row;
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -21,17 +9,17 @@ if ($result && $result->num_rows > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizzaria - Home</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/index.css">
 </head>
 <body>
 <header>
     <div class="logo">
-        <img src="../fotosc/logo.png" alt="Logo Pizzaria">
+        <img src="./fotosc/l.png" alt="Logo Pizzaria">
     </div>
     <nav>
         <ul>
             <li><a href="index.php" class="ativo">Início</a></li>
-            <li><a href="cardapio.php">Cardápio</a></li> <!-- 🔹 Novo item do menu -->
+            <li><a href="cardapio.php">Cardápio</a></li>
             <li><a href="sobre.php">Sobre</a></li>
 
             <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim'): ?>
@@ -55,25 +43,15 @@ if ($result && $result->num_rows > 0) {
 </header>
 
 <main>
-    <h1>Bem-vindo à nossa Pizzaria!</h1>
-    <p>Confira nossas novidades em pizzas e bebidas.</p>
+    <div class="texto-principal">
+        <h1>Bem-vindo à nossa Pizzaria!</h1>
+        <p>Saboreie o melhor da culinária sem sair de casa.</p>
+        <a href="cardapio.php" class="btn-cardapio">Ver Cardápio</a>
+    </div>
 
-    <section class="produtos">
-        <?php if (count($produtos) > 0): ?>
-            <?php foreach ($produtos as $p): ?>
-                <div class="card">
-                    <img src="<?php echo $p['foto']; ?>" alt="<?php echo $p['nome']; ?>">
-                    <h3><?php echo $p['nome']; ?></h3>
-                    <?php if (!empty($p['tamanho'])): ?>
-                        <p>Tamanho: <?php echo $p['tamanho']; ?></p>
-                    <?php endif; ?>
-                    <p class="preco">R$ <?php echo number_format($p['preco'], 2, ',', '.'); ?></p>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>Nenhum produto cadastrado ainda.</p>
-        <?php endif; ?>
-    </section>
+    <div class="imagem-pizza">
+        <img src="./imagens/pizza-principal.png" alt="Pizza ">
+    </div>
 </main>
 
 <footer>

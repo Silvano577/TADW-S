@@ -1,0 +1,184 @@
+/* ===========================
+   ESTILO GERAL
+=========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background: #f7f7f7;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 30px 5%;
+}
+
+/* ===========================
+   TÍTULO
+=========================== */
+h1 {
+    color: #d32f2f;
+    margin-bottom: 25px;
+    font-size: 2em;
+    text-align: center;
+}
+
+/* ===========================
+   CONTAINER DO CARRINHO
+=========================== */
+.carrinho-container {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 20px;
+    width: 100%;
+    max-width: 1000px;
+}
+
+/* ===========================
+   TABELA
+=========================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+}
+
+th, td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background: #d32f2f;
+    color: #fff;
+    font-weight: 600;
+}
+
+td img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* ===========================
+   QUANTIDADE
+=========================== */
+.form-qtd {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-qtd {
+    background: #d32f2f;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-qtd:hover {
+    background: #b71c1c;
+}
+
+.form-qtd span {
+    font-weight: 500;
+}
+
+/* ===========================
+   BOTÕES
+=========================== */
+.btn {
+    background: #d32f2f;
+    color: #fff;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background: #b71c1c;
+}
+
+.btn-remover {
+    background: #f44336;
+}
+
+.btn-remover:hover {
+    background: #d32f2f;
+}
+
+.btn-finalizar {
+    display: block;
+    margin: 10px auto;
+    font-size: 1em;
+}
+
+/* ===========================
+   TOTAL
+=========================== */
+.total {
+    text-align: right;
+    font-weight: 600;
+    color: #d32f2f;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+/* ===========================
+   CARRINHO VAZIO
+=========================== */
+.vazio {
+    text-align: center;
+    color: #777;
+    padding: 50px;
+    font-size: 1.1em;
+}
+
+/* ===========================
+   RESPONSIVO
+=========================== */
+@media (max-width: 800px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    th {
+        display: none;
+    }
+
+    tr {
+        border-bottom: 2px solid #eee;
+        margin-bottom: 15px;
+        padding: 10px 0;
+    }
+
+    td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+    }
+
+    td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        color: #555;
+        font-weight: 600;
+    }
+}

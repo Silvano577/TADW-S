@@ -1,30 +1,26 @@
 <?php
-// protege.php
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Pega o nome do arquivo atual
+
 $currentPage = basename($_SERVER['PHP_SELF']);
 
-// Se não estiver logado e não estiver no login.php, redireciona
+
 if ((!isset($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') && $currentPage !== 'login.php') {
-    header("Location: ../login.php"); // ajuste o caminho conforme a estrutura
+    header("Location: ../login.php");
     exit;
 }
 
-// Disponibiliza os dados do usuário
-$usuario = $_SESSION['usuario'] ?? 'Usuário';
-$tipo = $_SESSION['tipo'] ?? ''; // adm ou usuario
 
-/**
- * Função para proteger páginas específicas por tipo
- * Uso: protegeTipo('adm'); ou protegeTipo('usuario');
- */
+$usuario = $_SESSION['usuario'] ?? 'Usuário';
+$tipo = $_SESSION['tipo'] ?? ''; 
+
 function protegeTipo($tipoNecessario) {
     global $tipo;
     if ($tipo !== $tipoNecessario) {
-        // Redireciona para a home do tipo correspondente
+
         if ($tipo === 'adm') {
             header("Location: ../homeAdm.php");
         } else {
