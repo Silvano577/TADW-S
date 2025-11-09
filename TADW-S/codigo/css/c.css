@@ -11,7 +11,7 @@
 body {
     background: url("../fotosc/fundo.png") no-repeat center center fixed !important;
     background-size: cover !important;
-    color: #fff !important;
+
     display: flex !important;
     flex-direction: column !important;
     min-height: 100vh !important;

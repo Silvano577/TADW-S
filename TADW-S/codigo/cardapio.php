@@ -25,8 +25,7 @@ $produtos = listar_produtos($conexao);
     <nav>
         <a href="index.php">Início</a> |
         <a href="cardapio.php" class="ativo">Cardápio</a> |
-        <a href="carrinho.php" class="carrinho-status">🛒 0 itens</a> |
-        <a href="contato.php">Contato</a>
+
     </nav>
 </header>
 

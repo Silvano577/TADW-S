@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizzaria - Home</title>
-    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./css/in.css">
 </head>
 <body>
 <header>
@@ -30,7 +30,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 <?php endif; ?>
             <?php endif; ?>
 
-            <li><a href="contato.php">Contato</a></li>
 
             <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim'): ?>
                 <li class="saudacao">Olá, <?= htmlspecialchars($_SESSION['usuario'] ?? ''); ?></li>
@@ -50,11 +49,16 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 
     <div class="imagem-pizza">
-        <img src="./imagens/pizza-principal.png" alt="Pizza ">
+        <img src="./fotosc/l.png" alt="Pizza ">
     </div>
 </main>
 
 <footer>
+    <div class="redes-sociais">
+        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    </div>
     <p>&copy; <?php echo date('Y'); ?> Pizzaria - Todos os direitos reservados.</p>
 </footer>
 </body>

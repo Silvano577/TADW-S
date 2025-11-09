@@ -1,42 +1,44 @@
 <?php
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-
-$usuario_logado = !empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim';
-$nome_usuario = $_SESSION['nomeusuario'] ?? ''; 
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobre - Pizzaria</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <title>Pizzaria - Sobre</title>
+    <link rel="stylesheet" href="./css/sobre.css">
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <img src="../fotosc/logo.png" alt="Logo Pizzaria">
-        </div>
+<header>
+    <div class="logo">
+        <img src="./fotosc/l.png" alt="Logo Pizzaria">
+    </div>
+    <nav>
+        <ul>
+            <li><a href="index.php">Início</a></li>
+            <li><a href="cardapio.php">Cardápio</a></li>
+            <li><a href="sobre.php" class="ativo">Sobre</a></li>
 
-        <nav>
-            <ul>
-                <li><a href="index.php">Início</a></li>
-                <li><a href="sobre.php" class="ativo">Sobre</a></li>
-                <li><a href="contato.php">Contato</a></li>
-
-                <?php if ($usuario_logado): ?>
-                    <li><a href="perfil.php">👤 Olá, <?php echo htmlspecialchars($nome_usuario); ?></a></li>
-                    <li><a href="deslogar.php">Sair</a></li>
-                <?php else: ?>
-                    <li><a href="login.php">Login</a></li>
+            <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim'): ?>
+                <?php if(($_SESSION['tipo'] ?? '') === 'adm'): ?>
+                    <li><a href="homeAdm.php">Admin</a></li>
+                <?php elseif(($_SESSION['tipo'] ?? '') === 'cliente'): ?>
+                    <li><a href="perfil.php">Perfil</a></li>
                 <?php endif; ?>
-            </ul>
-        </nav>
-    </header>
+            <?php endif; ?>
+
+            <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim'): ?>
+                <li class="saudacao">Olá, <?= htmlspecialchars($_SESSION['usuario'] ?? ''); ?></li>
+                <li><a href="deslogar.php">Sair</a></li>
+            <?php else: ?>
+                <li><a href="login.php">Login</a></li>
+            <?php endif; ?>
+        </ul>
+    </nav>
+</header>
 
     <main class="sobre">
         <h1>Sobre a Nossa Pizzaria</h1>
@@ -62,8 +64,10 @@ $nome_usuario = $_SESSION['nomeusuario'] ?? '';
         </p>
     </main>
 
-    <footer>
-        <p>&copy; <?php echo date('Y'); ?> Pizzaria - Todos os direitos reservados.</p>
-    </footer>
+
+
+<footer>
+    <p>&copy; <?= date('Y'); ?> Pizzaria - Todos os direitos reservados.</p>
+</footer>
 </body>
 </html>

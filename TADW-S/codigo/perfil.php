@@ -61,83 +61,104 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
 <head>
     <meta charset="UTF-8">
     <title>Área do Usuário - Perfil</title>
-    <link rel="stylesheet" href="./css/p.css">
+    <link rel="stylesheet" href="./css/perfi.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
-    <!-- CABEÇALHO -->
-    <header>
-        <div class="logo">
-            <img src="imagens/logo.png" alt="Logo" class="logo-img">
-            <h1>PIZZA PROS</h1>
-        </div>
-        <div class="user-info">
-            <span><?= htmlspecialchars($usuario['usuario'] ?? '') ?></span>
-            <i class="fa-regular fa-user"></i>
-        </div>
-    </header>
+<!-- CABEÇALHO PADRONIZADO -->
+<header>
+    <div class="logo">
+        <img src="./fotosc/l.png" alt="Logo Pizzaria">
+    </div>
+    <nav>
+        <ul>
+            <li><a href="index.php">Início</a></li>
+            <li><a href="cardapio.php">Cardápio</a></li>
+            <li><a href="sobre.php">Sobre</a></li>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <main class="perfil-container">
-        <section class="perfil-card">
-            <div class="perfil-titulo">
-                <i class="fa-regular fa-user-circle"></i>
-                <h2>Seu Perfil</h2>
+            <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim'): ?>
+                <?php if(($_SESSION['tipo'] ?? '') === 'adm'): ?>
+                    <li><a href="homeAdm.php">Admin</a></li>
+                <?php elseif(($_SESSION['tipo'] ?? '') === 'cliente'): ?>
+                    <li><a href="perfil.php" class="ativo">Perfil</a></li>
+                <?php endif; ?>
+            <?php endif; ?>
+
+            <li><a href="contato.php">Contato</a></li>
+
+            <?php if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim'): ?>
+                <li class="saudacao">Olá, <?= htmlspecialchars($_SESSION['usuario'] ?? ''); ?></li>
+                <li><a href="deslogar.php">Sair</a></li>
+            <?php else: ?>
+                <li><a href="login.php">Login</a></li>
+            <?php endif; ?>
+        </ul>
+    </nav>
+</header>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<main class="perfil-container">
+    <section class="perfil-card">
+        <div class="perfil-titulo">
+            <i class="fa-regular fa-user-circle"></i>
+            <h2>Seu Perfil</h2>
+        </div>
+
+        
+        <div class="perfil-conteudo">
+            <!-- Coluna esquerda -->
+            <div class="perfil-esquerda">
+                
+                <div class="foto-perfil">
+                    <img src="<?= htmlspecialchars($cliente['foto'] ?? 'imagens/default_user.png') ?>" alt="Foto de perfil">
+                </div>
+                <h4>Dados do Usuario</h4>
+                <label>Nome de Usuário:</label>
+                <input type="text" value="<?= htmlspecialchars($usuario['usuario'] ?? '') ?>" readonly>
+
+                <label>E-mail:</label>
+                <input type="text" value="<?= htmlspecialchars($usuario['email'] ?? '') ?>" readonly>
+
+                <label>Senha:</label>
+                <input type="password" value="************" readonly>
             </div>
 
-            <div class="perfil-conteudo">
-                <!-- Coluna esquerda -->
-                <div class="perfil-esquerda">
-                    <div class="foto-perfil">
-                        <img src="<?= htmlspecialchars($cliente['foto'] ?? 'imagens/default_user.png') ?>" alt="Foto de perfil">
-                    </div>
+            <!-- Coluna direita -->
+            <div class="perfil-direita">
+                <h4>Dados do Cliente</h4>
+                <label>Nome:</label>
+                <input type="text" value="<?= htmlspecialchars($cliente['nome'] ?? '') ?>" readonly>
 
-                    <label>Nome de Usuário:</label>
-                    <input type="text" value="<?= htmlspecialchars($usuario['usuario'] ?? '') ?>" readonly>
+                <label>Data de Nascimento:</label>
+                <input type="text" value="<?= htmlspecialchars($cliente['data_ani'] ?? '') ?>" readonly>
 
-                    <label>E-mail:</label>
-                    <input type="text" value="<?= htmlspecialchars($usuario['email'] ?? '') ?>" readonly>
-
-                    <label>Senha:</label>
-                    <input type="password" value="************" readonly>
-                </div>
-
-                <!-- Coluna direita -->
-                <div class="perfil-direita">
-                    <label>Nome:</label>
-                    <input type="text" value="<?= htmlspecialchars($cliente['nome'] ?? '') ?>" readonly>
-
-                    <label>Data de Nascimento:</label>
-                    <input type="text" value="<?= htmlspecialchars($cliente['data_ani'] ?? '') ?>" readonly>
-
-                    <label>Endereço:</label>
-                    <input type="text" value="<?= htmlspecialchars($enderecos[0]['rua'] ?? 'Não cadastrado') ?>" readonly>
-
-                    <label>Telefone:</label>
-                    <input type="text" value="<?= htmlspecialchars($cliente['telefone'] ?? '') ?>" readonly>
-
-                    <p class="suporte">Suporte: (62)9944630327</p>
-                </div>
-
-                <!-- Painel de Configuração -->
-                <aside class="config-painel">
-                    <a href="Forms/formusuario.php?id=<?= $usuario_id ?>">Editar Perfil</a>
-                    <a href="perfil.php?delete_conta=1" onclick="return confirm('Deseja realmente excluir sua conta?')">Excluir Perfil</a>
-                    <a href="meus_pedidos.php">Histórico de Pedidos</a>
-
-                    <?php if (!empty($cliente['idcliente'])): ?>
-                        <a href="./Forms/formentrega.php?cliente_id=<?= intval($cliente['idcliente']) ?>">Registrar Endereço</a>
-                    <?php else: ?>
-                        <a href="./Forms/formcliente.php?idusuario=<?= intval($usuario_id) ?>">Cadastrar Dados (Registrar Endereço)</a>
-                    <?php endif; ?>
-
-                    <a href="deslogar.php" class="btn-danger">Deslogar</a>
-                </aside>
-
+                <label>Telefone:</label>
+                <input type="text" value="<?= htmlspecialchars($cliente['telefone'] ?? '') ?>" readonly>
+                <p>Suporte:(62)994630327</p>
             </div>
-        </section>
-    </main>
+                
+
+            <!-- Painel de Configuração -->
+            <aside class="config-painel">
+                <a href="Forms/formusuario.php?id=<?= $usuario_id ?>">Editar Perfil</a>
+                <a href="perfil.php?delete_conta=1" onclick="return confirm('Deseja realmente excluir sua conta?')">Excluir Perfil</a>
+                <a href="meus_pedidos.php">Histórico de Pedidos</a>
+                <a href="./Listar/listarendentrega.php">Meus Endereços</a>
+
+                <?php if (!empty($cliente['idcliente'])): ?>
+                    <a href="./Forms/formentrega.php?cliente_id=<?= intval($cliente['idcliente']) ?>">Registrar Endereço</a>
+                <?php else: ?>
+                    <a href="./Forms/formcliente.php?idusuario=<?= intval($usuario_id) ?>">Cadastrar Dados (Registrar Endereço)</a>
+                <?php endif; ?>
+
+                <a href="deslogar.php" class="btn-danger">Deslogar</a>
+            </aside>
+
+        </div>
+    </section>
+</main>
 
 </body>
 </html>

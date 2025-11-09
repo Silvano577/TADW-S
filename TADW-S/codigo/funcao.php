@@ -185,25 +185,29 @@ function atualizar_endereco($conexao, $id, $rua, $numero, $complemento, $bairro,
     return $exec;
 }
 
-function deletar_endereco($conexao, $id) {
-    $sql = "DELETE FROM endentrega WHERE idendentrega=?";
+
+
+function buscar_endereco($conexao, $idendentrega) {
+    $sql = "SELECT * FROM endentrega WHERE idendentrega = ?";
     $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $id);
+    mysqli_stmt_bind_param($comando, 'i', $idendentrega);
+    mysqli_stmt_execute($comando);
+    $resultado = mysqli_stmt_get_result($comando);
+    $dados = mysqli_fetch_assoc($resultado);
+    mysqli_stmt_close($comando);
+    return $dados;
+}
+
+
+function deletar_endereco($conexao, $idendentrega) {
+    $sql = "DELETE FROM endentrega WHERE idendentrega = ?";
+    $comando = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($comando, 'i', $idendentrega);
     $exec = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
     return $exec;
 }
 
-function buscar_endereco($conexao, $id) {
-    $sql = "SELECT * FROM endentrega WHERE idendentrega=?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $id);
-    mysqli_stmt_execute($comando);
-    $res = mysqli_stmt_get_result($comando);
-    $row = mysqli_fetch_assoc($res);
-    mysqli_stmt_close($comando);
-    return $row;
-}
 
 function listar_enderecos($conexao) {
     $sql = "SELECT * FROM endentrega";
@@ -483,7 +487,6 @@ function buscar_cliente_por_usuario($conexao, $idusuario) {
     mysqli_stmt_close($comando);
     return $row ?: null;
 }
-
 
 function buscar_enderecos_por_cliente($conexao, $idcliente) {
     $sql = "SELECT * FROM endentrega WHERE idcliente = ?";

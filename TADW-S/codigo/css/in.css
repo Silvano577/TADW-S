@@ -38,6 +38,7 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 25px 80px;
+    backdrop-filter: blur(10px);
 }
 
 .logo img {
@@ -126,7 +127,7 @@ main {
 }
 
 .imagem-pizza img {
-    max-width: 420px;
+    max-width: 320px;
     height: auto;
     transition: transform 0.4s;
 }

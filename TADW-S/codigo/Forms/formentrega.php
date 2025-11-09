@@ -59,7 +59,7 @@ if ($idcliente <= 0) {
     <input type="submit" value="<?= htmlspecialchars($botao) ?>">
 </form>
 
-<a href="<?= $origem === 'formpedido' ? '../Forms/formpedido.php' : '../perfil.php' ?>">Voltar</a>
+<a href="<?= $origem === 'formpedido' ? '../Forms/formpedido.php' : '../Listar/listarendentrega.php' ?>">Voltar</a>
 
 </body>
 </html>

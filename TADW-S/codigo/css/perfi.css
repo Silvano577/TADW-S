@@ -15,29 +15,56 @@ body {
 }
 
 /* ===========================
-   CABEÇALHO
+   CABEÇALHO PRINCIPAL
 =========================== */
 header {
-    background-color: #5a0000;
-    color: #fff;
+    position: relative;
+    z-index: 1;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 40px;
+    padding: 25px 80px;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #fff;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-header .logo {
+.logo img {
+    height: 55px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.logo img:hover {
+    transform: scale(1.05);
+}
+
+nav ul {
+    list-style: none;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 30px;
 }
 
-header .logo-img {
-    width: 40px;
-    height: 40px;
+nav ul li a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    font-size: 1.05rem;
+    transition: color 0.3s;
 }
 
+nav ul li a:hover,
+nav ul li a.ativo {
+    color: #ffce00;
+}
+
+/* ===========================
+   INFORMAÇÕES DO USUÁRIO
+=========================== */
 header .user-info {
     display: flex;
     align-items: center;
@@ -78,7 +105,7 @@ header .user-info {
 }
 
 /* ===========================
-   CONTEÚDO
+   CONTEÚDO DO PERFIL
 =========================== */
 .perfil-conteudo {
     display: flex;
@@ -88,7 +115,7 @@ header .user-info {
     gap: 25px;
 }
 
-/* COLUNA ESQUERDA */
+/* COLUNAS */
 .perfil-esquerda, .perfil-direita {
     flex: 1;
     min-width: 250px;
@@ -101,8 +128,8 @@ header .user-info {
 }
 
 .foto-perfil img {
-    width: 85px;
-    height: 85px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     border: 2px solid #5a0000;
     object-fit: cover;
@@ -174,6 +201,18 @@ input {
    RESPONSIVIDADE
 =========================== */
 @media (max-width: 900px) {
+    header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+
     .perfil-conteudo {
         flex-direction: column;
         align-items: center;
