@@ -51,6 +51,7 @@ mysqli_stmt_close($stmt);
 <head>
     <meta charset="UTF-8">
     <title>Meus Pedidos</title>
+    <link rel="stylesheet" href="./css/meus.css">
 </head>
 <body>
     <h1>Meus Pedidos</h1>
@@ -58,7 +59,7 @@ mysqli_stmt_close($stmt);
     <?php if (empty($pedidos)): ?>
         <p>Você ainda não fez nenhum pedido.</p>
     <?php else: ?>
-        <table border="1" cellpadding="5" cellspacing="0">
+        <table >
             <thead>
                 <tr>
                     <th>ID Pedido</th>

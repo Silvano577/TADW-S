@@ -1,0 +1,283 @@
+/* ===========================
+   RESET E CONFIGURAÇÕES GERAIS
+=========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    color: #fff;
+    background: url("../fotosc/png") no-repeat center center/cover;
+    background-attachment: fixed;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Sobreposição escura */
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 0;
+}
+
+/* Conteúdo acima da sobreposição */
+header, main, footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* ===========================
+   CABEÇALHO
+=========================== */
+header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 80px;
+    backdrop-filter: blur(10px);
+}
+
+.logo img {
+    height: 55px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.logo img:hover {
+    transform: scale(1.05);
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    font-size: 1.05rem;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover,
+nav ul li a.ativo {
+    color: #ffce00;
+}
+
+/* ===========================
+   CONTEÚDO PRINCIPAL
+=========================== */
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+}
+
+main h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #ffce00;
+    text-shadow: 0 0 10px rgba(0,0,0,0.6);
+}
+
+main p {
+    font-size: 1.2rem;
+    max-width: 700px;
+    line-height: 1.6;
+    color: #f0f0f0;
+    margin-bottom: 40px;
+}
+
+/* ===========================
+   BOTÕES DE REDIRECIONAMENTO
+=========================== */
+.btn-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn {
+    background: #ffce00;
+    color: #000;
+    border: none;
+    padding: 14px 32px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.btn:hover {
+    background: #fff;
+    color: #000;
+    transform: scale(1.05);
+}
+
+/* Variações */
+.btn-secundario {
+    background: transparent;
+    border: 2px solid #ffce00;
+    color: #ffce00;
+}
+
+.btn-secundario:hover {
+    background: #ffce00;
+    color: #000;
+}
+
+/* ===========================
+   RODAPÉ
+=========================== */
+footer {
+    background: rgba(0, 0, 0, 0.6);
+    text-align: center;
+    padding: 20px;
+    color: #ccc;
+    font-size: 0.9rem;
+}
+
+/* ===========================
+   RESPONSIVIDADE
+=========================== */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        padding: 15px 40px;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    main h1 {
+        font-size: 2rem;
+    }
+
+    main p {
+        font-size: 1rem;
+    }
+
+    .btn {
+        width: 80%;
+        text-align: center;
+    }
+}
+/* ===========================
+   PAINEL ADMINISTRATIVO
+=========================== */
+main h1 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #ffce00;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Grade de opções */
+.menu-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* Estilo dos blocos */
+.menu-grid li {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 25px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.menu-grid li:hover {
+    background: rgba(255, 206, 0, 0.85);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Links dentro dos blocos */
+.menu-grid li a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    transition: color 0.3s ease;
+}
+
+/* Ícones */
+.menu-grid li a i {
+    font-size: 2rem;
+    color: #ffce00;
+    transition: transform 0.3s, color 0.3s;
+}
+
+/* Hover nos ícones */
+.menu-grid li:hover i {
+    transform: scale(1.2);
+    color: #000;
+}
+
+/* Texto dentro dos blocos */
+.menu-grid li:hover a {
+    color: #000;
+}
+
+/* ===========================
+   RESPONSIVIDADE
+=========================== */
+@media (max-width: 768px) {
+    .menu-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+    }
+
+    .menu-grid li {
+        padding: 18px 10px;
+    }
+
+    .menu-grid li a i {
+        font-size: 1.8rem;
+    }
+
+    main h1 {
+        font-size: 2rem;
+    }
+}
