@@ -50,7 +50,7 @@ if ($id > 0) {
     <nav>
         <ul>
             <li><a href="../index.php">Início</a></li>
-            <li><a href="../Forms/formusuario.php" class="ativo">Cadastro</a></li>
+            <li><a href="./sobre.php">Sobre</a></li>
             <li><a href="login.php">Login</a></li>
         </ul>
     </nav>

@@ -11,21 +11,25 @@ if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
 
 $usuario_id = $_SESSION['idusuario'] ?? 0;
 
-// Buscar usuário e cliente
+// Busca dados do usuário
 $usuario = buscar_usuario($conexao, $usuario_id);
-$cliente = buscar_cliente_por_usuario($conexao, $usuario_id);
+if (is_array($usuario) && isset($usuario[0])) {
+    $usuario = $usuario[0]; // garante que seja um array associativo simples
+}
 
+// Busca cliente vinculado ao usuário
+$cliente = buscar_cliente_por_usuario($conexao, $usuario_id);
 if (!is_array($cliente) || empty($cliente)) {
     $cliente = null;
 }
 
-// Buscar endereços
+// Busca endereços do cliente (se houver)
 $enderecos = [];
 if (!empty($cliente['idcliente'])) {
     $enderecos = buscar_enderecos_por_cliente($conexao, $cliente['idcliente']);
 }
 
-// Deletar endereço
+// Exclusão de endereço
 if (isset($_GET['delete_endereco'])) {
     $id_endereco = intval($_GET['delete_endereco']);
     deletar_endereco($conexao, $id_endereco);
@@ -33,22 +37,26 @@ if (isset($_GET['delete_endereco'])) {
     exit;
 }
 
-// Deletar conta
+// Exclusão completa de conta
 if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
     if (!empty($cliente['idcliente'])) {
         $cliente_id = $cliente['idcliente'];
 
+        // Exclui endereços
         foreach ($enderecos as $end) {
             deletar_endereco($conexao, $end['idendentrega']);
         }
 
+        // Remove foto do cliente se existir
         if (!empty($cliente['foto'])) {
             $arquivo = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($cliente['foto'], '/');
             if (file_exists($arquivo)) unlink($arquivo);
         }
+
         deletar_cliente($conexao, $cliente_id);
     }
 
+    // Exclui usuário
     deletar_usuario($conexao, $usuario_id);
     session_unset();
     session_destroy();
@@ -67,7 +75,6 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
 </head>
 <body>
 
-<!-- CABEÇALHO PADRONIZADO -->
 <header>
     <div class="logo">
         <img src="./fotosc/l.png" alt="Logo Pizzaria">
@@ -98,7 +105,6 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
     </nav>
 </header>
 
-<!-- CONTEÚDO PRINCIPAL -->
 <main class="perfil-container">
     <section class="perfil-card">
         <div class="perfil-titulo">
@@ -106,15 +112,13 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
             <h2>Seu Perfil</h2>
         </div>
 
-        
         <div class="perfil-conteudo">
-            <!-- Coluna esquerda -->
             <div class="perfil-esquerda">
-                
                 <div class="foto-perfil">
                     <img src="<?= htmlspecialchars($cliente['foto'] ?? 'imagens/default_user.png') ?>" alt="Foto de perfil">
                 </div>
-                <h4>Dados do Usuario</h4>
+
+                <h4>Dados do Usuário</h4>
                 <label>Nome de Usuário:</label>
                 <input type="text" value="<?= htmlspecialchars($usuario['usuario'] ?? '') ?>" readonly>
 
@@ -125,37 +129,35 @@ if (isset($_GET['delete_conta']) && $_GET['delete_conta'] == 1) {
                 <input type="password" value="************" readonly>
             </div>
 
-            <!-- Coluna direita -->
             <div class="perfil-direita">
                 <h4>Dados do Cliente</h4>
                 <label>Nome:</label>
-                <input type="text" value="<?= htmlspecialchars($cliente['nome'] ?? '') ?>" readonly>
+                <input type="text" value="<?= htmlspecialchars($cliente['nome'] ?? 'Não cadastrado') ?>" readonly>
 
                 <label>Data de Nascimento:</label>
-                <input type="text" value="<?= htmlspecialchars($cliente['data_ani'] ?? '') ?>" readonly>
+                <input type="text" value="<?= htmlspecialchars($cliente['data_ani'] ?? 'Não informado') ?>" readonly>
 
                 <label>Telefone:</label>
-                <input type="text" value="<?= htmlspecialchars($cliente['telefone'] ?? '') ?>" readonly>
-                <p>Suporte:(62)994630327</p>
-            </div>
-                
+                <input type="text" value="<?= htmlspecialchars($cliente['telefone'] ?? 'Não informado') ?>" readonly>
 
-            <!-- Painel de Configuração -->
+                <p>Suporte: (62) 99463-0327</p>
+            </div>
+
             <aside class="config-painel">
-                <a href="Forms/formusuario.php?id=<?= $usuario_id ?>">Editar Perfil</a>
-                <a href="perfil.php?delete_conta=1" onclick="return confirm('Deseja realmente excluir sua conta?')">Excluir Perfil</a>
-                <a href="meus_pedidos.php">Histórico de Pedidos</a>
-                <a href="./Listar/listarendentrega.php">Meus Endereços</a>
+                <a href="Forms/formusuario.php?id=<?= $usuario_id ?>">Editar Usuário</a>
 
                 <?php if (!empty($cliente['idcliente'])): ?>
-                    <a href="./Forms/formentrega.php?cliente_id=<?= intval($cliente['idcliente']) ?>">Registrar Endereço</a>
+                    <a href="Forms/formcliente.php?id=<?= intval($cliente['idcliente']) ?>">Editar Cliente</a>
+                    <a href="Forms/formentrega.php?cliente_id=<?= intval($cliente['idcliente']) ?>">Registrar Endereço</a>
                 <?php else: ?>
-                    <a href="./Forms/formcliente.php?idusuario=<?= intval($usuario_id) ?>">Cadastrar Dados (Registrar Endereço)</a>
+                    <a href="Forms/formcliente.php?idusuario=<?= intval($usuario_id) ?>">Cadastrar Dados do Cliente</a>
                 <?php endif; ?>
 
-                <a href="deslogar.php" class="btn-danger">Deslogar</a>
+                <a href="meus_pedidos.php">Histórico de Pedidos</a>
+                <a href="./Listar/listarendentrega.php">Meus Endereços</a>
+                <a href="perfil.php?delete_conta=1" onclick="return confirm('Deseja realmente excluir sua conta?')">Excluir Conta</a>
+                <a href="deslogar.php" class="btn-danger">Sair</a>
             </aside>
-
         </div>
     </section>
 </main>

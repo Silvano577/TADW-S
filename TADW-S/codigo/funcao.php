@@ -19,41 +19,7 @@ function criar_usuario($conexao, $usuario, $email, $senha) {
     return false;
 }
 
-function buscar_usuario($conexao, $idusuario = 0, $usuario = '') {
-    // 🔹 Se for buscar por ID
-    if ($idusuario > 0) {
-        $sql = "SELECT * FROM usuario WHERE idusuario = ?";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 'i', $idusuario);
-        mysqli_stmt_execute($comando);
-        $res = mysqli_stmt_get_result($comando);
-        $row = mysqli_fetch_assoc($res); // apenas um usuário
-        mysqli_stmt_close($comando);
-        return $row ?: null; // retorna 1 usuário ou null
-    }
 
-    // 🔹 Se for buscar por nome de usuário (LIKE)
-    if ($usuario !== '') {
-        $sql = "SELECT * FROM usuario WHERE usuario LIKE ?";
-        $like = "%{$usuario}%";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 's', $like);
-        mysqli_stmt_execute($comando);
-        $res = mysqli_stmt_get_result($comando);
-        $rows = mysqli_fetch_all($res, MYSQLI_ASSOC); // pode haver vários
-        mysqli_stmt_close($comando);
-        return $rows;
-    }
-
-    // 🔹 Se não passou parâmetros → lista todos
-    $sql = "SELECT * FROM usuario";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_execute($comando);
-    $res = mysqli_stmt_get_result($comando);
-    $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
-    mysqli_stmt_close($comando);
-    return $rows;
-}
 
 
 function atualizar_usuario($conexao, $idusuario, $usuario, $email, $senha = null) {
@@ -105,19 +71,19 @@ function criar_cliente($conexao, $nome, $data_ani, $telefone, $foto, $idusuario)
     return false;
 }
 
-function buscar_cliente($conexao, $idcliente = 0, $nome = '') {
-    if ($idcliente > 0) {
-        $sql = "SELECT * FROM cliente WHERE idcliente = ?";
+function buscar_usuario($conexao, $idusuario = 0, $usuario = '') {
+    if ($idusuario > 0) {
+        $sql = "SELECT * FROM usuario WHERE idusuario = ?";
         $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 'i', $idcliente);
+        mysqli_stmt_bind_param($comando, 'i', $idusuario);
         mysqli_stmt_execute($comando);
         $res = mysqli_stmt_get_result($comando);
         $row = mysqli_fetch_all($res, MYSQLI_ASSOC);
         mysqli_stmt_close($comando);
         return $row;
-    } elseif ($nome !== '') {
-        $sql = "SELECT * FROM cliente WHERE nome LIKE ?";
-        $like = "%{$nome}%";
+    } elseif ($usuario !== '') {
+        $sql = "SELECT * FROM usuario WHERE usuario LIKE ?";
+        $like = "%{$usuario}%";
         $comando = mysqli_prepare($conexao, $sql);
         mysqli_stmt_bind_param($comando, 's', $like);
         mysqli_stmt_execute($comando);
@@ -126,7 +92,7 @@ function buscar_cliente($conexao, $idcliente = 0, $nome = '') {
         mysqli_stmt_close($comando);
         return $row;
     } else {
-        $sql = "SELECT * FROM cliente";
+        $sql = "SELECT * FROM usuario";
         $comando = mysqli_prepare($conexao, $sql);
         mysqli_stmt_execute($comando);
         $res = mysqli_stmt_get_result($comando);
@@ -136,16 +102,24 @@ function buscar_cliente($conexao, $idcliente = 0, $nome = '') {
     }
 }
 
-// **Apenas uma** definição: buscar_cliente_por_usuario
 
-function atualizar_cliente($conexao, $idcliente, $nome, $data_ani, $telefone, $foto) {
-    $sql = "UPDATE cliente SET nome = ?, data_ani = ?, telefone = ?, foto = ? WHERE idcliente = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ssssi', $nome, $data_ani, $telefone, $foto, $idcliente);
-    $exec = mysqli_stmt_execute($comando);
+// **Apenas uma** definição: buscar_cliente_por_usuario
+function atualizar_cliente($conexao, $idcliente, $nome, $data_ani, $telefone, $foto = null) {
+    if ($foto) {
+        $sql = "UPDATE cliente SET nome = ?, data_ani = ?, telefone = ?, foto = ? WHERE idcliente = ?";
+        $comando = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($comando, 'ssssi', $nome, $data_ani, $telefone, $foto, $idcliente);
+    } else {
+        $sql = "UPDATE cliente SET nome = ?, data_ani = ?, telefone = ? WHERE idcliente = ?";
+        $comando = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($comando, 'sssi', $nome, $data_ani, $telefone, $idcliente);
+    }
+
+    $ok = mysqli_stmt_execute($comando);
     mysqli_stmt_close($comando);
-    return $exec;
+    return $ok;
 }
+
 
 function deletar_cliente($conexao, $idcliente) {
     $sql = "DELETE FROM cliente WHERE idcliente = ?";
@@ -498,6 +472,18 @@ function buscar_enderecos_por_cliente($conexao, $idcliente) {
     mysqli_stmt_close($comando);
     return $enderecos;
 }
+
+function buscar_cliente_por_id($conexao, $idcliente) {
+    $sql = "SELECT * FROM cliente WHERE idcliente = ?";
+    $comando = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($comando, 'i', $idcliente);
+    mysqli_stmt_execute($comando);
+    $resultado = mysqli_stmt_get_result($comando);
+    $cliente = mysqli_fetch_assoc($resultado);
+    mysqli_stmt_close($comando);
+    return $cliente ?: null;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

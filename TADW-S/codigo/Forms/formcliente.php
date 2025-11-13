@@ -2,56 +2,67 @@
 require_once "../conexao.php";
 require_once "../funcao.php";
 
-$idusuario = isset($_GET['idusuario']) ? intval($_GET['idusuario']) : 0;
-$id         = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$id = intval($_GET['id'] ?? 0);
+$idusuario = intval($_GET['idusuario'] ?? 0);
+$cliente = null;
 
-$nome     = '';
-$data_ani = '';
-$telefone = '';
-$foto     = '';
-$botao    = 'Cadastrar';
-
+// Buscar dados do cliente, se for edição
 if ($id > 0) {
-    $cliente = buscar_cliente($conexao, $id, '');
-    if (!empty($cliente)) {
-        $c = $cliente[0];
-        $nome = $c['nome'];
-        $data_ani = $c['data_ani'];
-        $telefone = $c['telefone'];
-        $foto = $c['foto'];
-        $botao = 'Atualizar';
-    }
+    $cliente = buscar_cliente_por_id($conexao, $id);
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title><?= $botao ?> Cliente</title>
-<link rel="stylesheet" href="../css/formcliente.css">
+    <meta charset="UTF-8">
+    <title><?= $id > 0 ? 'Editar Cliente' : 'Cadastrar Cliente'; ?></title>
+    <link rel="stylesheet" href="../css/cli.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<h1><?= $botao ?> Cliente</h1>
-<form action="../Salvar/salvarcliente.php?id=<?= $id ?>" method="post" enctype="multipart/form-data">
-Nome:<br>
-<input type="text" name="nome" value="<?= htmlspecialchars($nome) ?>" required><br><br>
 
-Data de Nascimento:<br>
-<input type="date" name="data_ani" value="<?= htmlspecialchars($data_ani) ?>" required><br><br>
+<section class="form-container">
+    <h2><?= $id > 0 ? 'Atualizar Dados do Cliente' : 'Cadastro de Cliente'; ?></h2>
 
-Telefone:<br>
-<input type="text" name="telefone" value="<?= htmlspecialchars($telefone) ?>" required><br><br>
+    <form action="../Salvar/salvarcliente.php" method="POST" enctype="multipart/form-data">
+        <!-- Envia ID oculto para atualização -->
+        <input type="hidden" name="idcliente" value="<?= htmlspecialchars($cliente['idcliente'] ?? '') ?>">
+        <input type="hidden" name="idusuario" value="<?= htmlspecialchars($idusuario ?: ($cliente['idusuario'] ?? '')) ?>">
 
-Foto:<br>
-<input type="file" name="foto" accept="image/*"><br>
-<?php if (!empty($foto)): ?>
-    <img src="<?= htmlspecialchars($foto) ?>" width="100" alt="Foto atual"><br>
-<?php endif; ?>
-<br>
+        <div class="form-group">
+            <label for="nome">Nome Completo:</label>
+            <input type="text" name="nome" id="nome" required
+                   value="<?= htmlspecialchars($cliente['nome'] ?? '') ?>">
+        </div>
 
-<input type="hidden" name="idusuario" value="<?= $idusuario ?>">
+        <div class="form-group">
+            <label for="data_ani">Data de Nascimento:</label>
+            <input type="date" name="data_ani" id="data_ani" required
+                   value="<?= htmlspecialchars($cliente['data_ani'] ?? '') ?>">
+        </div>
 
-<input type="submit" value="<?= $botao ?>">
-</form>
+        <div class="form-group">
+            <label for="telefone">Telefone:</label>
+            <input type="text" name="telefone" id="telefone" required
+                   value="<?= htmlspecialchars($cliente['telefone'] ?? '') ?>">
+        </div>
+
+        <div class="form-group">
+            <label for="foto">Foto de Perfil:</label><br>
+            <?php if (!empty($cliente['foto'])): ?>
+                <img src="../<?= htmlspecialchars($cliente['foto']) ?>" alt="Foto atual" class="foto-preview"><br>
+            <?php endif; ?>
+            <input type="file" name="foto" id="foto" accept="image/*">
+        </div>
+
+        <div class="botoes">
+            <button type="submit" class="btn-salvar">
+                <?= $id > 0 ? 'Atualizar' : 'Salvar'; ?>
+            </button>
+            <a href="../perfil.php" class="btn-cancelar">Cancelar</a>
+        </div>
+    </form>
+</section>
+
 </body>
 </html>
