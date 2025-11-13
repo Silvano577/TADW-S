@@ -3,7 +3,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
 if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim') {
     if (!empty($_SESSION['tipo']) && $_SESSION['tipo'] === 'adm') {
         header("Location: homeAdm.php");
@@ -19,48 +18,60 @@ if (!empty($_SESSION['logado']) && $_SESSION['logado'] === 'sim') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso ao Sistema</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .erro { color: #b00020; margin: 10px 0; }
-        form { max-width: 400px; margin: auto; }
-        input[type=email], input[type=password] { width: 100%; padding: 8px; margin: 5px 0; }
-        input[type=submit] { padding: 10px 20px; margin-top: 10px; }
-    </style>
+    <link rel="stylesheet" href="./css/lo.css">
+    <header>
+    <div class="logo">
+        <a href="index.php">
+            <img src="./fotosc/l.png" alt="Logo da Pizzaria">
+        </a>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="index.php" >Início</a></li>
+            <li><a href="sobre.php" >Sobre</a></li>
+            <li><a href="login.php" class="ativo">Login</a></li>
+        </ul>
+    </nav>
+</header>
+
 </head>
 <body>
-    <h2 style="text-align:center;">Acesso ao Sistema</h2>
+    <div class="login-container">
+        <h2>Acesso ao Sistema</h2>
 
-    <form action="verificarlogin.php" method="post">
         <?php
         if (isset($_GET['erro'])) {
+            echo '<div class="erro">';
             switch ($_GET['erro']) {
                 case 'campos':
-                    echo '<div class="erro">Preencha todos os campos.</div>';
+                    echo 'Preencha todos os campos.';
                     break;
-                case 'email':
-                    echo '<div class="erro">Email não encontrado.</div>';
+                case 'usuario':
+                    echo 'Usuário ou e-mail não encontrado.';
                     break;
                 case 'senha':
-                    echo '<div class="erro">Senha incorreta.</div>';
-                    break;
-                case 'bloqueado':
-                    echo '<div class="erro">Conta bloqueada ou inexistente.</div>';
+                    echo 'Senha incorreta.';
                     break;
             }
+            echo '</div>';
         }
+
         if (isset($_GET['sucesso'])) {
-            echo '<div style="color:green;">Conta criada com sucesso! Faça login.</div>';
+            echo '<div class="sucesso">Conta criada com sucesso! Faça login.</div>';
         }
         ?>
-        Email:<br>
-        <input type="email" name="email" placeholder="Digite seu email" required><br>
 
-        Senha:<br>
-        <input type="password" name="senha" placeholder="Digite sua senha" required><br>
+        <form action="verificarlogin.php" method="post">
+            <label for="usuario">Usuário ou E-mail:</label>
+            <input type="text" id="usuario" name="usuario" placeholder="Digite seu nome de usuário ou e-mail" required>
 
-        <input type="submit" value="Acessar"><br><br>
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
 
-        <a href="Forms/formusuario.php">Criar Conta</a>
-    </form>
+            <input type="submit" value="Acessar">
+
+            <a class="criar-conta" href="Forms/formusuario.php">Criar Conta</a>
+        </form>
+    </div>
 </body>
 </html>

@@ -28,6 +28,7 @@ if ($id > 0) {
 <head>
 <meta charset="UTF-8">
 <title><?= $botao ?> Cliente</title>
+<link rel="stylesheet" href="../css/formcliente.css">
 </head>
 <body>
 <h1><?= $botao ?> Cliente</h1>

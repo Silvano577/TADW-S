@@ -2,47 +2,60 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 require_once "conexao.php";
 
-
-$email = isset($_POST['email']) ? trim($_POST['email']) : '';
+// Captura os dados enviados pelo formulário
+$login = isset($_POST['usuario']) ? trim($_POST['usuario']) : '';
 $senha = $_POST['senha'] ?? '';
 
-if ($email === '' || $senha === '') {
+// Verifica se os campos foram preenchidos
+if ($login === '' || $senha === '') {
     header("Location: login.php?erro=campos");
     exit;
 }
 
-
-$sql = "SELECT idusuario, usuario, email, senha, tipo FROM usuario WHERE email = ?";
+// Consulta que aceita tanto usuário quanto e-mail
+$sql = "SELECT idusuario, usuario, email, senha, tipo 
+        FROM usuario 
+        WHERE usuario = ? OR email = ?";
 $stmt = mysqli_prepare($conexao, $sql);
-if (!$stmt) {
 
-    header("Location: login.php?erro=email");
+if (!$stmt) {
+    header("Location: login.php?erro=usuario");
     exit;
 }
-mysqli_stmt_bind_param($stmt, "s", $email);
+
+// Usa o mesmo valor ($login) para comparar com ambos (usuario e email)
+mysqli_stmt_bind_param($stmt, "ss", $login, $login);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $linha = $result ? mysqli_fetch_assoc($result) : null;
 
+// Verifica se encontrou registro
 if (!$linha) {
-    header("Location: login.php?erro=email");
+    header("Location: login.php?erro=usuario");
     exit;
 }
 
-
+// Confere a senha
 if (!password_verify($senha, $linha['senha'])) {
     header("Location: login.php?erro=senha");
     exit;
 }
 
-
+// Se deu certo, cria a sessão
 session_regenerate_id(true);
-$_SESSION['logado']   = 'sim';
-$_SESSION['idusuario']= $linha['idusuario'] ?? null;
-$_SESSION['usuario']  = $linha['usuario'];  
-$_SESSION['tipo']     = $linha['tipo'];     
+$_SESSION['logado']    = 'sim';
+$_SESSION['idusuario'] = $linha['idusuario'] ?? null;
+$_SESSION['usuario']   = $linha['usuario'];
+$_SESSION['tipo']      = $linha['tipo'];
 
-header("Location: index.php?bemvindo=1");
+// Redireciona conforme o tipo de conta
+if ($linha['tipo'] === 'adm') {
+    header("Location: homeAdm.php");
+} else {
+    header("Location: index.php?bemvindo=1");
+}
 exit;
+?>
