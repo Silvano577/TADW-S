@@ -51,19 +51,12 @@ $tipo = $_SESSION['tipo'] ?? 'adm';
         <h1>Painel Administrativo</h1>
 
         <ul class="menu-grid">
-            <li><a href="./Forms/formusuario.php"><i class="fas fa-user-plus"></i> Cadastrar Usuário</a></li>
-            <li><a href="./Forms/formcliente.php"><i class="fas fa-user-friends"></i> Cadastrar Cliente</a></li>
-            <li><a href="./Forms/formfeedback.php"><i class="fas fa-comment-dots"></i> Registrar Feedback</a></li>
             <li><a href="./Forms/formproduto.php"><i class="fas fa-pizza-slice"></i> Cadastrar Produto</a></li>
-            <li><a href="./Forms/formpagamento.php"><i class="fas fa-credit-card"></i> Registrar Pagamento</a></li>
             <li><a href="./Forms/formdelivery.php"><i class="fas fa-motorcycle"></i> Registrar Delivery</a></li>
-            <li><a href="./Forms/formpedido.php"><i class="fas fa-receipt"></i> Registrar Pedido</a></li>
             <li><a href="./Forms/formstatusdelivery.php"><i class="fas fa-truck"></i> Status do Delivery</a></li>
-            <li><a href="./Forms/formendentrega.php"><i class="fas fa-map-marker-alt"></i> Registrar Endereço</a></li>
             <li><a href="./Listar/listarproduto.php"><i class="fas fa-list"></i> Listar Produtos</a></li>
             <li><a href="./Listar/listarcliente.php"><i class="fas fa-users"></i> Listar Clientes</a></li>
             <li><a href="./Listar/listarusuario.php"><i class="fas fa-user-cog"></i> Listar Usuários</a></li>
-            <li><a href="./Listar/listarvenda.php"><i class="fas fa-shopping-cart"></i> Listar Vendas</a></li>
             <li><a href="./Listar/listarpedido.php"><i class="fas fa-clipboard-list"></i> Listar Pedidos</a></li>
             <li><a href="./Listar/listarfeedback.php"><i class="fas fa-comments"></i> Listar Feedbacks</a></li>
             <li><a href="./Listar/listardelivery.php"><i class="fas fa-motorcycle"></i> Listar Deliveries</a></li>

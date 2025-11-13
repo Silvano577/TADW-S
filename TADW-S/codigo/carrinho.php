@@ -60,9 +60,9 @@ foreach ($carrinho as $item) {
 
             <td>R$ <?= number_format($item['preco'], 2, ',', '.') ?></td>
             <td>
-                <button class="btn-qtd" data-acao="menos">−</button>
+
                 <span class="quantidade"><?= $item['quantidade'] ?></span>
-                <button class="btn-qtd" data-acao="mais">+</button>
+
             </td>
             <td class="subtotal">R$ <?= number_format($subtotal, 2, ',', '.') ?></td>
             <td>

@@ -440,6 +440,90 @@ function buscar_pedido($conexao, $idpedido) {
 
     return mysqli_fetch_assoc($res);
 }
+function buscar_produto($conexao, $idproduto = 0, $nome = '') {
+    $sql = "SELECT * FROM produto WHERE 1=1"; // Base para filtrar dinamicamente
+    $params = [];
+    $types = '';
 
+    if ($idproduto > 0) {
+        $sql .= " AND idproduto = ?";
+        $types .= 'i';
+        $params[] = $idproduto;
+    }
 
+    if (!empty($nome)) {
+        $sql .= " AND nome LIKE ?";
+        $types .= 's';
+        $params[] = "%$nome%";
+    }
+
+    $comando = mysqli_prepare($conexao, $sql);
+
+    if (!empty($params)) {
+        mysqli_stmt_bind_param($comando, $types, ...$params);
+    }
+
+    mysqli_stmt_execute($comando);
+    $resultado = mysqli_stmt_get_result($comando);
+    $produtos = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+    mysqli_stmt_close($comando);
+
+    return $produtos;
+}
+// Lista pagamentos, opcionalmente filtrando pelo método
+function listar_pagamentos($conexao, $metodo = '') {
+    $sql = "SELECT p.*, c.nome AS cliente_nome 
+            FROM pagamento p
+            JOIN cliente c ON p.idcliente = c.idcliente";
+    
+    $params = [];
+    $types = '';
+    
+    if (!empty($metodo)) {
+        $sql .= " WHERE p.metodo_pagamento = ?";
+        $types .= 's';
+        $params[] = $metodo;
+    }
+
+    $sql .= " ORDER BY p.data_pagamento DESC";
+
+    $stmt = mysqli_prepare($conexao, $sql);
+    if (!empty($params)) {
+        mysqli_stmt_bind_param($stmt, $types, ...$params);
+    }
+
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+    $pagamentos = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+
+    return $pagamentos;
+}
+
+// Retorna resumo: quantidade e total dos pagamentos
+function resumo_pagamentos($conexao, $metodo = '') {
+    $sql = "SELECT COUNT(*) AS qtd, COALESCE(SUM(valor),0) AS total 
+            FROM pagamento";
+
+    $params = [];
+    $types = '';
+
+    if (!empty($metodo)) {
+        $sql .= " WHERE metodo_pagamento = ?";
+        $types .= 's';
+        $params[] = $metodo;
+    }
+
+    $stmt = mysqli_prepare($conexao, $sql);
+    if (!empty($params)) {
+        mysqli_stmt_bind_param($stmt, $types, ...$params);
+    }
+
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+    $resumo = mysqli_fetch_assoc($resultado);
+    mysqli_stmt_close($stmt);
+
+    return $resumo;
+}
 ?>

@@ -62,7 +62,7 @@ $metodos_possiveis = [
                     <p><strong>Status:</strong> <?= htmlspecialchars($pg['status_pagamento']) ?></p>
                     <p><strong>Data:</strong> <?= date('d/m/Y', strtotime($pg['data_pagamento'])) ?></p>
 
-                    <a href="../Forms/formpagamento.php?id=<?= $pg['idpagamento'] ?>" class="btn">Editar</a>
+                    <a href="../Forms/editarpagamento.php?id=<?= $pg['idpagamento'] ?>" class="btn">Editar</a>
                     <a href="../Deletar/deletarpagamentos.php?id=<?= $pg['idpagamento'] ?>" class="btn btn-delete"
                        onclick="return confirm('Deseja realmente excluir este pagamento?');">Excluir</a>
                 </div>

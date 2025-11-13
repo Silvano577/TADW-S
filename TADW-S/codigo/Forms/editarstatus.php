@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_bind_param($stmt, "si", $novo_status, $idpedido);
         mysqli_stmt_execute($stmt);
 
-        header("Location: listarpedidoadm.php"); // Redireciona para lista de pedidos do ADM
+        header("Location: ../Listar/listarpedido.php"); // Redireciona para lista de pedidos do ADM
         exit;
     } else {
         $erro = "Status inválido.";
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="botoes">
             <button type="submit" class="btn-salvar">Atualizar</button>
-            <a href="../Listar/listarpedidoadm.php" class="btn-cancelar">Voltar</a>
+            <a href="../Listar/listarpedido.php" class="btn-cancelar">Voltar</a>
         </div>
     </form>
 </div>

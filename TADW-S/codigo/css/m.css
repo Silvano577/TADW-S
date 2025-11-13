@@ -1,0 +1,143 @@
+/* ===========================
+   ESTILO GERAL
+=========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background: #f7f7f7 url('../fotosc/png') no-repeat center;
+    background-size: cover;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ===========================
+   TÍTULO
+=========================== */
+h1 {
+    color: #5a0000;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* ===========================
+   CARD DE PEDIDO
+=========================== */
+.pedido-card {
+    background: #fff;
+    width: 100%;
+    max-width: 900px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    padding: 20px 25px;
+    margin-bottom: 25px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.pedido-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+}
+
+/* ===========================
+   TÍTULO DO CARD
+=========================== */
+.pedido-card h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* ===========================
+   INFORMAÇÕES DO PEDIDO
+=========================== */
+.pedido-card p {
+    margin-bottom: 8px;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+/* ===========================
+   ITENS COMPRADOS
+=========================== */
+.pedido-card h3 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    color: #5a0000;
+    font-size: 1.1rem;
+}
+
+.pedido-card ul {
+    list-style: disc inside;
+    padding-left: 15px;
+    margin-bottom: 15px;
+}
+
+.pedido-card li {
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+/* ===========================
+   LINKS
+=========================== */
+a {
+    color: #5a0000;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #ffce00;
+}
+
+/* ===========================
+   RESPONSIVIDADE
+=========================== */
+@media (max-width: 768px) {
+    .pedido-card {
+        padding: 15px 20px;
+    }
+
+    .pedido-card h2 {
+        font-size: 1.25rem;
+    }
+
+    .pedido-card p,
+    .pedido-card li {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 15px;
+    }
+
+    .pedido-card {
+        padding: 12px 15px;
+    }
+
+    .pedido-card h2 {
+        font-size: 1.1rem;
+    }
+
+    .pedido-card h3 {
+        font-size: 1rem;
+    }
+
+    .pedido-card p,
+    .pedido-card li {
+        font-size: 0.85rem;
+    }
+}

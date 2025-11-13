@@ -51,7 +51,7 @@ mysqli_stmt_close($stmt);
 <head>
     <meta charset="UTF-8">
     <title>Meus Pedidos</title>
-    <link rel="stylesheet" href="./css/meus.css">
+    <link rel="stylesheet" href="./css/m.css">
 </head>
 <body>
     <h1>Meus Pedidos</h1>
@@ -59,34 +59,38 @@ mysqli_stmt_close($stmt);
     <?php if (empty($pedidos)): ?>
         <p>Você ainda não fez nenhum pedido.</p>
     <?php else: ?>
-        <table >
-            <thead>
-                <tr>
-                    <th>ID Pedido</th>
-                    <th>Data</th>
-                    <th>Status do Pedido</th>
-                    <th>Status Pagamento</th>
-                    <th>Método de Pagamento</th>
-                    <th>Status Entrega</th>
-                    <th>Valor Total</th>
-                    <th>Ação</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($pedidos as $pedido): ?>
-                    <tr>
-                        <td><?= $pedido['idpedido'] ?></td>
-                        <td><?= $pedido['data_pedido'] ?></td>
-                        <td><?= ucfirst($pedido['status_pedido']) ?></td>
-                        <td><?= ucfirst($pedido['status_pagamento'] ?? '-') ?></td>
-                        <td><?= ucfirst($pedido['metodo_pagamento'] ?? '-') ?></td>
-                        <td><?= ucfirst($pedido['status_delivery'] ?? '-') ?></td>
-                        <td>R$ <?= number_format($pedido['valortotal'], 2, ',', '.') ?></td>
-                        <td><a href="detalhe_pedido.php?id=<?= $pedido['idpedido'] ?>">Ver Detalhes</a></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+        <?php foreach ($pedidos as $pedido): ?>
+            <div class="pedido-card">
+                <h2> <?= $pedido['data_pedido'] ?></h2>
+                <p>Status do Pedido: <?= ucfirst($pedido['status_pedido']) ?></p>
+                <p>Status Pagamento: <?= ucfirst($pedido['status_pagamento'] ?? '-') ?></p>
+                <p>Método de Pagamento: <?= ucfirst($pedido['metodo_pagamento'] ?? '-') ?></p>
+                <p>Status Entrega: <?= ucfirst($pedido['status_delivery'] ?? '-') ?></p>
+                <p>Valor Total: R$ <?= number_format($pedido['valortotal'], 2, ',', '.') ?></p>
+
+                <h3>Itens Comprados:</h3>
+                <ul>
+                    <?php
+                    $sql_itens = "
+                        SELECT pp.quantidade, pp.preco_unit, p.nome
+                        FROM pedido_produto pp
+                        JOIN produto p ON pp.idproduto = p.idproduto
+                        WHERE pp.idpedido = ?
+                    ";
+                    $stmt_itens = mysqli_prepare($conexao, $sql_itens);
+                    mysqli_stmt_bind_param($stmt_itens, "i", $pedido['idpedido']);
+                    mysqli_stmt_execute($stmt_itens);
+                    $res_itens = mysqli_stmt_get_result($stmt_itens);
+                    while ($item = mysqli_fetch_assoc($res_itens)):
+                    ?>
+                        <li>
+                            <?= htmlspecialchars($item['nome']) ?> - <?= $item['quantidade'] ?>x - R$ <?= number_format($item['preco_unit'], 2, ',', '.') ?>
+                        </li>
+                    <?php endwhile; ?>
+                </ul>
+                <hr>
+            </div>
+        <?php endforeach; ?>
     <?php endif; ?>
 
     <br>
