@@ -16,10 +16,26 @@ if ($id > 0) {
 <head>
     <meta charset="UTF-8">
     <title><?= $id > 0 ? 'Editar Cliente' : 'Cadastrar Cliente'; ?></title>
-    <link rel="stylesheet" href="../css/cli.css">
+    <link rel="stylesheet" href="../css/clin.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+    <header>
+    <div class="logo">
+        <a href="../index.php">
+            <img src="../fotosc/l.png" alt="Logo da Pizzaria">
+        </a>
+    </div>
+
+    <nav>
+        <ul>
+            <li><a href="../index.php">Início</a></li>
+            <li><a href="../sobre.php">Sobre</a></li>
+            <li><a href="../login.php">Login</a></li>
+        </ul>
+    </nav>
+</header>
+
 
 <section class="form-container">
     <h2><?= $id > 0 ? 'Atualizar Dados do Cliente' : 'Cadastro de Cliente'; ?></h2>

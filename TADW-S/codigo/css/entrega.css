@@ -1,0 +1,135 @@
+/* ===========================
+   ESTILO GERAL
+=========================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start; /* alinhado à esquerda */
+  align-items: flex-start;
+  background: url("../fotosc/png") no-repeat center center fixed;
+  background-size: cover;
+  padding: 80px 40px; /* espaço da esquerda e topo */
+}
+
+/* ===========================
+   CONTAINER DO FORMULÁRIO
+=========================== */
+.form-container {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  width: 400px;
+  text-align: left; /* alinhado à esquerda */
+}
+
+/* ======== TÍTULO ======== */
+.form-container h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* ======== FORMULÁRIO ======== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+form label {
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+form input[type="text"],
+form input[type="number"] {
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form input[type="number"]:focus {
+  border-color: #b91c1c;
+  box-shadow: 0 0 8px rgba(185, 28, 28, 0.3);
+}
+
+/* ======== BOTÕES ======== */
+.botoes {
+  display: flex;
+  justify-content: flex-start; /* botões à esquerda */
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn-salvar,
+.btn-cancelar {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.btn-salvar {
+  background: #b91c1c;
+  color: #fff;
+}
+
+.btn-salvar:hover {
+  background: #a21818;
+}
+
+.btn-cancelar {
+  background: #ccc;
+  color: #333;
+}
+
+.btn-cancelar:hover {
+  background: #bbb;
+}
+
+/* ======== MENSAGENS ======== */
+.erro {
+  background-color: #ffdddd;
+  color: #c00;
+  border: 1px solid #c00;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.sucesso {
+  background-color: #ddffdd;
+  color: #007a00;
+  border: 1px solid #007a00;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+/* ======== RESPONSIVO ======== */
+@media (max-width: 600px) {
+  body {
+    padding: 60px 20px;
+  }
+
+  .form-container {
+    width: 100%;
+    padding: 30px 20px;
+  }
+}

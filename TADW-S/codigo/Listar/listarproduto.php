@@ -7,18 +7,15 @@ $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : "";
 // Busca opcional por nome
 $busca = isset($_GET['busca']) ? trim($_GET['busca']) : "";
 
-// Buscar todos os produtos
+// Buscar todos os produtos usando a função existente
 $todos = listar_produtos($conexao);
 
 // Aplicar filtro de tipo e busca por nome
-$lista_produtos = [];
-foreach ($todos as $produto) {
+$lista_produtos = array_filter($todos, function($produto) use ($tipo, $busca) {
     $matchTipo = $tipo === "" || $produto['tipo'] === $tipo;
     $matchNome = $busca === "" || stripos($produto['nome'], $busca) !== false;
-    if ($matchTipo && $matchNome) {
-        $lista_produtos[] = $produto;
-    }
-}
+    return $matchTipo && $matchNome;
+});
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -31,7 +28,6 @@ foreach ($todos as $produto) {
 <body>
     <h1>Produtos</h1>
 
-    <!-- Barra de pesquisa e filtro usando as mesmas classes do listar usuário -->
     <form method="get" class="form-pesquisa">
         <input type="text" name="busca" placeholder="Pesquisar produto..."
                value="<?= htmlspecialchars($busca) ?>" class="input-pesquisa">

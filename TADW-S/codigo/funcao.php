@@ -1,808 +1,445 @@
 <?php
+// funcao.php - versão padronizada e limpa
 
-// funcao.php - versões limpas das funções (substitua seu arquivo atual por este)
-
-// ---------- USUÁRIO ----------
+// ======================= USUÁRIO =======================
 function criar_usuario($conexao, $usuario, $email, $senha) {
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
     $tipo = 'cliente';
     $sql = "INSERT INTO usuario (usuario, email, senha, tipo) VALUES (?, ?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ssss', $usuario, $email, $senha_hash, $tipo);
-    $exec = mysqli_stmt_execute($comando);
-    if ($exec) {
-        $id = mysqli_insert_id($conexao);
-        mysqli_stmt_close($comando);
-        return $id;
-    }
-    mysqli_stmt_close($comando);
-    return false;
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ssss', $usuario, $email, $senha_hash, $tipo);
+    $ok = mysqli_stmt_execute($stmt);
+    $id = $ok ? mysqli_insert_id($conexao) : false;
+    mysqli_stmt_close($stmt);
+    return $id;
 }
 
-
-
-
 function atualizar_usuario($conexao, $idusuario, $usuario, $email, $senha = null) {
-    if ($senha !== null && $senha !== '') {
+    if ($senha) {
         $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
         $sql = "UPDATE usuario SET usuario=?, email=?, senha=? WHERE idusuario=?";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 'sssi', $usuario, $email, $senha_hash, $idusuario);
+        $stmt = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($stmt, 'sssi', $usuario, $email, $senha_hash, $idusuario);
     } else {
         $sql = "UPDATE usuario SET usuario=?, email=? WHERE idusuario=?";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 'ssi', $usuario, $email, $idusuario);
+        $stmt = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($stmt, 'ssi', $usuario, $email, $idusuario);
     }
-    $exec = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $exec;
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
 
 function deletar_usuario($conexao, $idusuario) {
-    $sql = "DELETE FROM usuario WHERE idusuario = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idusuario);
-    $exec = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $exec;
+    $sql = "DELETE FROM usuario WHERE idusuario=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idusuario);
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
 
 function listar_usuarios($conexao) {
     $sql = "SELECT * FROM usuario";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_execute($comando);
-    $res = mysqli_stmt_get_result($comando);
-    $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
-    mysqli_stmt_close($comando);
-    return $rows;
-}
-
-// ---------- CLIENTE ----------
-function criar_cliente($conexao, $nome, $data_ani, $telefone, $foto, $idusuario) {
-    $sql = "INSERT INTO cliente (nome, data_ani, telefone, foto, idusuario) VALUES (?, ?, ?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ssssi', $nome, $data_ani, $telefone, $foto, $idusuario);
-    if (mysqli_stmt_execute($comando)) {
-        $id = mysqli_insert_id($conexao);
-        mysqli_stmt_close($comando);
-        return $id;
-    }
-    mysqli_stmt_close($comando);
-    return false;
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $usuarios = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $usuarios;
 }
 
 function buscar_usuario($conexao, $idusuario = 0, $usuario = '') {
     if ($idusuario > 0) {
-        $sql = "SELECT * FROM usuario WHERE idusuario = ?";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 'i', $idusuario);
-        mysqli_stmt_execute($comando);
-        $res = mysqli_stmt_get_result($comando);
-        $row = mysqli_fetch_all($res, MYSQLI_ASSOC);
-        mysqli_stmt_close($comando);
-        return $row;
-    } elseif ($usuario !== '') {
+        $sql = "SELECT * FROM usuario WHERE idusuario=?";
+        $stmt = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($stmt, 'i', $idusuario);
+    } elseif ($usuario) {
         $sql = "SELECT * FROM usuario WHERE usuario LIKE ?";
-        $like = "%{$usuario}%";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 's', $like);
-        mysqli_stmt_execute($comando);
-        $res = mysqli_stmt_get_result($comando);
-        $row = mysqli_fetch_all($res, MYSQLI_ASSOC);
-        mysqli_stmt_close($comando);
-        return $row;
+        $stmt = mysqli_prepare($conexao, $sql);
+        $like = "%$usuario%";
+        mysqli_stmt_bind_param($stmt, 's', $like);
     } else {
         $sql = "SELECT * FROM usuario";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_execute($comando);
-        $res = mysqli_stmt_get_result($comando);
-        $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
-        mysqli_stmt_close($comando);
-        return $rows;
+        $stmt = mysqli_prepare($conexao, $sql);
     }
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $rows;
 }
 
+// ======================= CLIENTE =======================
+function criar_cliente($conexao, $nome, $data_ani, $telefone, $foto, $idusuario) {
+    $sql = "INSERT INTO cliente (nome, data_ani, telefone, foto, idusuario) VALUES (?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ssssi', $nome, $data_ani, $telefone, $foto, $idusuario);
+    $ok = mysqli_stmt_execute($stmt);
+    $id = $ok ? mysqli_insert_id($conexao) : false;
+    mysqli_stmt_close($stmt);
+    return $id;
+}
 
-// **Apenas uma** definição: buscar_cliente_por_usuario
 function atualizar_cliente($conexao, $idcliente, $nome, $data_ani, $telefone, $foto = null) {
     if ($foto) {
-        $sql = "UPDATE cliente SET nome = ?, data_ani = ?, telefone = ?, foto = ? WHERE idcliente = ?";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 'ssssi', $nome, $data_ani, $telefone, $foto, $idcliente);
+        $sql = "UPDATE cliente SET nome=?, data_ani=?, telefone=?, foto=? WHERE idcliente=?";
+        $stmt = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($stmt, 'ssssi', $nome, $data_ani, $telefone, $foto, $idcliente);
     } else {
-        $sql = "UPDATE cliente SET nome = ?, data_ani = ?, telefone = ? WHERE idcliente = ?";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 'sssi', $nome, $data_ani, $telefone, $idcliente);
+        $sql = "UPDATE cliente SET nome=?, data_ani=?, telefone=? WHERE idcliente=?";
+        $stmt = mysqli_prepare($conexao, $sql);
+        mysqli_stmt_bind_param($stmt, 'sssi', $nome, $data_ani, $telefone, $idcliente);
     }
-
-    $ok = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
     return $ok;
 }
 
-
 function deletar_cliente($conexao, $idcliente) {
-    $sql = "DELETE FROM cliente WHERE idcliente = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idcliente);
-    $exec = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $exec;
+    $sql = "DELETE FROM cliente WHERE idcliente=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idcliente);
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
 
 function listar_clientes($conexao) {
     $sql = "SELECT * FROM cliente";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_execute($comando);
-    $res = mysqli_stmt_get_result($comando);
-    $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
-    mysqli_stmt_close($comando);
-    return $rows;
-    //////////////////////////////////////////////////////////////////////////////////////////////////
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $clientes = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $clientes;
 }
+
+function buscar_cliente_por_usuario($conexao, $idusuario) {
+    $sql = "SELECT * FROM cliente WHERE idusuario=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idusuario);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $cliente = mysqli_fetch_assoc($res);
+    mysqli_stmt_close($stmt);
+    return $cliente ?: null;
+}
+
+function buscar_cliente_por_id($conexao, $idcliente) {
+    $sql = "SELECT * FROM cliente WHERE idcliente=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idcliente);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $cliente = mysqli_fetch_assoc($res);
+    mysqli_stmt_close($stmt);
+    return $cliente ?: null;
+}
+
+// ======================= ENDEREÇOS =======================
 function registrar_endereco($conexao, $rua, $numero, $complemento, $bairro, $idcliente) {
     $sql = "INSERT INTO endentrega (rua, numero, complemento, bairro, idcliente) VALUES (?, ?, ?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ssssi', $rua, $numero, $complemento, $bairro, $idcliente);
-    mysqli_stmt_execute($comando);
-    $id = mysqli_insert_id($conexao);
-    mysqli_stmt_close($comando);
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ssssi', $rua, $numero, $complemento, $bairro, $idcliente);
+    $ok = mysqli_stmt_execute($stmt);
+    $id = $ok ? mysqli_insert_id($conexao) : false;
+    mysqli_stmt_close($stmt);
     return $id;
 }
 
 function atualizar_endereco($conexao, $id, $rua, $numero, $complemento, $bairro, $idcliente) {
     $sql = "UPDATE endentrega SET rua=?, numero=?, complemento=?, bairro=?, idcliente=? WHERE idendentrega=?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ssssii', $rua, $numero, $complemento, $bairro, $idcliente, $id);
-    $exec = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $exec;
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ssssii', $rua, $numero, $complemento, $bairro, $idcliente, $id);
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
-
-
-
-function buscar_endereco($conexao, $idendentrega) {
-    $sql = "SELECT * FROM endentrega WHERE idendentrega = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idendentrega);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    $dados = mysqli_fetch_assoc($resultado);
-    mysqli_stmt_close($comando);
-    return $dados;
-}
-
 
 function deletar_endereco($conexao, $idendentrega) {
-    $sql = "DELETE FROM endentrega WHERE idendentrega = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idendentrega);
-    $exec = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $exec;
+    $sql = "DELETE FROM endentrega WHERE idendentrega=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idendentrega);
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
 
-
-function listar_enderecos($conexao) {
-    $sql = "SELECT * FROM endentrega";
-    $res = mysqli_query($conexao, $sql);
-    $enderecos = [];
-    while ($row = mysqli_fetch_assoc($res)) {
-        $enderecos[] = $row;
-    }
-    return $enderecos;
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////
-
-// Buscar cliente pelo idusuario
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function registrar_feedback($conexao, $assunto, $comentario) {
-    $sql = "INSERT INTO feedback (assunto, comentario) VALUES (?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, "ss", $assunto, $comentario);
-    mysqli_stmt_execute($comando);
-}
-
-function buscar_feedback($conexao, $id) {
-    $sql = "SELECT * FROM feedback WHERE idfeedback = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, "i", $id);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-
-    return mysqli_fetch_assoc($resultado); // retorna só 1 registro
-}
-
-
-
-
-function atualizar_feedback($conexao, $id, $assunto, $comentario) {
-    $sql = "UPDATE feedback SET assunto = ?, comentario = ? WHERE idfeedback = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, "ssi", $assunto, $comentario, $id);
-    mysqli_stmt_execute($comando);
-}
-
-function deletar_feedback($conexao, $idfeedback) {
-    $sql = "DELETE FROM feedback WHERE idfeedback = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idfeedback);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-
-function listar_feedback($conexao) {
-    $sql = "SELECT idfeedback, assunto, comentario FROM feedback ORDER BY idfeedback DESC";
-    $resultado = mysqli_query($conexao, $sql);
-
-    $feedbacks = [];
-    while ($linha = mysqli_fetch_assoc($resultado)) {
-        $feedbacks[] = $linha;
-    }
-
-    return $feedbacks;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Criar Produto
-function criar_produto($conexao, $nome, $tipo, $tamanho, $preco, $foto) {
-    $sql = "INSERT INTO produto (nome, tipo, tamanho, preco, foto) VALUES (?, ?, ?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sssds', $nome, $tipo, $tamanho, $preco, $foto);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-
-// Buscar Produto por ID ou Nome
-function buscar_produto($conexao, $idproduto, $nome) {
-    $sql = "SELECT * FROM produto WHERE idproduto = ? OR nome LIKE ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    $nome = "%$nome%";
-    mysqli_stmt_bind_param($comando, 'is', $idproduto, $nome);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    mysqli_stmt_close($comando);
-    return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-}
-
-// Atualizar Produto
-function atualizar_produto($conexao, $id, $nome, $tipo, $tamanho, $preco, $foto) {
-    $sql = "UPDATE produto SET nome=?, tipo=?, tamanho=?, preco=?, foto=? WHERE idproduto=?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sssdsi', $nome, $tipo, $tamanho, $preco, $foto, $id);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-
-// Deletar Produto
-function deletar_produto($conexao, $idproduto) {
-    $sql = "DELETE FROM produto WHERE idproduto = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idproduto);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-
-// Listar Produtos
-function listar_produtos($conexao) {
-    $sql = "SELECT * FROM produto";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-
-    $lista_produtos = [];
-    while ($produto = mysqli_fetch_assoc($resultado)) {
-        $lista_produtos[] = $produto;
-    }
-
-    mysqli_stmt_close($comando);
-    return $lista_produtos;
-}
-
-// adiciona no seu arquivo de funções (funcao.php ou funcoes.php)
-function pesquisarProdutoId($conexao, $idproduto) {
-    $sql = "SELECT idproduto, nome, tipo, preco, tamanho, foto FROM produto WHERE idproduto = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, "i", $idproduto);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-
-    return mysqli_fetch_assoc($resultado);
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function registrar_pagamento($conexao, $idcliente, $idpedido, $metodo_pagamento, $valor, $data_pagamento) {
-    $status_pagamento = 'pendente';
-    $sql = "INSERT INTO pagamento (idcliente, idpedido, metodo_pagamento, valor, status_pagamento, data_pagamento)
-            VALUES (?, ?, ?, ?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    if (!$comando) return false;
-
-    mysqli_stmt_bind_param($comando, "iisdss", $idcliente, $idpedido, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento);
-    $ok = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-
-    return $ok ? mysqli_insert_id($conexao) : false;
-}
-
-
-
-
-
-function atualizar_pagamento($conexao, $id, $metodo_pagamento, $valor, $status_pagamento, $data_pagamento) {
-    $sql = "UPDATE pagamento SET metodo_pagamento = ?, valor = ?, status_pagamento = ?, data_pagamento = ?
-    WHERE idpagamento = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'sdssi', $metodo_pagamento, $valor, $status_pagamento, $data_pagamento, $id);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-function buscar_pagamento($conexao, $id) {
-    $sql = "SELECT * FROM pagamento WHERE idpagamento = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $id);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    $pagamento = mysqli_fetch_assoc($resultado);
-    mysqli_stmt_close($comando);
-    return $pagamento ?: null;
-}
-
-
-// Listar pagamentos — aceita filtro opcional por método
-function listar_pagamentos($conexao, $metodo = null) {
-    if ($metodo === null || $metodo === '') {
-        $sql = "SELECT * FROM pagamento ORDER BY data_pagamento DESC, idpagamento DESC";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_execute($comando);
-    } else {
-        $sql = "SELECT * FROM pagamento WHERE metodo_pagamento = ? ORDER BY data_pagamento DESC, idpagamento DESC";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 's', $metodo);
-        mysqli_stmt_execute($comando);
-    }
-    $resultado = mysqli_stmt_get_result($comando);
-    $pagamentos = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-    mysqli_stmt_close($comando);
-    return $pagamentos;
-}
-
-function deletar_pagamento($conexao, $id) {
-    $sql = "DELETE FROM pagamento WHERE idpagamento = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $id);
-    $resultado = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $resultado;
-}
-
-
-// Função auxiliar para obter resumo (count e soma) por método (opcional)
-function resumo_pagamentos($conexao, $metodo = null) {
-    if ($metodo === null || $metodo === '') {
-        $sql = "SELECT COUNT(*) AS qtd, SUM(valor) AS total FROM pagamento";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_execute($comando);
-    } else {
-        $sql = "SELECT COUNT(*) AS qtd, SUM(valor) AS total FROM pagamento WHERE metodo_pagamento = ?";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 's', $metodo);
-        mysqli_stmt_execute($comando);
-    }
-    $resultado = mysqli_stmt_get_result($comando);
-    $row = mysqli_fetch_assoc($resultado);
-    mysqli_stmt_close($comando);
-    return $row ?: ['qtd' => 0, 'total' => 0.00];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function salvar_venda($conexao, $idpedido, $idproduto, $quantidade) {
-    // Inserir ou atualizar quantidade do item no pedido
-    $sql = "INSERT INTO pedido_produto (idpedido, idproduto, quantidade) 
-            VALUES (?, ?, ?) 
-            ON DUPLICATE KEY UPDATE quantidade = quantidade + VALUES(quantidade)";
-
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'iii', $idpedido, $idproduto, $quantidade);
-
-    $sucesso = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-
-    // Se deu certo, atualizar o valor total do pedido
-    if ($sucesso) {
-        atualizar_total_pedido($conexao, $idpedido);
-    }
-
-    return $sucesso;
-}
-
-function listarvenda($conexao) {
-    $sql = "SELECT p.idpedido, p.valortotal, pag.metodo_pagamento AS metodo FROM pedido p
-    LEFT JOIN pagamento pag ON pag.idpedido = p.idpedido ORDER BY p.idpedido DESC";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    $vendas = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-    mysqli_stmt_close($comando);
-
-    return $vendas;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-function buscar_cliente_por_usuario($conexao, $idusuario) {
-    $sql = "SELECT * FROM cliente WHERE idusuario = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idusuario);
-    mysqli_stmt_execute($comando);
-    $res = mysqli_stmt_get_result($comando);
-    $row = mysqli_fetch_assoc($res); // retorna só um cliente
-    mysqli_stmt_close($comando);
-    return $row ?: null;
+function buscar_endereco($conexao, $idendentrega) {
+    $sql = "SELECT * FROM endentrega WHERE idendentrega=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idendentrega);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $endereco = mysqli_fetch_assoc($res);
+    mysqli_stmt_close($stmt);
+    return $endereco ?: null;
 }
 
 function buscar_enderecos_por_cliente($conexao, $idcliente) {
-    $sql = "SELECT * FROM endentrega WHERE idcliente = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idcliente);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    $enderecos = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-    mysqli_stmt_close($comando);
+    $sql = "SELECT * FROM endentrega WHERE idcliente=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idcliente);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $enderecos = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
     return $enderecos;
 }
 
-function buscar_cliente_por_id($conexao, $idcliente) {
-    $sql = "SELECT * FROM cliente WHERE idcliente = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idcliente);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    $cliente = mysqli_fetch_assoc($resultado);
-    mysqli_stmt_close($comando);
-    return $cliente ?: null;
+// ======================= PRODUTOS =======================
+function criar_produto($conexao, $nome, $tipo, $tamanho, $preco, $foto) {
+    $sql = "INSERT INTO produto (nome, tipo, tamanho, preco, foto) VALUES (?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'sssds', $nome, $tipo, $tamanho, $preco, $foto);
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Criar delivery vinculado ao pedido
-
-function salvarPedido($conexao, $endentrega, $idcliente, $idpagamento, $valortotal, $idfeedback = null) {
-    $status = 'pendente'; // Status inicial padrão
-
-    $sql = "INSERT INTO pedido (endentrega, idcliente, idpagamento, valortotal, idfeedback, status) 
-            VALUES (?, ?, ?, ?, ?, ?)";
-    $comando = mysqli_prepare($conexao, $sql);
-    if (!$comando) return false;
-
-    // Correção dos tipos — d = double (para o valor total)
-    mysqli_stmt_bind_param($comando, "iiidis", $endentrega, $idcliente, $idpagamento, $valortotal, $idfeedback, $status);
-
-    $sucesso = mysqli_stmt_execute($comando);
-    if (!$sucesso) {
-        mysqli_stmt_close($comando);
-        return false;
-    }
-
-    $idpedido = mysqli_insert_id($conexao);
-    mysqli_stmt_close($comando);
-    return $idpedido; // retorna o ID do pedido criado
+function atualizar_produto($conexao, $id, $nome, $tipo, $tamanho, $preco, $foto) {
+    $sql = "UPDATE produto SET nome=?, tipo=?, tamanho=?, preco=?, foto=? WHERE idproduto=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'sssdsi', $nome, $tipo, $tamanho, $preco, $foto, $id);
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
 
-
-function criar_delivery($conexao, $idpedido) {
-    $status = 'em preparo'; // Status inicial padrão da entrega
-
-    $sql = "INSERT INTO delivery (idpedido, status, data_envio)
-            VALUES (?, ?, NOW())";
-    $comando = mysqli_prepare($conexao, $sql);
-    if (!$comando) return false;
-
-    mysqli_stmt_bind_param($comando, "is", $idpedido, $status);
-
-    $sucesso = mysqli_stmt_execute($comando);
-    if (!$sucesso) {
-        mysqli_stmt_close($comando);
-        return false;
-    }
-
-    $iddelivery = mysqli_insert_id($conexao);
-    mysqli_stmt_close($comando);
-    return $iddelivery; // retorna o ID da entrega criada
+function deletar_produto($conexao, $idproduto) {
+    $sql = "DELETE FROM produto WHERE idproduto=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idproduto);
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
 
-
-
-// Atualizar status do delivery
-function atualizar_delivery($conexao, $idpedido, $novo_status) {
-    // Verifica se o status informado é válido
-    $status_validos = ['atribuido', 'a_caminho', 'entregue', 'falha'];
-    if (!in_array($novo_status, $status_validos)) {
-        return false;
-    }
-    $sql = "UPDATE delivery SET status = ?, entregue_em = CASE WHEN ? = 'entregue' THEN NOW() ELSE entregue_em END
-    WHERE pedido_id = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ssi', $novo_status, $novo_status, $idpedido);
-    $res = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $res;
+function listar_produtos($conexao) {
+    $sql = "SELECT * FROM produto";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $produtos = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $produtos;
 }
 
-// Buscar acompanhamento de delivery
-function buscar_delivery($conexao, $pedido_id) {
-    $sql = "SELECT d.iddelivery, d.status, d.iniciado_em, d.entregue_em, p.idpedido, p.total, c.nome AS cliente FROM delivery d
-            INNER JOIN pedido p ON d.pedido_id = p.idpedido
-            INNER JOIN cliente c ON p.cliente = c.idcliente
-            WHERE d.pedido_id = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $pedido_id);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    return mysqli_fetch_assoc($resultado);
+function pesquisar_produto_por_id($conexao, $idproduto) {
+    $sql = "SELECT * FROM produto WHERE idproduto=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idproduto);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $produto = mysqli_fetch_assoc($res);
+    mysqli_stmt_close($stmt);
+    return $produto ?: null;
 }
 
-// Listar todos os deliveries
-function listar_deliveries($conexao) {
-    $sql = "SELECT d.iddelivery, d.status, d.iniciado_em, d.entregue_em, p.idpedido, c.nome AS cliente FROM delivery d
-            INNER JOIN pedido p ON d.pedido_id = p.idpedido
-            INNER JOIN cliente c ON p.cliente = c.idcliente
-            ORDER BY d.iniciado_em DESC";
-    $resultado = mysqli_query($conexao, $sql);
-    return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-// Atualizar Pedido
-function atualizar_pedido($conexao, $idpedido, $endentrega, $idcliente, $idfeedback, $idpagamento, $valortotal) {
-    $sql = "UPDATE pedido SET endentrega=?, idcliente=?, idfeedback=?, idpagamento=?, valortotal=? WHERE idpedido=?";
-    $comando = mysqli_prepare($conexao, $sql);
-
-    // idfeedback pode ser null
-    if ($idfeedback === null) {
-        // Bind ignorando idfeedback (vai como NULL)
-        mysqli_stmt_bind_param($comando, 'iiiidi', $endentrega, $idcliente, $idfeedback, $idpagamento, $valortotal, $idpedido);
-    } else {
-        mysqli_stmt_bind_param($comando, 'iiiidi', $endentrega, $idcliente, $idfeedback, $idpagamento, $valortotal, $idpedido);
-    }
-
-    $res = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $res;
-}
-
-// Buscar pedido por ID
-function buscar_pedido($conexao, $idpedido) {
-    $sql = "SELECT p.*, d.status AS status_delivery FROM pedido p LEFT JOIN delivery d ON d.pedido_id = p.idpedido
-    WHERE p.idpedido = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idpedido);
-    mysqli_stmt_execute($comando);
-    $res = mysqli_stmt_get_result($comando);
-    $pedido = mysqli_fetch_assoc($res);
-    mysqli_stmt_close($comando);
-    return $pedido;
-}
-
-
-// Deletar pedido
-function deletar_pedido($conexao, $idpedido) {
-    $sql = "DELETE FROM pedido WHERE idpedido=?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idpedido);
-    $res = mysqli_stmt_execute($comando);
-    mysqli_stmt_close($comando);
-    return $res;
-}
-
-// Listar pedidos
-function listar_pedidos($conexao, $cliente_id = null) {
-    if ($cliente_id) {
-        $sql = "SELECT p.*, d.status AS status_delivery
-                FROM pedido p
-                LEFT JOIN delivery d ON d.pedido_id = p.idpedido
-                WHERE p.cliente = ?
-                ORDER BY p.idpedido DESC";
-        $comando = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($comando, 'i', $cliente_id);
-    } else {
-        $sql = "SELECT p.*, d.status AS status_delivery
-                FROM pedido p
-                LEFT JOIN delivery d ON d.pedido_id = p.idpedido
-                ORDER BY p.idpedido DESC";
-        $comando = mysqli_prepare($conexao, $sql);
-    }
-    mysqli_stmt_execute($comando);
-    $res = mysqli_stmt_get_result($comando);
-    $pedidos = mysqli_fetch_all($res, MYSQLI_ASSOC);
-    mysqli_stmt_close($comando);
-    return $pedidos;
-}
-
-function listar_itens_pedido($conexao, $idpedido) {
-    $sql = "SELECT pp.quantidade, pr.nome, pp.preco_unit AS preco
-            FROM pedido_produto pp
-            JOIN produto pr ON pr.idproduto = pp.idproduto
-            WHERE pp.idpedido = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idpedido);
-    mysqli_stmt_execute($comando);
-    $res = mysqli_stmt_get_result($comando);
-    $itens = mysqli_fetch_all($res, MYSQLI_ASSOC);
-    mysqli_stmt_close($comando);
-    return $itens;
-}
-function atualizar_total_pedido($conexao, $idpedido) {
-    // 1. Calcular o valor total somando (preco * quantidade)
-    $sql = "SELECT SUM(p.preco * pp.quantidade) AS total
-            FROM pedido_produto pp
-            INNER JOIN produto p ON p.idproduto = pp.idproduto
-            WHERE pp.idpedido = ?";
-    
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idpedido);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-    $dados = mysqli_fetch_assoc($resultado);
-    mysqli_stmt_close($comando);
-
-    $total = $dados['total'] ?? 0.00;
-
-    // 2. Atualizar o pedido com o novo valor
-    $sql_update = "UPDATE pedido SET valortotal = ? WHERE idpedido = ?";
-    $comando_update = mysqli_prepare($conexao, $sql_update);
-    mysqli_stmt_bind_param($comando_update, 'di', $total, $idpedido);
-
-    $sucesso = mysqli_stmt_execute($comando_update);
-    mysqli_stmt_close($comando_update);
-
-    return $sucesso ? $total : false;
-}
-
-function criarPedidoCompleto($conexao, $cliente, $endentrega, $itens, $valortotal, $taxaEntrega = 5.00) {
-    // Inicia a transação
-    mysqli_begin_transaction($conexao);
-
-    try {
-        // --- 1️⃣ Criar pagamento ---
-        $status_pagamento = 'pendente';
-        $sqlPagamento = "INSERT INTO pagamento (cliente, status, valortotal, data_pagamento) 
-                         VALUES (?, ?, ?, NOW())";
-        $stmtPag = mysqli_prepare($conexao, $sqlPagamento);
-        if (!$stmtPag) throw new Exception("Erro ao preparar pagamento.");
-        mysqli_stmt_bind_param($stmtPag, "isd", $cliente, $status_pagamento, $valortotal);
-        if (!mysqli_stmt_execute($stmtPag)) throw new Exception("Erro ao registrar pagamento.");
-        $idpagamento = mysqli_insert_id($conexao);
-        mysqli_stmt_close($stmtPag);
-
-        // --- 2️⃣ Criar pedido ---
-        $status_pedido = 'pendente';
-        $sqlPedido = "INSERT INTO pedido (endentrega, cliente, idpagamento, valortotal, idfeedback, status)
-                      VALUES (?, ?, ?, ?, NULL, ?)";
-        $stmtPed = mysqli_prepare($conexao, $sqlPedido);
-        if (!$stmtPed) throw new Exception("Erro ao preparar pedido.");
-        mysqli_stmt_bind_param($stmtPed, "iiids", $endentrega, $cliente, $idpagamento, $valortotal, $status_pedido);
-        if (!mysqli_stmt_execute($stmtPed)) throw new Exception("Erro ao salvar pedido.");
-        $idpedido = mysqli_insert_id($conexao);
-        mysqli_stmt_close($stmtPed);
-
-        // --- 3️⃣ Inserir produtos no pedido ---
-        $sqlItem = "INSERT INTO pedido_produto (idpedido, idproduto, quantidade, preco_unit) 
-                    VALUES (?, ?, ?, ?)";
-        $stmtItem = mysqli_prepare($conexao, $sqlItem);
-        if (!$stmtItem) throw new Exception("Erro ao preparar itens do pedido.");
-
-        foreach ($itens as $item) {
-            mysqli_stmt_bind_param($stmtItem, "iiid", 
-                $idpedido,
-                $item['idproduto'],
-                $item['quantidade'],
-                $item['preco_unit']
-            );
-            if (!mysqli_stmt_execute($stmtItem)) {
-                throw new Exception("Erro ao inserir item do pedido.");
-            }
-        }
-        mysqli_stmt_close($stmtItem);
-
-        // --- 4️⃣ Criar delivery ---
-        $status_delivery = 'em preparo';
-        $sqlDelivery = "INSERT INTO delivery (idpedido, status, data_envio) VALUES (?, ?, NOW())";
-        $stmtDel = mysqli_prepare($conexao, $sqlDelivery);
-        if (!$stmtDel) throw new Exception("Erro ao preparar delivery.");
-        mysqli_stmt_bind_param($stmtDel, "is", $idpedido, $status_delivery);
-        if (!mysqli_stmt_execute($stmtDel)) throw new Exception("Erro ao criar delivery.");
-        $iddelivery = mysqli_insert_id($conexao);
-        mysqli_stmt_close($stmtDel);
-
-        // --- 5️⃣ Concluir transação ---
-        mysqli_commit($conexao);
-
-        // --- 6️⃣ Retornar dados completos ---
-        return [
-            'sucesso' => true,
-            'idpedido' => $idpedido,
-            'idpagamento' => $idpagamento,
-            'iddelivery' => $iddelivery,
-            'valortotal' => $valortotal
-        ];
-
-    } catch (Exception $e) {
-        mysqli_rollback($conexao); // desfaz tudo se algo falhar
-        return [
-            'sucesso' => false,
-            'erro' => $e->getMessage()
-        ];
-    }
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function contar_itens_carrinho($conexao, $idcliente) {
-    $sql = "SELECT SUM(quantidade) AS total FROM carrinho WHERE idcliente = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'i', $idcliente);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
-
-    $linha = mysqli_fetch_assoc($resultado);
-    return intval($linha['total'] ?? 0);
-}
-
+// ======================= CARRINHO =======================
 function adicionar_ao_carrinho($conexao, $idcliente, $idproduto, $quantidade = 1) {
-    // Verifica se o produto já existe no carrinho do cliente
-    $sql_verificar = "SELECT quantidade FROM carrinho WHERE idcliente = ? AND idproduto = ?";
-    $comando = mysqli_prepare($conexao, $sql_verificar);
-    mysqli_stmt_bind_param($comando, 'ii', $idcliente, $idproduto);
-    mysqli_stmt_execute($comando);
-    $resultado = mysqli_stmt_get_result($comando);
+    $sql = "SELECT quantidade FROM carrinho WHERE idcliente=? AND idproduto=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ii', $idcliente, $idproduto);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
 
-    if ($linha = mysqli_fetch_assoc($resultado)) {
-        // Se já existe, atualiza a quantidade
+    if ($linha = mysqli_fetch_assoc($res)) {
         $nova_qtd = $linha['quantidade'] + $quantidade;
-        $sql_update = "UPDATE carrinho SET quantidade = ? WHERE idcliente = ? AND idproduto = ?";
-        $stmt_update = mysqli_prepare($conexao, $sql_update);
-        mysqli_stmt_bind_param($stmt_update, 'iii', $nova_qtd, $idcliente, $idproduto);
-        mysqli_stmt_execute($stmt_update);
+        $sql_update = "UPDATE carrinho SET quantidade=? WHERE idcliente=? AND idproduto=?";
+        $stmt2 = mysqli_prepare($conexao, $sql_update);
+        mysqli_stmt_bind_param($stmt2, 'iii', $nova_qtd, $idcliente, $idproduto);
+        $ok = mysqli_stmt_execute($stmt2);
+        mysqli_stmt_close($stmt2);
     } else {
-        // Caso contrário, insere novo item
-        $sql_inserir = "INSERT INTO carrinho (idcliente, idproduto, quantidade) VALUES (?, ?, ?)";
-        $stmt_inserir = mysqli_prepare($conexao, $sql_inserir);
-        mysqli_stmt_bind_param($stmt_inserir, 'iii', $idcliente, $idproduto, $quantidade);
-        mysqli_stmt_execute($stmt_inserir);
+        $sql_insert = "INSERT INTO carrinho (idcliente, idproduto, quantidade) VALUES (?, ?, ?)";
+        $stmt2 = mysqli_prepare($conexao, $sql_insert);
+        mysqli_stmt_bind_param($stmt2, 'iii', $idcliente, $idproduto, $quantidade);
+        $ok = mysqli_stmt_execute($stmt2);
+        mysqli_stmt_close($stmt2);
     }
+
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
 
 function remover_do_carrinho($conexao, $idcliente, $idproduto) {
-    $sql = "DELETE FROM carrinho WHERE idcliente = ? AND idproduto = ?";
-    $comando = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($comando, 'ii', $idcliente, $idproduto);
-    mysqli_stmt_execute($comando);
+    $sql = "DELETE FROM carrinho WHERE idcliente=? AND idproduto=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'ii', $idcliente, $idproduto);
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
+
+function contar_itens_carrinho($conexao, $idcliente) {
+    $sql = "SELECT SUM(quantidade) AS total FROM carrinho WHERE idcliente=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idcliente);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $linha = mysqli_fetch_assoc($res);
+    mysqli_stmt_close($stmt);
+    return intval($linha['total'] ?? 0);
+}
+
+function buscar_carrinho($conexao, $idcliente) {
+    $sql = "SELECT c.idcarrinho, c.quantidade, p.nome AS nome_produto, p.preco, p.foto 
+            FROM carrinho c
+            JOIN produto p ON c.idproduto = p.idproduto
+            WHERE c.idcliente=?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idcliente);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $itens = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $itens;
+}
+// ======================= PEDIDOS =======================
+
+// Buscar produtos do carrinho de um cliente (completo)
+function buscar_carrinho_completo($conexao, $idcliente) {
+    $sql = "SELECT c.idproduto, c.quantidade, p.nome, p.preco 
+            FROM carrinho c 
+            JOIN produto p ON c.idproduto = p.idproduto 
+            WHERE c.idcliente = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $idcliente);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+
+    $carrinho = [];
+    while ($item = mysqli_fetch_assoc($res)) {
+        $carrinho[] = $item;
+    }
+    mysqli_stmt_close($stmt);
+    return $carrinho;
+}
+
+// Calcular total de um carrinho
+function calcular_total_carrinho($carrinho, $taxa_entrega = 0) {
+    $total = 0;
+    foreach ($carrinho as $item) {
+        $total += $item['preco'] * $item['quantidade'];
+    }
+    return $total + $taxa_entrega;
+}
+
+// Buscar endereços de entrega de um cliente
+function buscar_enderecos_cliente($conexao, $idcliente) {
+    $sql = "SELECT idendentrega, rua, numero, complemento, bairro 
+            FROM endentrega 
+            WHERE idcliente = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $idcliente);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+
+    $enderecos = [];
+    while ($end = mysqli_fetch_assoc($res)) {
+        $enderecos[] = $end;
+    }
+    mysqli_stmt_close($stmt);
+    return $enderecos;
+}
+// ======================= PEDIDOS =======================
+/**
+ * Lista todos os pedidos com informações do cliente, valor total, status e delivery.
+ * Para uso pelo administrador.
+ */
+function listar_pedidos($conexao) {
+    $sql = "SELECT 
+                p.idpedido,
+                p.data_pedido,
+                c.nome AS nome_cliente,
+                p.status AS status_pedido,
+                p.valortotal,
+                pg.idpagamento,
+                pg.status_pagamento,
+                pg.valor AS valor_pagamento,
+                d.iddelivery,
+                d.status AS status_delivery,
+                e.rua, e.numero, e.bairro, e.complemento
+            FROM pedido p
+            INNER JOIN cliente c ON p.idcliente = c.idcliente
+            INNER JOIN endentrega e ON p.identrega = e.idendentrega
+            LEFT JOIN pagamento pg ON pg.idpedido = p.idpedido
+            LEFT JOIN delivery d ON d.pedido_id = p.idpedido
+            ORDER BY p.idpedido DESC";
+
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $pedidos = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $pedidos;
+}
+
+/**
+ * Busca os itens de um pedido específico.
+ */
+function buscar_itens_pedido($conexao, $idpedido) {
+    $sql = "SELECT pr.nome, pp.preco_unit AS preco, pp.quantidade
+            FROM pedido_produto pp
+            INNER JOIN produto pr ON pp.idproduto = pr.idproduto
+            WHERE pp.idpedido = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $idpedido);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $itens = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $itens;
+}
+function atualizar_status_pedido($conexao, $idpedido, $status_pedido, $status_pagamento, $status_delivery) {
+    $sql = "UPDATE pedido p
+            INNER JOIN pagamento pg ON p.idpedido = pg.idpedido
+            INNER JOIN delivery d ON p.idpedido = d.pedido_id
+            SET p.status = ?, pg.status_pagamento = ?, d.status = ?
+            WHERE p.idpedido = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "sssi", $status_pedido, $status_pagamento, $status_delivery, $idpedido);
+    mysqli_stmt_execute($stmt);
+}
+// Função para listar todos os pedidos para o administrador
+function listar_pedidos_adm($conexao) {
+    $sql = "SELECT 
+                ped.idpedido, ped.data_pedido, ped.valortotal, ped.status AS status_pedido,
+                cli.nome AS nome_cliente
+            FROM pedido ped
+            INNER JOIN cliente cli ON ped.idcliente = cli.idcliente
+            ORDER BY ped.data_pedido DESC";
+
+    $resultado = mysqli_query($conexao, $sql);
+
+    if (!$resultado) {
+        die("Erro ao listar pedidos: " . mysqli_error($conexao));
+    }
+
+    return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+}
+// Buscar um pedido pelo ID
+function buscar_pedido($conexao, $idpedido) {
+    $sql = "SELECT 
+                ped.idpedido, ped.idcliente, ped.identrega, ped.valortotal, ped.data_pedido, ped.status AS status_pedido,
+                cli.nome AS nome_cliente
+            FROM pedido ped
+            INNER JOIN cliente cli ON ped.idcliente = cli.idcliente
+            WHERE ped.idpedido = ?";
+    
+    $stmt = mysqli_prepare($conexao, $sql);
+    if (!$stmt) {
+        die("Erro na preparação da query: " . mysqli_error($conexao));
+    }
+
+    mysqli_stmt_bind_param($stmt, "i", $idpedido);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_assoc($res);
+}
+
 
 ?>

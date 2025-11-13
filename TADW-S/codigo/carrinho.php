@@ -16,17 +16,14 @@ if (!$idcliente) {
     die("Cliente não encontrado.");
 }
 
-$sql = "SELECT c.idcarrinho, c.quantidade, 
-               p.nome AS nome_produto, p.preco, p.foto
-        FROM carrinho c
-        INNER JOIN produto p ON c.idproduto = p.idproduto
-        WHERE c.idcliente = ?";
-$stmt = mysqli_prepare($conexao, $sql);
-mysqli_stmt_bind_param($stmt, "i", $idcliente);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+// Buscar itens do carrinho
+$carrinho = buscar_carrinho($conexao, $idcliente);
 
+// Calcular total geral
 $total_geral = 0;
+foreach ($carrinho as $item) {
+    $total_geral += $item['preco'] * $item['quantidade'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,15 +31,17 @@ $total_geral = 0;
 <head>
     <meta charset="UTF-8">
     <title>Seu Carrinho</title>
-    <link rel="stylesheet" href="./css/a.css">
+    <link rel="stylesheet" href="./css/car.css">
 </head>
 <body>
 
 <h1>🛒 Seu Carrinho</h1>
 <div class="carrinho-container">
 
-<?php if (mysqli_num_rows($result) > 0): ?>
-    <table>
+<a href="cardapio.php" class="btn btn-voltar">← Voltar ao Cardápio</a>
+
+<?php if (!empty($carrinho)): ?>
+    <table id="tabela-carrinho">
         <tr>
             <th>Foto</th>
             <th>Produto</th>
@@ -52,35 +51,29 @@ $total_geral = 0;
             <th>Ação</th>
         </tr>
 
-        <?php while ($item = mysqli_fetch_assoc($result)): 
+        <?php foreach ($carrinho as $item): 
             $subtotal = $item['preco'] * $item['quantidade'];
-            $total_geral += $subtotal;
         ?>
-        <tr>
-           <td> <img src="<?php echo htmlspecialchars($item['foto']); ?>" alt="" width="50"> </td>
-            <td><?php echo htmlspecialchars($item['nome_produto']); ?></td>
-            <td>R$ <?php echo number_format($item['preco'], 2, ',', '.'); ?></td>
+        <tr data-idcarrinho="<?= $item['idcarrinho'] ?>" data-preco="<?= $item['preco'] ?>">
+            <td><img src="<?= htmlspecialchars($item['foto']) ?>" alt="" width="50"></td>
+            <td><?= htmlspecialchars($item['nome_produto'] ?? '') ?></td>
+
+            <td>R$ <?= number_format($item['preco'], 2, ',', '.') ?></td>
             <td>
-                <form action="../Forms/atualizar_carrinho_ajax.php" method="POST" class="form-qtd">
-                    <input type="hidden" name="idcarrinho" value="<?php echo $item['idcarrinho']; ?>">
-                    <button type="submit" name="acao" value="menos" class="btn-qtd">−</button>
-                    <span><?php echo $item['quantidade']; ?></span>
-                    <button type="submit" name="acao" value="mais" class="btn-qtd">+</button>
-                </form>
+                <button class="btn-qtd" data-acao="menos">−</button>
+                <span class="quantidade"><?= $item['quantidade'] ?></span>
+                <button class="btn-qtd" data-acao="mais">+</button>
             </td>
-            <td>R$ <?php echo number_format($subtotal, 2, ',', '.'); ?></td>
+            <td class="subtotal">R$ <?= number_format($subtotal, 2, ',', '.') ?></td>
             <td>
-                <form action="../Deletar/remover_ajax.php" method="POST" style="display:inline;">
-                    <input type="hidden" name="idcarrinho" value="<?php echo $item['idcarrinho']; ?>">
-                    <button type="submit" class="btn btn-remover">Remover</button>
-                </form>
+                <button class="btn btn-remover">Remover</button>
             </td>
         </tr>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </table>
 
     <div class="total">
-        Total Geral: R$ <?php echo number_format($total_geral, 2, ',', '.'); ?>
+        Total Geral: <span id="total-geral">R$ <?= number_format($total_geral, 2, ',', '.') ?></span>
     </div>
 
     <form action="../Forms/formpedido.php" method="POST">
@@ -92,5 +85,7 @@ $total_geral = 0;
 <?php endif; ?>
 
 </div>
+
+<script src="./js/carrinho.js"></script>
 </body>
 </html>

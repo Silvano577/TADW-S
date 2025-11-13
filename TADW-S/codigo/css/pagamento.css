@@ -1,0 +1,144 @@
+/* ===========================
+   ESTILO GERAL
+=========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background: #f7f7f7 url('../fotosc/png') no-repeat center;
+    background-size: cover;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ===========================
+   TÍTULOS
+=========================== */
+h1, h2 {
+    text-align: center;
+    color: #5a0000;
+    margin-bottom: 25px;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.7rem;
+}
+
+p {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* ===========================
+   FORMULÁRIOS
+=========================== */
+form {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    max-width: 500px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: #333;
+}
+
+select, input[type="text"], input[type="number"], input[type="email"], input[type="hidden"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: #fafafa;
+    transition: border 0.3s;
+}
+
+select:focus, input:focus {
+    border-color: #5a0000;
+    outline: none;
+}
+
+/* ===========================
+   LINKS
+=========================== */
+a {
+    display: inline-block;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    color: #5a0000;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #ffce00;
+}
+
+/* ===========================
+   BOTÕES
+=========================== */
+button {
+    width: 100%;
+    padding: 12px;
+    background: #5a0000;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #8b0000;
+}
+
+/* ===========================
+   CARD DE RESUMO
+=========================== */
+.resumo-pedido {
+    background: #fff;
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    margin-bottom: 20px;
+}
+
+.resumo-pedido p {
+    margin: 8px 0;
+    font-weight: 500;
+}
+
+/* ===========================
+   RESPONSIVIDADE
+=========================== */
+@media (max-width: 600px) {
+    form {
+        padding: 25px 20px;
+    }
+
+    h1, h2 {
+        font-size: 1.5rem;
+    }
+}

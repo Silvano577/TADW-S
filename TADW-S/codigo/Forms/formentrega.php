@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once "../protege.php";
 require_once "../conexao.php";
 require_once "../funcao.php";
@@ -36,30 +37,33 @@ if ($idcliente <= 0) {
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($botao) ?> Endereço</title>
+    <link rel="stylesheet" href="../css/entrega.css">
 </head>
 <body>
-<h1><?= htmlspecialchars($botao) ?> Endereço</h1>
+<div class="form-container">
+    <h1><?= htmlspecialchars($botao) ?> Endereço</h1>
 
-<form action="../Salvar/salvarentrega.php?id=<?= $id ?>&origem=<?= urlencode($origem) ?>" method="post">
-    Rua:<br>
-    <input type="text" name="rua" value="<?= htmlspecialchars($rua) ?>" required><br><br>
+    <form action="../Salvar/salvarentrega.php?id=<?= $id ?>&origem=<?= urlencode($origem) ?>" method="post">
+        <label for="rua">Rua:</label>
+        <input type="text" name="rua" id="rua" value="<?= htmlspecialchars($rua) ?>" required>
 
-    Número:<br>
-    <input type="text" name="numero" value="<?= htmlspecialchars($numero) ?>" required><br><br>
+        <label for="numero">Número:</label>
+        <input type="text" name="numero" id="numero" value="<?= htmlspecialchars($numero) ?>" required>
 
-    Complemento:<br>
-    <input type="text" name="complemento" value="<?= htmlspecialchars($complemento) ?>"><br><br>
+        <label for="complemento">Complemento:</label>
+        <input type="text" name="complemento" id="complemento" value="<?= htmlspecialchars($complemento) ?>">
 
-    Bairro:<br>
-    <input type="text" name="bairro" value="<?= htmlspecialchars($bairro) ?>" required><br><br>
+        <label for="bairro">Bairro:</label>
+        <input type="text" name="bairro" id="bairro" value="<?= htmlspecialchars($bairro) ?>" required>
 
-    Cliente ID:<br>
-    <input type="number" name="idcliente" value="<?= $idcliente ?>" readonly required><br><br>
+        <label for="idcliente">Cliente ID:</label>
+        <input type="number" name="idcliente" id="idcliente" value="<?= $idcliente ?>" readonly required>
 
-    <input type="submit" value="<?= htmlspecialchars($botao) ?>">
-</form>
-
-<a href="<?= $origem === 'formpedido' ? '../Forms/formpedido.php' : '../Listar/listarendentrega.php' ?>">Voltar</a>
-
+        <div class="botoes">
+            <button type="submit" class="btn-salvar"><?= htmlspecialchars($botao) ?></button>
+            <a href="<?= $origem === 'formpedido' ? '../Forms/formpedido.php' : '../Listar/listarendentrega.php' ?>" class="btn-cancelar">Voltar</a>
+        </div>
+    </form>
+</div>
 </body>
 </html>

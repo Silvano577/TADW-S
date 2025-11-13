@@ -9,8 +9,16 @@
 }
 
 body {
-    background: #f7f7f7;
+    background-color: #f7f7f7;
     color: #333;
+
+    /* Fundo em tela cheia */
+    background-image: url("../fotosc/png"); /* Caminho da imagem */
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed; /* Fixa o fundo ao rolar a página */
+    background-size: cover; /* Preenche toda a tela proporcionalmente */
+
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -32,12 +40,13 @@ h1 {
    CONTAINER DO CARRINHO
 =========================== */
 .carrinho-container {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.95); /* leve transparência */
     border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     padding: 20px;
     width: 100%;
     max-width: 1000px;
+    backdrop-filter: blur(4px);
 }
 
 /* ===========================

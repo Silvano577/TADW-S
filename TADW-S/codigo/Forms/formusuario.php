@@ -25,23 +25,9 @@ if ($id > 0) {
     <meta charset="UTF-8">
     <title><?= $botao ?> Usuário</title>
     <link rel="stylesheet" href="../css/u.css">
-    <script>
-        // ======== Validação de Senha ========
-        function validarSenha() {
-            const senha = document.getElementById("senha").value;
-            const confirmar = document.getElementById("confirmar_senha").value;
-
-            // se ambos foram preenchidos, compara
-            if (senha !== "" || confirmar !== "") {
-                if (senha !== confirmar) {
-                    alert("As senhas não coincidem. Por favor, digite novamente.");
-                    return false;
-                }
-            }
-            return true;
-        }
-    </script>
+    <script src="../js/usuario.js"></script>
 </head>
+
 <body>
 <header>
     <div class="logo">
@@ -50,8 +36,8 @@ if ($id > 0) {
     <nav>
         <ul>
             <li><a href="../index.php">Início</a></li>
-            <li><a href="./sobre.php">Sobre</a></li>
-            <li><a href="login.php">Login</a></li>
+            <li><a href="../sobre.php">Sobre</a></li>
+            <li><a href="../login.php">Login</a></li>
         </ul>
     </nav>
 </header>
