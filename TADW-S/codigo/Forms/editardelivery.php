@@ -1,15 +1,16 @@
 <?php
-session_start();
 require_once "../conexao.php";
+session_start();
 
-// Verifica ID
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    die("ID inválido.");
+    die("Delivery inválido.");
 }
 
 $iddelivery = intval($_GET['id']);
 
-// Buscar delivery + pedido
+/*
+    1) Buscar qual pedido pertence a este delivery
+*/
 $sql = "SELECT pedido_id FROM delivery WHERE iddelivery = ?";
 $stmt = mysqli_prepare($conexao, $sql);
 mysqli_stmt_bind_param($stmt, "i", $iddelivery);
@@ -22,11 +23,11 @@ if (!$delivery) {
     die("Delivery não encontrado.");
 }
 
-$idpedido = $delivery['pedido_id'];
+$pedido_id = $delivery['pedido_id'];
 
-/* ==========================================
-   1) Atualiza DELIVERY como entregue
-========================================== */
+/*
+    2) Atualizar o status do delivery para ENTREGUE
+*/
 $sql = "UPDATE delivery 
         SET status = 'entregue', entregue_em = NOW()
         WHERE iddelivery = ?";
@@ -35,33 +36,21 @@ mysqli_stmt_bind_param($stmt, "i", $iddelivery);
 mysqli_stmt_execute($stmt);
 mysqli_stmt_close($stmt);
 
-/* ==========================================
-   2) Atualiza PAGAMENTO como pago
-========================================== */
+/*
+    3) Atualizar o status de pagamento para CONCLUIDO
+*/
 $sql = "UPDATE pagamento 
-        SET status_pagamento = 'pago'
+        SET status_pagamento = 'concluido'
         WHERE idpedido = ?";
 $stmt = mysqli_prepare($conexao, $sql);
-mysqli_stmt_bind_param($stmt, "i", $idpedido);
+mysqli_stmt_bind_param($stmt, "i", $pedido_id);
 mysqli_stmt_execute($stmt);
 mysqli_stmt_close($stmt);
 
-/* ==========================================
-   3) Atualiza PEDIDO para PRONTO
-========================================== */
-$sql = "UPDATE pedido 
-        SET status = 'pronto'
-        WHERE idpedido = ?";
-$stmt = mysqli_prepare($conexao, $sql);
-mysqli_stmt_bind_param($stmt, "i", $idpedido);
-mysqli_stmt_execute($stmt);
-mysqli_stmt_close($stmt);
-
-/* ==========================================
-   4) Voltar para mesma página
-========================================== */
+/*
+    4) Redirecionar para a página anterior ou lista
+*/
 $voltar = $_SERVER['HTTP_REFERER'] ?? "../Listar/listardelivery.php";
 header("Location: $voltar");
 exit;
-
 ?>

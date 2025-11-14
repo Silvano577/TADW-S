@@ -17,6 +17,7 @@ if ($id > 0) {
     <meta charset="UTF-8">
     <title><?= $id > 0 ? 'Editar Cliente' : 'Cadastrar Cliente'; ?></title>
     <link rel="stylesheet" href="../css/clin.css">
+    <script src="../js/cliente.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>

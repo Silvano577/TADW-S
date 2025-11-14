@@ -1,0 +1,207 @@
+/* ===========================
+   ESTILO GERAL
+=========================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start; /* Alinha o conteúdo à esquerda */
+  background: url("../fotosc/png") no-repeat center center fixed;
+  background-size: cover;
+  padding-top: 80px; /* espaço para o header */
+  padding-left: 40px; /* margem esquerda */
+}
+
+/* ===========================
+   CABEÇALHO FIXO
+=========================== */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 80px;
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+header .logo img {
+  height: 55px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+header .logo img:hover {
+  transform: scale(1.05);
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  font-size: 1.05rem;
+  transition: color 0.3s ease;
+}
+
+nav ul li a:hover,
+nav ul li a.ativo {
+  color: #ffce00;
+}
+
+/* ===========================
+   FORMULÁRIO DE PRODUTO
+=========================== */
+form {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px 30px;
+  border-radius: 16px;
+  max-width: 400px;
+  margin-top: 30px;
+  flex-direction: column;
+}
+
+form h1 {
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+}
+
+label {
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"],
+select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="file"]:focus,
+select:focus {
+  border-color: #a21818;
+}
+
+/* Imagem atual do produto */
+form img {
+  display: block;
+  margin: 10px 0;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #a21818;
+}
+
+/* Botões */
+input[type="submit"],
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  font-size: 15px;
+}
+
+input[type="submit"] {
+  background: #b91c1c;
+  color: #fff;
+}
+
+input[type="submit"]:hover {
+  background: #a21818;
+}
+
+button {
+  background: #ccc;
+  color: #333;
+}
+
+button:hover {
+  background: #bbb;
+}
+
+/* Campo tamanho condicionado */
+#campo-tamanho {
+  display: none;
+}
+
+/* Mensagens */
+.erro {
+  background-color: #ffdddd;
+  color: #c00;
+  border: 1px solid #c00;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.sucesso {
+  background-color: #ddffdd;
+  color: #007a00;
+  border: 1px solid #007a00;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+/* ===========================
+   RESPONSIVO
+=========================== */
+@media (max-width: 600px) {
+  body {
+    padding: 20px 10px 0 10px;
+    align-items: center; /* centraliza em telas pequenas */
+  }
+
+  header {
+    padding: 15px 20px;
+  }
+
+  nav ul {
+    gap: 15px;
+  }
+
+  form {
+    width: 95%;
+    padding: 25px 20px;
+    margin-top: 20px;
+  }
+
+  form img {
+    margin: 10px auto;
+  }
+}

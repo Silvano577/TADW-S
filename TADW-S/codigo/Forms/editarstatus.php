@@ -24,14 +24,39 @@ if (!$pedido) {
 // Processa atualização
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $novo_status = $_POST['status'] ?? '';
-    if (in_array($novo_status, ['pendente', 'preparando', 'pronto', 'cancelado'])) {
+
+    // Verifica se o status enviado é válido
+    $status_validos = ['pendente', 'preparando', 'pronto', 'cancelado'];
+    if (in_array($novo_status, $status_validos)) {
+
+        // Atualiza o status do pedido
         $sql = "UPDATE pedido SET status = ? WHERE idpedido = ?";
         $stmt = mysqli_prepare($conexao, $sql);
         mysqli_stmt_bind_param($stmt, "si", $novo_status, $idpedido);
         mysqli_stmt_execute($stmt);
 
-        header("Location: ../Listar/listarpedido.php"); // Redireciona para lista de pedidos do ADM
+        // ==============================
+        // CRIA DELIVERY AUTOMÁTICO
+        // ==============================
+        if ($novo_status === 'pronto') {
+
+            // Verifica se já existe delivery para este pedido
+            $sqlCheck = "SELECT * FROM delivery WHERE pedido_id = ?";
+            $stmtCheck = mysqli_prepare($conexao, $sqlCheck);
+            mysqli_stmt_bind_param($stmtCheck, "i", $idpedido);
+            mysqli_stmt_execute($stmtCheck);
+            $resCheck = mysqli_stmt_get_result($stmtCheck);
+
+            if (mysqli_num_rows($resCheck) == 0) {
+                // Cria o delivery com status padrão "atribuido"
+                criar_delivery($conexao, $idpedido);
+            }
+        }
+
+        // Redireciona de volta para lista
+        header("Location: ../Listar/listarpedido.php");
         exit;
+
     } else {
         $erro = "Status inválido.";
     }
@@ -56,10 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="post">
         <label for="status">Status do Pedido:</label>
         <select name="status" id="status" required>
-            <option value="pendente" <?= $pedido['status_pedido'] === 'pendente' ? 'selected' : '' ?>>Pendente</option>
+            <option value="pendente"   <?= $pedido['status_pedido'] === 'pendente' ? 'selected' : '' ?>>Pendente</option>
             <option value="preparando" <?= $pedido['status_pedido'] === 'preparando' ? 'selected' : '' ?>>Preparando</option>
-            <option value="pronto" <?= $pedido['status_pedido'] === 'pronto' ? 'selected' : '' ?>>Pronto</option>
-            <option value="cancelado" <?= $pedido['status_pedido'] === 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
+            <option value="pronto"     <?= $pedido['status_pedido'] === 'pronto' ? 'selected' : '' ?>>Pronto</option>
+            <option value="cancelado"  <?= $pedido['status_pedido'] === 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
         </select>
 
         <div class="botoes">

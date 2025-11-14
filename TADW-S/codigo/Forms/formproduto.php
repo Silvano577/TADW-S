@@ -35,11 +35,14 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <title><?php echo $botao; ?> Produto</title>
     <script src="../js/produto.js" defer></script>
+    <script src="../js/impedir.js" defer></script>
+    <link rel="stylesheet" href="../css/prod.css">
 </head>
 <body>
-<h1><?php echo $botao; ?> Produto</h1>
+
 
 <form action="../Salvar/salvarproduto.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data">
+    <h1><?php echo $botao; ?> Produto</h1>
     <?php if ($id != 0 && !empty($foto)): ?>
         <p>Foto atual:</p>
         <img src="<?php echo $foto; ?>" width="100" alt="Foto do produto"><br><br>

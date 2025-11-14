@@ -1,0 +1,141 @@
+/* ===========================
+   RESET E BASE
+=========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* ===========================
+   FUNDO PADRÃO
+=========================== */
+body {
+    min-height: 100vh;
+    background: #b71c1c; /* Vermelho padrão sólido */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+
+    /* opcional (remove se quiser fundo totalmente liso) */
+    background-image: url("../fotosc/1.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* ===========================
+   CONTAINER PRINCIPAL
+=========================== */
+.form-container {
+    width: 450px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.25);
+    position: relative;
+    animation: formAppear 0.4s ease;
+    overflow: hidden;
+}
+
+.form-container h1 {
+    text-align: center;
+    color: #c62828;
+    margin-bottom: 25px;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+/* ===========================
+   CAMPOS DO FORMULÁRIO
+=========================== */
+label {
+    font-weight: 600;
+    color: #9a0007;
+    margin-top: 15px;
+    display: block;
+}
+
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 2px solid #ef9a9a;
+    background: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+    margin-top: 4px;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #c62828;
+    box-shadow: 0 0 8px rgba(198, 40, 40, 0.4);
+}
+
+textarea {
+    height: 150px;
+    resize: none;
+}
+
+/* ===========================
+   BOTÃO ENVIAR
+=========================== */
+.btn-enviar {
+    width: 100%;
+    padding: 14px;
+    margin-top: 22px;
+    border: none;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    background: #c62828;
+    transition: 0.25s ease;
+    box-shadow: 0 3px 10px rgba(183, 28, 28, 0.4);
+}
+
+.btn-enviar:hover {
+    background: #8e0000;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(130, 0, 0, 0.45);
+}
+
+/* ===========================
+   BOTÃO VOLTAR
+=========================== */
+.voltar {
+    display: block;
+    text-align: center;
+    margin-top: 18px;
+    color: #7f0000;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.voltar:hover {
+    color: #4a0000;
+    text-decoration: underline;
+}
+
+/* ===========================
+   ANIMAÇÃO
+=========================== */
+@keyframes formAppear {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
