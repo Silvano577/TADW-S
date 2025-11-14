@@ -3,11 +3,13 @@ session_start();
 require_once "conexao.php";
 require_once "funcao.php";
 
+// Verifica login
 if (empty($_SESSION['logado']) || $_SESSION['logado'] !== 'sim') {
     header("Location: login.php");
     exit;
 }
 
+// Obtém cliente logado
 $usuario_id = $_SESSION['idusuario'] ?? 0;
 $cliente = buscar_cliente_por_usuario($conexao, $usuario_id);
 $idcliente = $cliente['idcliente'] ?? 0;
@@ -19,7 +21,7 @@ if (!$idcliente) {
 // Buscar itens do carrinho
 $carrinho = buscar_carrinho($conexao, $idcliente);
 
-// Calcular total geral
+// Calcula total geral
 $total_geral = 0;
 foreach ($carrinho as $item) {
     $total_geral += $item['preco'] * $item['quantidade'];
@@ -32,6 +34,7 @@ foreach ($carrinho as $item) {
     <meta charset="UTF-8">
     <title>Seu Carrinho</title>
     <link rel="stylesheet" href="./css/car.css">
+
 </head>
 <body>
 
@@ -47,26 +50,27 @@ foreach ($carrinho as $item) {
             <th>Produto</th>
             <th>Preço</th>
             <th>Quantidade</th>
-            <th>Total</th>
+            <th>Subtotal</th>
             <th>Ação</th>
         </tr>
 
-        <?php foreach ($carrinho as $item): 
+        <?php foreach ($carrinho as $item):
             $subtotal = $item['preco'] * $item['quantidade'];
         ?>
         <tr data-idcarrinho="<?= $item['idcarrinho'] ?>" data-preco="<?= $item['preco'] ?>">
-            <td><img src="<?= htmlspecialchars($item['foto']) ?>" alt="" width="50"></td>
-            <td><?= htmlspecialchars($item['nome_produto'] ?? '') ?></td>
-
+            <td><img src="<?= htmlspecialchars($item['foto']) ?>" alt=""></td>
+            <td><?= htmlspecialchars($item['nome_produto']) ?></td>
             <td>R$ <?= number_format($item['preco'], 2, ',', '.') ?></td>
             <td>
-
-                <span class="quantidade"><?= $item['quantidade'] ?></span>
-
+                <div class="quantidade-container">
+                    <button class="btn-quantidade btn-diminuir">−</button>
+                    <span class="quantidade"><?= $item['quantidade'] ?></span>
+                    <button class="btn-quantidade btn-aumentar">+</button>
+                </div>
             </td>
             <td class="subtotal">R$ <?= number_format($subtotal, 2, ',', '.') ?></td>
             <td>
-                <button class="btn btn-remover">Remover</button>
+                <button class="btn-remover">Remover</button>
             </td>
         </tr>
         <?php endforeach; ?>

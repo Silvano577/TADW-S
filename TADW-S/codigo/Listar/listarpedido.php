@@ -124,7 +124,7 @@ $pedidos = mysqli_fetch_all($res, MYSQLI_ASSOC);
             <div class="acoes">
 
 
-                <a class="btn-editar" href="./Forms/editarstatus.php?id=<?= $pedido['idpedido'] ?>">Editar</a>
+                <a class="btn-editar" href="../Forms/editarstatus.php?id=<?= $pedido['idpedido'] ?>">Editar</a>
 
                 <a class="btn-excluir"
                    onclick="return confirm('Deseja realmente excluir este pedido?');"
